@@ -59,7 +59,7 @@ a {
     box-sizing: border-box;
     margin: 0 auto;
     clear: both;
-    width: 80%;
+    width: 90%;
 }
 
     .columns:after /* clearfix */ {
@@ -97,16 +97,24 @@ a {
 .width75 {
     width: 75%;
 }
+
 .width25 {
     width: 25%;
 }
 
 .landCols {
+    margin-bottom: 0;
+    padding-bottom: 0;
 }
 
-    .landCols .col:nth-child(2) {
-        text-align: right;
+    .landCols .col {
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
+
+        .landCols .col:nth-child(2) {
+            text-align: right;
+        }
 
 .icon-lg {
     height: 40px;
@@ -129,9 +137,17 @@ a {
 }
 
     #header h1 {
+        float: left;
         font-weight: normal;
         margin-top: 0;
         margin-bottom: 0;
+       
+    }
+
+    #header #ruler {
+        font-size: 75%;
+        color: #666;
+        margin-left: 2em;
     }
 
     #header.condensed {
@@ -543,18 +559,21 @@ button {
 #logTable {
     width: 100%;
 }
-#logTable td {
-    padding-right: 10px;
-    vertical-align: top;
-}
+
+    #logTable td {
+        padding-right: 10px;
+        vertical-align: top;
+    }
+
 #syslogTable td {
     padding-right: 20px;
     vertical-align: top;
 }
+/*
 #graveTotal {
     display: none;
 }
-
+*/
 
 #achievements {
 }
@@ -753,7 +772,7 @@ button {
 
 
 .bar {
-    margin: 1em 0;
+    margin: 1px 0;
     height: 1em;
     border: solid 1px rgba(0,0,0,0.2);
 }
@@ -773,6 +792,8 @@ button {
 
 #landBar > div {
     background-color: #aca;
+    margin-top: 0;
+    padding-top: 0;
 }
 
 #progressContainer {
