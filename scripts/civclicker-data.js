@@ -629,7 +629,7 @@ function getCivData () {
             effectText: "Protect from attack"
         }),
     new Unit({ 
-        id: "totalSick", singular: "sick citizens", plural: "sick citizens",
+        id: "totalSick", singular: "sick citizen", plural: "sick citizens",
         //subType: "special", // it's not special! it's still player it still needs food, it still counts towards population
 		prereqs: undefined,  // Hide until we get one.
 		require: undefined,  // Cannot be purchased.
