@@ -234,12 +234,6 @@ function updateResourceTotals() {
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
 }
 
-function isUnderAttack() {
-    return (curCiv.wolf.owned > 0) ||
-        (curCiv.bandit.owned > 0) ||
-        (curCiv.barbarian.owned > 0) ||
-        (curCiv.invader.owned > 0);
-}
 
 //Update page with numbers
 function updatePopulation(calc) {
