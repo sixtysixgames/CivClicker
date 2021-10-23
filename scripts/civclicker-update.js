@@ -123,7 +123,9 @@ function updatePurchaseRow(purchaseObj) {
     if (purchaseObj.hasVariableCost()) { updateRequirements(purchaseObj); }
 
     // Already having one reveals it as though we met the prereq.
-    var havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs);
+    // freeLand added to stop annoying UI jump
+    var havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == "freeLand";
+    //|| (purchaseObj.id == "freeLand" && purchaseObj.owned == 0)
 
     // Special check: Hide one-shot upgrades after purchase; they're
     // redisplayed elsewhere.
@@ -201,7 +203,8 @@ function updateResourceTotals() {
         else if (val > 0) { elem.style.color = "#0b0"; }
         else { elem.style.color = "#000"; }
 
-        elem.innerHTML = ((val < 0) ? "" : "+") + prettify(val.toFixed(2));
+        elem.innerHTML = ((val <= 0) ? "" : "+") + prettify(val.toFixed(1));
+        // val.toFixed(2)
     }
 
 
