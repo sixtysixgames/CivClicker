@@ -1,3 +1,5 @@
+"use strict";
+
 function createUIComponents() {
     return {
         raidRow: (elem) => {
