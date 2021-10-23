@@ -1,3 +1,4 @@
+"use strict";
 
 function VersionData(major,minor,sub,mod) {
 	this.major = major;
@@ -17,7 +18,7 @@ function CivObj(props, asProto)
 	//xxx Should these just be taken off the prototype's property names?
 	var names = asProto ? null : [
 		"id","name","subType","owned","prereqs","require","salable","vulnerable","effectText"
-		,"prestige","initOwned","init","reset","limit","hasVariableCost"
+		,"prestige","initOwned","init","reset","limit","hasVariableCost","tradeAmount","baseTradeAmount","initTradeAmount"
 	];
 	Object.call(this,props);
 	copyProps(this,props,names,true);
@@ -44,13 +45,13 @@ CivObj.prototype = {
 		if (fullInit === undefined) { fullInit = true; }
 		if (fullInit || !this.prestige)  { 
 			this.data = {};
-			if (this.initOwned !== undefined) { this.owned = this.initOwned; }
+            if (this.initOwned !== undefined) { this.owned = this.initOwned; }
 		} 
 		return true; 
 	},
 	reset: function() { return this.init(false); }, // Default reset behavior is to re-init non-prestige items.
 	get limit() { return (typeof this.initOwned == "number" ) ? Infinity // Default is no limit for numbers
-					   : (typeof this.initOwned == "boolean") ? true : 0; }, // true (1) for booleans, 0 otherwise.
+                   : (typeof this.initOwned == "boolean") ? true : 0; }, // true (1) for booleans, 0 otherwise.
 	set limit(value) { return this.limit; }, // Only here for JSLint.
 	//xxx This is a hack; it assumes that any CivObj with a getter for its
 	// 'require' has a variable cost.  Which is currently true, but might not
@@ -74,7 +75,8 @@ CivObj.prototype = {
 		if (qty === 1 && this.singular) { return this.singular; }
 		if (typeof qty == "number" && this.plural) { return this.plural; }
 		return this.name || this.singular || "(UNNAMED)";
-	}
+    }
+
 };
 
 function Resource(props) // props is an object containing the desired properties.
@@ -100,7 +102,10 @@ Resource.prototype = new CivObj({
 	increment: 0,
 	specialChance: 0,
 	specialMaterial: "",
-	activity: "gathering" //I18N
+    activity: "gathering", //I18N
+    // for variable trading costs
+    get tradeAmount() { return this.data.tradeAmount; },
+    set tradeAmount(value) { this.data.tradeAmount = value; }
 },true);
 
 function Building(props) // props is an object containing the desired properties.
@@ -149,7 +154,7 @@ function Unit(props) // props is an object containing the desired properties.
 	CivObj.call(this,props);
 	copyProps(this,props,null,true);
 	// Occasional Properties: singular, plural, subType, prereqs, require, effectText, alignment,
-	// source, efficiency_base, efficiency, onWin, lootFatigue, killFatigue, killExhaustion, species
+	// source, efficiency_base, efficiency, onWin, lootFatigue, sackFatigue, killFatigue, killExhaustion, species
 	// place, ill
 	return this;
 }
@@ -231,7 +236,7 @@ Unit.prototype = new CivObj({
 	},
 	get limit() { 
 		return (this.isDest()) ? civData[this.source].limit 
-											 : Object.getOwnPropertyDescriptor(CivObj.prototype,"limit").get.call(this); 
+	            : Object.getOwnPropertyDescriptor(CivObj.prototype,"limit").get.call(this); 
 	},
 	set limit(value) { 
 		return this.limit; 
