@@ -1094,15 +1094,15 @@ function doHomeless() {
     if (population.living > population.limit) {
         // we have homeless, let some die of exposure
         var numHomeless = population.living - population.limit;
-        if (numHomeless * Math.random() < numHomeless * 0.1) {
-            // kill off up to 1% of homeless
-            var numDie = starve(Math.ceil(Math.random() * numHomeless / 100));
-            if (numDie == 1) {
-                gameLog("A homeless citizen died of exposure");
-            } else if (numDie > 1) {
-                gameLog(prettify(numDie) + " homeless citizens died of exposure");
-            }
+        //if (numHomeless * Math.random() < numHomeless * 0.1) {
+        // kill off up to 1% of homeless
+        var numDie = starve(Math.ceil(Math.random() * numHomeless / 100));
+        if (numDie == 1) {
+            gameLog("A homeless citizen died of exposure");
+        } else if (numDie > 1) {
+            gameLog(prettify(numDie) + " homeless citizens died of exposure");
         }
+        //}
     }
 }
 
@@ -2158,7 +2158,7 @@ function doPlague() {
             gameLog("A sick " + lastVictim + " died of the plague.");
         }
         else if (died > 1) {
-            gameLog(died + " sick citizens died of the plague.");
+            gameLog(prettify(died) + " sick citizens died of the plague.");
         }
         calculatePopulation();
         return true;
@@ -2181,7 +2181,7 @@ function doPlague() {
             gameLog("A sick " + lastJob + " recovered from the plague.");
         }
         else if (survived > 1) {
-            gameLog(survived + " sick citizens recovered from the plague.");
+            gameLog(prettify(survived) + " sick citizens recovered from the plague.");
         }
         calculatePopulation();
         return true;
@@ -2198,14 +2198,12 @@ function doPlague() {
         // Infect up to 0.1% of the healthy population.
         var infected = Math.floor(population.healthy / 1000 * Math.random()) + 1;
 
-        //spreadPlague(1);
-        //gameLog("The sickness spreads to a new citizen.");
         var num = spreadPlague(infected);
         if (num == 1) {
             gameLog("The plague spreads to a new citizen.");
         }
         else {
-            gameLog("The plague spreads to " + num + " new citizens.");
+            gameLog("The plague spreads to " + prettify(num) + " new citizens.");
         }
         return true;
     }
@@ -2272,9 +2270,9 @@ function doCorpses() {
             calculatePopulation();
             //notify player
             if (infected == 1) {
-                gameLog("A citizen caught the plague"); 
+                gameLog("A citizen caught the plague");
             } else {
-                gameLog(prettify(infected) + " citizens caught the plague"); 
+                gameLog(prettify(infected) + " citizens caught the plague");
             }
         }
     }
@@ -2282,7 +2280,17 @@ function doCorpses() {
     // Corpses have a 50-50 chance of decaying (at least there is a bright side)
     if (Math.random() < 0.5) {
         //civData.corpses.owned -= 1;
-        civData.corpses.owned -= 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
+        var gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
+        civData.corpses.owned -= gone;
+        var corpse = " corpse" + ((gone > 1) ? "s" : "");
+        var action = " rotted away";
+        if (Math.random() < 0.33) {
+            action = " eaten by vermin";
+        } else if (Math.random() < 0.66) {
+            action = " devoured by scavengers";
+        }
+
+        gameLog(prettify(gone) + corpse + action);
     }
     if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 }
@@ -2335,25 +2343,37 @@ function doFight(attacker, defender) {
 }
 
 function doWolves(attacker) {
-    doSlaughter(attacker);
+    // eat corpses first
+    if (civData.corpses.owned > 0) {
+        var gone = Math.ceil((Math.random() * attacker.owned / 100));
+        civData.corpses.owned -= gone;
+        attacker.owned -= gone; // wolves leave after eating
+        // just in case
+        if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
+
+        gameLog(prettify(gone) + " rotting corpses devoured by wolves");
+
+    } else {
+        doSlaughter(attacker);
+    }
 }
 function doBandits(attacker) {
     // bandits mainly loot
     var r = Math.random();
     if (r < 0.1) { doSlaughter(attacker); }
     else if (r < 0.2) { doSack(attacker); }
-    else { doLoot(attacker);}
+    else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
     //barbarians mainly kill, steal and destroy
-    var r = Math.random(); 
+    var r = Math.random();
     if (r < 0.3) { doSlaughter(attacker); }
     else if (r < 0.6) { doLoot(attacker); }
     else if (r < 0.9) { doSack(attacker); }
-    else { doConquer(attacker);}
+    else { doConquer(attacker); }
 }
 function doInvaders(attacker) {
-    var r = Math.random(); 
+    var r = Math.random();
     if (r < 0.25) { doSlaughterMulti(attacker); }
     else if (r < 0.5) { doLoot(attacker); }
     else if (r < 0.75) { doSackMulti(attacker); }
@@ -2389,25 +2409,28 @@ function doSlaughter(attacker) {
         attacker.owned -= leaving;
     }
     calculatePopulation();
+    if (attacker.owned < 0) { attacker.owned = 0; }
 }
 function doSlaughterMulti(attacker) {
     //var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
 
     // kill up to 1% of attacking force
-    var kills = Math.ceil(Math.random() * attacker.owned * 0.01);
-    for (var k = 1; k <= kills; k++) {
+    var targets = Math.ceil(Math.random() * attacker.owned * 0.01);
+    var kills = 0;
+    for (var k = 1; k <= targets; k++) {
         //var target = randomHealthyWorker(); //Choose random worker
         // sick people get killed as well
         var target = randomWorker(); //Choose random worker
-        
+
         var targetUnit = civData[target];
         if (target) {
-            //sysLog(targetUnit.id);
+
             if (targetUnit.owned >= 1) {
                 // An attacker may disappear after killing
                 if (Math.random() < attacker.killExhaustion) { --attacker.owned; }
 
                 targetUnit.owned -= 1;
+                kills++;
                 // Animals will eat the corpse
                 if (attacker.species != "animal") {
                     civData.corpses.owned += 1;
@@ -2423,9 +2446,12 @@ function doSlaughterMulti(attacker) {
             attacker.owned -= leaving;
         }
     }
-    var killVerb = (kills == 1) ? " citizen slaughtered by " : " citizens slaughtered by ";
-    gameLog(kills + killVerb + attacker.getQtyName(2)); // always use plural attacker
-    calculatePopulation();
+    if (kills > 0) {
+        var killVerb = (kills == 1) ? " citizen murdered by " : " citizens slaughtered by ";
+        gameLog(prettify(kills) + killVerb + attacker.getQtyName(2)); // always use plural attacker
+        calculatePopulation();
+    }
+    if (attacker.owned < 0) { attacker.owned = 0; }
 }
 
 // rob
@@ -2438,8 +2464,7 @@ function doLoot(attacker) {
     stolenQty = Math.min(stolenQty, Math.floor(target.owned));
     // prettify(val.toFixed(1)
     if (stolenQty > 0) {
-        gameLog(stolenQty + " " + target.getQtyName(stolenQty)
-            + " stolen by " + attacker.getQtyName(attacker.owned));
+        gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(attacker.owned));
     }
     target.owned -= stolenQty;
     if (target.owned <= 0) {
@@ -2465,49 +2490,89 @@ function doSack(attacker) {
         --target.owned;
         ++civData.freeLand.owned;
 
+        if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after sacking something.
+        updateRequirements(target);
+        updateResourceTotals();
+        calculatePopulation(); // Limits might change
+
         gameLog(target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
     } else {
         //some will leave
         var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
+    
+    if (attacker.owned < 0) { attacker.owned = 0; }
 
-    if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after sacking something.
-    updateRequirements(target);
-    updateResourceTotals();
-    calculatePopulation(); // Limits might change
 }
 function doSackMulti(attacker) {
     //Destroy buildings
-    var target = sackable[Math.floor(Math.random() * sackable.length)];
 
-    if (target.owned > 0) {
-        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
-        // Slightly different phrasing for fortifications
-        if (target == civData.fortification) { destroyVerb = "damaged"; }
+    // sack up to 1% of attacking force
+    var targets = Math.ceil(Math.random() * attacker.owned * 0.01);
+    var sacks = 0;
+    for (var s = 1; s <= targets; s++) {
+        var target = sackable[Math.floor(Math.random() * sackable.length)];
 
-        // sack up to 1% of attacking force
-        var sacked = Math.ceil(Math.random() * attacker.owned * 0.01);
-        // can't sack more than we own
-        sacked = Math.min(target.owned, sacked);
-        if (sacked > 0) {
-            target.owned -= sacked;
-            civData.freeLand.owned += sacked;
+        if (target.owned > 0) {
 
-            gameLog(sacked + " " + target.getQtyName(sacked) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
-            // Attackers leave after sacking something.
-            attacker.owned -= sacked;
+            --target.owned;
+            ++civData.freeLand.owned;
+            sacks++;
+
+            if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after sacking something.
+            updateRequirements(target);
+
+        } else {
+            //some will leave
+            var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
+            attacker.owned -= leaving;
         }
-    } else {
-        //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
-        attacker.owned -= leaving;
+        if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after sacking something.
+        updateRequirements(target);
+        
     }
 
-    if (attacker.owned < 0) { attacker.owned = 0; } 
-    updateRequirements(target);
-    updateResourceTotals();
-    calculatePopulation(); // Limits might change
+    if (sacks > 0) {
+        var destroyVerb = (sacks == 1) ? " building burned by " : " buildings destroyed by ";
+        gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
+        updateResourceTotals();
+        calculatePopulation(); // Limits might change
+    }
+
+    if (attacker.owned < 0) { attacker.owned = 0; }
+
+    /////////
+    //var target = sackable[Math.floor(Math.random() * sackable.length)];
+
+    //if (target.owned > 0) {
+    //    var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+    //    // Slightly different phrasing for fortifications
+    //    if (target == civData.fortification) { destroyVerb = "damaged"; }
+
+    //    // sack up to 1% of attacking force or target, whichever is smaller sp all building aren't wiped out in one raid
+    //    var targets = Math.min(attacker.owned, target.owned);
+    //    var sacked = Math.ceil(Math.random() * targets * 0.01);
+    //    // can't sack more than we own
+    //    sacked = Math.min(target.owned, sacked);
+    //    if (sacked > 0) {
+    //        target.owned -= sacked;
+    //        civData.freeLand.owned += sacked;
+
+    //        gameLog(prettify(sacked) + " " + target.getQtyName(sacked) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
+    //        // Attackers leave after sacking something.
+    //        attacker.owned -= sacked;
+    //    }
+    //} else {
+    //    //some will leave
+    //    var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
+    //    attacker.owned -= leaving;
+    //}
+
+    //if (attacker.owned < 0) { attacker.owned = 0; }
+    //updateRequirements(target);
+    //updateResourceTotals();
+    //calculatePopulation(); // Limits might change
 }
 // barbarians
 //function doHavoc(attacker) {
@@ -2523,12 +2588,13 @@ function doConquer(attacker) {
     // conquer some freeland
 
     if (civData.freeLand.owned > 0) {
-        // random 10% of attacking force - this might need adjusting
-        var land = Math.ceil(Math.random() * attacker.owned * 0.1);
+        // random 10% of attacking force or land - this might need adjusting
+        var targets = Math.min(attacker.owned, civData.freeLand.owned);
+        var land = Math.ceil(Math.random() * targets * 0.1);
         land = Math.min(civData.freeLand.owned, land);
         if (land > 0) {
             civData.freeLand.owned -= land;
-            gameLog(land + " land conquered by " + attacker.getQtyName(attacker.owned));
+            gameLog(prettify(land) + " land conquered by " + attacker.getQtyName(attacker.owned));
             // Attackers leave after conquering land.
             attacker.owned -= land;
             //if (--attacker.owned < 0) { attacker.owned = 0; } 
