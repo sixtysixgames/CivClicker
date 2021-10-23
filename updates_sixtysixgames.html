@@ -1,86 +1,95 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
-<head>
-    <title>CivClicker Updates</title>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-</head>
-<body>
-<h1>CivClicker Updates</h1>
-    <h2>2021-07-21 v1.4.3 (alpha)</h2>
-    <p>Change requirements for temple and cleric</p>
-    <p>Calculate ill and healthy correctly</p>
-    <p>Check for totalSick in doPlague and return if none</p>
-    <p>Plague kills a random number of citizens</p>
-    <p>Plague spreads to a random number of citizens</p>
-    <p>Only healthy citizens catch plague</p>
-    <p>A random number of corpses will decay</p>
+    <head>
+        <title>CivClicker Updates</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    </head>
+    <body>
+        <h1>CivClicker Updates</h1>
+        
+        <h2>2021-07-22 v1.4.3 (alpha)</h2>
+        <p>Moved landBar above tabs because land is also used up by altars</p>
+        <p>Added function to update trade amounts</p>
+        <p>Prettify resources to 2 decimal places</p>
+        <p>Add userTraded flag to trader object to indicate if user bought something</p>
+        <p>Lose piety for having temples but no clerics</p>
+        <p>Some citizens randomly recover from plague</p>
+        
+        <h2>2021-07-21 v1.4.3 (alpha)</h2>
+        <p>Change requirements for temple and cleric</p>
+        <p>Calculate ill and healthy correctly</p>
+        <p>Check for totalSick in doPlague and return if none</p>
+        <p>Plague kills a random number of citizens</p>
+        <p>Plague spreads to a random number of citizens</p>
+        <p>Only healthy citizens catch plague</p>
+        <p>A random number of corpses will decay</p>
 
-    <h2>2021-07-20 v1.4.3 (alpha)</h2>
-    <p>Changed requirements for Buildings: tannery, smithy, apothecary, temple</p>
-    <p>Added requirements for Units: tanner, blacksmith, healer, cleric</p>
-    <p>Added specific functions for enemy units onWin method</p>
-    <p>Fiddled with fatigue numbers</p>
-    <p>Rearrange jobList for starveTarget</p>
-    <p>Added method to randomly kill off any homeless.  Homeless occur when the population is greater than the total supported by dwellings</p>
-    <p>Added specific functions for enemy units</p>
-    <p>Added method for slaughtering multiple citizens</p>
-    <p>Added method for sacking multiple buildings</p>
-    <p>Added method for attackers to conquer free land</p>
-    <p>Added the doHomeless method to the main game loop</p>
-    
-    <h2>2021-07-15 v1.4.3 (alpha)</h2>
-    <p>Include new script files</p>
-    <p>Added new spans for resource costs</p>
-    <p>Added "use strict" directive</p>
-    <p>Added new names to CivObj prototype</p>
-    <p>Added new methods for tradeAmount</p>
-    <p>Added tradeAmount properties</p>
-    <p>Changed piety requirement for altars</p>
-    <p>Removed subtype: special from totalSick because they weren't being included in the living population count</p>
-    <p>Fiddled with fatigue numbers for Barbarians and Invaders</p>
-    <p>Added new method to detect if under attack</p>
-    <p>Method to set initial trade price</p>
-    <p>Changed the number that starve to be random 1% of living</p>
-    <p>Remembered to smite the Invaders</p>
-    <p>Moved all trade functions to new file</p>
-    <p>Moved all migrate functions to new file</p>
-    <p>Update the trade buttons as needed</p>
-    <p>New method to get total number by job type</p>
-    <p>Steal a random amount of resources</p>
-    <p>Use sackFatigue property of mob</p>
-    <p>Improved dismissWorkers function</p>
-    <p>Improved doMobs function</p>
-    <p>Moved all UI functions to new file</p>
-    <p>Call dismissWorkers in main game loop</p>
-    
-    <h2>2021-07-08 v1.4.1 (alpha)</h2>
-    <p>Include player name in head title</p>
-    <p>Made cols style wider</p>
-    <p>Removed padding and margin on landBar</p>
-    <p>Moved totalSick to end of player units to stop the annoying UI jump</p>
-    <p>Added new enemy unit: Invader</p>
-    <p>Added alert on population tab when under attack</p>
-    <p>Added some sysLog messages</p>
-    <p>Added Town and City.  Changed Metropolis to City State</p>
-    <p>Added enum for mobTypes</p>
-    <p>Added some sysLog messages</p>
-    <p>Added some gameLog messages</p>
-    <p>Land plundered now a random amount</p>
-    <p>Added method to dismiss workers when a building is destroyed.  Otherwise we could have, for example, tanners but no tanneries.</p>
-    <p>Added method for Invaders</p>
-    <p>Change doMobs method so that wolves do not attack large settlements and Invaders do not attack small ones.</p>
-    <p>Code to handle new buttons' display</p>
-    <p>New sysLog method for system events e.g. autosave</p>
-    
-    <h2>2021-07-05</h2>
-    <p>Rearranged index page</p>
-    <p>Added 10k and 100k buttons</p>
-    <p>Added Population tab.</p>
-    <p>Added System Events tab.</p>
-    <p>Added Settings tab</p>
-    <p>Split the Events list into system events and game events</p>
-    <p>Added new styles for columns, new buttons, syslogtable</p>
-    <p>Added update code for new 10k and 100k buttons</p>
-    <p>Change colour of landBar if getting close to full</p>
-</body>
+        <h2>2021-07-20 v1.4.3 (alpha)</h2>
+        <p>Changed requirements for Buildings: tannery, smithy, apothecary, temple</p>
+        <p>Added requirements for Units: tanner, blacksmith, healer, cleric</p>
+        <p>Added specific functions for enemy units onWin method</p>
+        <p>Fiddled with fatigue numbers</p>
+        <p>Rearrange jobList for starveTarget</p>
+        <p>Added method to randomly kill off any homeless.  Homeless occur when the population is greater than the total supported by dwellings</p>
+        <p>Added specific functions for enemy units</p>
+        <p>Added method for slaughtering multiple citizens</p>
+        <p>Added method for sacking multiple buildings</p>
+        <p>Added method for attackers to conquer free land</p>
+        <p>Added the doHomeless method to the main game loop</p>
+
+        <h2>2021-07-15 v1.4.3 (alpha)</h2>
+        <p>Include new script files</p>
+        <p>Added new spans for resource costs</p>
+        <p>Added "use strict" directive</p>
+        <p>Added new names to CivObj prototype</p>
+        <p>Added new methods for tradeAmount</p>
+        <p>Added tradeAmount properties</p>
+        <p>Changed piety requirement for altars</p>
+        <p>Removed subtype: special from totalSick because they weren't being included in the living population count</p>
+        <p>Fiddled with fatigue numbers for Barbarians and Invaders</p>
+        <p>Added new method to detect if under attack</p>
+        <p>Method to set initial trade price</p>
+        <p>Changed the number that starve to be random 1% of living</p>
+        <p>Remembered to smite the Invaders</p>
+        <p>Moved all trade functions to new file</p>
+        <p>Moved all migrate functions to new file</p>
+        <p>Update the trade buttons as needed</p>
+        <p>New method to get total number by job type</p>
+        <p>Steal a random amount of resources</p>
+        <p>Use sackFatigue property of mob</p>
+        <p>Improved dismissWorkers function</p>
+        <p>Improved doMobs function</p>
+        <p>Moved all UI functions to new file</p>
+        <p>Call dismissWorkers in main game loop</p>
+
+        <h2>2021-07-08 v1.4.1 (alpha)</h2>
+        <p>Include player name in head title</p>
+        <p>Made cols style wider</p>
+        <p>Removed padding and margin on landBar</p>
+        <p>Moved totalSick to end of player units to stop the annoying UI jump</p>
+        <p>Added new enemy unit: Invader</p>
+        <p>Added alert on population tab when under attack</p>
+        <p>Added some sysLog messages</p>
+        <p>Added Town and City.  Changed Metropolis to City State</p>
+        <p>Added enum for mobTypes</p>
+        <p>Added some sysLog messages</p>
+        <p>Added some gameLog messages</p>
+        <p>Land plundered now a random amount</p>
+        <p>Added method to dismiss workers when a building is destroyed.  Otherwise we could have, for example, tanners but no tanneries.</p>
+        <p>Added method for Invaders</p>
+        <p>Change doMobs method so that wolves do not attack large settlements and Invaders do not attack small ones.</p>
+        <p>Code to handle new buttons' display</p>
+        <p>New sysLog method for system events e.g. autosave</p>
+
+        <h2>2021-07-05</h2>
+        <p>Rearranged index page</p>
+        <p>Added 10k and 100k buttons</p>
+        <p>Added Population tab.</p>
+        <p>Added System Events tab.</p>
+        <p>Added Settings tab</p>
+        <p>Split the Events list into system events and game events</p>
+        <p>Added new styles for columns, new buttons, syslogtable</p>
+        <p>Added update code for new 10k and 100k buttons</p>
+        <p>Change colour of landBar if getting close to full</p>
+    </body>
 </html>
