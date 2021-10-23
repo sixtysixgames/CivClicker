@@ -129,24 +129,21 @@
                                 <td></td>
                                 <td></td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <img src="images/smitten.png" class="icon icon-lg" alt="Happiness" />
-                                    <label>Happiness:</label>
-                                </td>
-                                <td colspan="3" id="morale">
-                                    <ol class="happinessRanks">
-                                        <li>Blissful</li>
-                                        <li>Happy</li>
-                                        <li>Content</li>
-                                        <li>Unhappy</li>
-                                        <li>Angry</li>
-                                    </ol>
-                                </td>
-                            </tr>
+
                         </tbody>
                     </table>
                 </div>
+            </div>
+            <div class="landCols cols">
+                <div class="col">
+                    Total Buildings: <span id="totalBuildings">...</span><!--<br />-->
+                </div>
+                <div class="col">
+                    Total Land: <span id="totalLand">...</span><!--<br />-->
+                </div>
+            </div>
+            <div id="landBar" class="bar" title="Land usage">
+                <!-- populated by javascript -->
             </div>
         </div>
         <div id="rightColumn" class="column right">
@@ -245,20 +242,25 @@
                                 </div>
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                <img src="images/smitten.png" class="icon icon-lg" alt="Happiness" />
+                                <label>Happiness:</label>
+                            </td>
+                            <td colspan="5" id="morale">
+                                <ol class="happinessRanks">
+                                    <li>Blissful</li>
+                                    <li>Happy</li>
+                                    <li>Content</li>
+                                    <li>Unhappy</li>
+                                    <li>Angry</li>
+                                </ol>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="landCols cols">
-                <div class="col">
-                    Total Buildings: <span id="totalBuildings">...</span><!--<br />-->
-                </div>
-                <div class="col">
-                    Total Land: <span id="totalLand">...</span><!--<br />-->
-                </div>
-            </div>
-            <div id="landBar" class="bar" title="Land usage">
-                <!-- populated by javascript -->
-            </div>
+            
         </div>
         <div id="leftColumn75" class="column left width75">
             <div id="panesSelectors" class="civSection">
