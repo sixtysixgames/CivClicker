@@ -527,7 +527,7 @@ function getResourceRowText(purchaseObj) {
         + '</td>'
         + '<td class="number mainNumber"><span data-action="display">.</span></td>'
         + '<td class="number maxNumber">/ max: <span id="max' + objId + '">...</span></td>'
-        + '<td class="number net"><span data-action="displayNet">..</span>/s</td>'
+        + '<td class="number net"><span data-action="displayNet">..</span><span class="perSecond">/s</span></td>'
         + '</tr>'
     );
     return s;
@@ -1077,7 +1077,7 @@ function doStarve() {
     if (civData.food.owned < 0) { // starve if there's not enough food.
         //xxx This is very kind.  Only 0.1% deaths no matter how big the shortage?
         //numberStarve = starve(Math.ceil(population.living / 1000));
-        //xxx This is very kind.  Only 1.0% deaths no matter how big the shortage?
+        //Only 1.0% deaths no matter how big the shortage?
         numberStarve = starve(Math.ceil(Math.random() * population.living / 100));
         if (numberStarve == 1) {
             gameLog("A citizen starved to death");
@@ -1094,12 +1094,14 @@ function doHomeless() {
     if (population.living > population.limit) {
         // we have homeless, let some die of exposure
         var numHomeless = population.living - population.limit;
-        // kill off up to 10% of homeless
-        var numDie = starve(Math.ceil(Math.random() * numHomeless / 10));
-        if (numDie == 1) {
-            gameLog("A citizen died of exposure");
-        } else if (numDie > 1) {
-            gameLog(prettify(numDie) + " citizens died of exposure");
+        if (numHomeless * Math.random() < numHomeless * 0.1) {
+            // kill off up to 1% of homeless
+            var numDie = starve(Math.ceil(Math.random() * numHomeless / 100));
+            if (numDie == 1) {
+                gameLog("A homeless citizen died of exposure");
+            } else if (numDie > 1) {
+                gameLog(prettify(numDie) + " homeless citizens died of exposure");
+            }
         }
     }
 }
@@ -1205,7 +1207,17 @@ function randomHealthyWorker() {
 
     return "";
 }
+function randomWorker() {
+    var num = Math.random() * population.living;
+    var chance = 0;
+    var i;
+    for (i = 0; i < killable.length; ++i) {
+        chance += civData[killable[i].id].owned;
+        if (chance > num) { return killable[i].id; }
+    }
 
+    return "";
+}
 //Selects a random worker, kills them, and then adds a random resource
 //xxx This should probably scale based on population (and maybe devotion).
 function wickerman() {
@@ -2141,12 +2153,12 @@ function doPlague() {
                 died++;
             }
         }
-        sysLog("died=" + died);
+
         if (died == 1) {
-            gameLog("A sick " + lastVictim + " died of plague.");
+            gameLog("A sick " + lastVictim + " died of the plague.");
         }
         else if (died > 1) {
-            gameLog(died + " sick citizens died of plague.");
+            gameLog(died + " sick citizens died of the plague.");
         }
         calculatePopulation();
         return true;
@@ -2166,10 +2178,10 @@ function doPlague() {
             }
         }
         if (survived == 1) {
-            gameLog("A sick " + lastJob + " survived the plague.");
+            gameLog("A sick " + lastJob + " recovered from the plague.");
         }
         else if (survived > 1) {
-            gameLog(survived + " sick citizens survived the plague.");
+            gameLog(survived + " sick citizens recovered from the plague.");
         }
         calculatePopulation();
         return true;
@@ -2232,8 +2244,6 @@ function doCorpses() {
     // why 7?  Because after about 7 days corpses start decaying
     if (civData.corpses.owned <= civData.cleric.owned * 7) { return; }
 
-
-
     // Corpses lying around will occasionally make people sick.
     // 1-in-50 chance (1-in-100 with feast)
     //sickChance = 50 * Math.random() * (1 + civData.feast.owned);
@@ -2241,15 +2251,20 @@ function doCorpses() {
 
     // more corpses should mean more chance of disease
     // TODO: sort this out, it's happening too frequently, - or is it? if there are no clerics to bury the dead
-    sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
-    var test = civData.corpses.owned * Math.random();
+    //sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
+    //var test = civData.corpses.owned * Math.random();
 
-    if (sickChance >= test) { return; }
+    sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
+    var test = population.healthy * 0.1 * Math.random();
 
-    // Infect up to 0.1% of the healthy population.
-    if (population.healthy > 0) {
-        //infected = Math.floor(population.living / 100 * Math.random());
-        infected = Math.floor(population.healthy / 10000 * Math.random());
+    // if corpses owned is greater than 10% of population, then chance of sickness spreading
+    //sysLog(sickChance < test);
+    if (sickChance < test) { return; }
+
+    // Infect up to 0.01% of the healthy population.
+    // if there are sick already, then see doPlague()
+    if (population.healthy > 0 && population.totalSick == 0) {
+        infected = Math.floor(population.healthy / 1000 * Math.random());
         if (infected <= 0) { return; }
 
         infected = spreadPlague(infected);
@@ -2348,7 +2363,8 @@ function doInvaders(attacker) {
 // kill
 function doSlaughter(attacker) {
     var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
-    var target = randomHealthyWorker(); //Choose random worker
+    //var target = randomHealthyWorker(); //Choose random worker
+    var target = randomWorker(); //Choose random worker
     var targetUnit = civData[target];
     if (target) {
         if (targetUnit.owned >= 1) {
@@ -2380,9 +2396,13 @@ function doSlaughterMulti(attacker) {
     // kill up to 1% of attacking force
     var kills = Math.ceil(Math.random() * attacker.owned * 0.01);
     for (var k = 1; k <= kills; k++) {
-        var target = randomHealthyWorker(); //Choose random worker
+        //var target = randomHealthyWorker(); //Choose random worker
+        // sick people get killed as well
+        var target = randomWorker(); //Choose random worker
+        
         var targetUnit = civData[target];
         if (target) {
+            //sysLog(targetUnit.id);
             if (targetUnit.owned >= 1) {
                 // An attacker may disappear after killing
                 if (Math.random() < attacker.killExhaustion) { --attacker.owned; }
@@ -2403,7 +2423,7 @@ function doSlaughterMulti(attacker) {
             attacker.owned -= leaving;
         }
     }
-    var killVerb = (kills == 1) ? " citizen killed by " : " citizens killed by ";
+    var killVerb = (kills == 1) ? " citizen slaughtered by " : " citizens slaughtered by ";
     gameLog(kills + killVerb + attacker.getQtyName(2)); // always use plural attacker
     calculatePopulation();
 }
