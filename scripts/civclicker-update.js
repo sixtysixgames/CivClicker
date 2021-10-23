@@ -201,7 +201,7 @@ function updateResourceTotals() {
         else if (val > 0) { elem.style.color = "#0b0"; }
         else { elem.style.color = "#000"; }
 
-        elem.innerHTML = ((val < 0) ? "" : "+") + prettify(val.toFixed(1));
+        elem.innerHTML = ((val < 0) ? "" : "+") + prettify(val.toFixed(2));
     }
 
 
