@@ -24,12 +24,13 @@ var loopTimer = 0;
 // TODO: Update the version numbering internally
 var version = 22; // This is an ordinal used to trigger reloads. 
 //Always increment versionData if adding new element to civData
-var versionData = new VersionData(1, 4, 1, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 3, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
 var saveSettingsTag = "civSettings";
 var logRepeat = 1;
+var sysLogRepeat = 1;
 
 // Civ size category minimums
 
@@ -76,7 +77,7 @@ var PATIENT_LIST = [
 // need a corresponding unit in civData
 // used in doMobs()
 const mobTypes = {
-    wolf: "wolf" ,
+    wolf: "wolf",
     bandit: "bandit",
     barbarian: "barbarian",
     invader: "invader"
@@ -184,6 +185,10 @@ var settings = {
     useIcons: true
 };
 
+function setInitTradePrice(civObj) {
+    if (!isValid(civObj.initTradeAmount)) { return; }
+    updateTradeButton(civObj.id, civObj.initTradeAmount);
+}
 
 function setIndexArrays(civData) {
     civData.forEach(function (elem) {
@@ -199,6 +204,7 @@ function setIndexArrays(civData) {
             if (elem.subType == "basic") {
                 basicResources.push(elem);
             }
+            setInitTradePrice(elem);
         }
         if (elem.type == "building") {
             buildingData.push(elem);
@@ -267,8 +273,10 @@ function calculatePopulation() {
             population.extra += unit.owned;
         }
     });
+
     // Calculate housed/fed population (excludes zombies)
     population.living = Math.max(0, population.current - population.zombie);
+
     // Calculate healthy workers (should exclude sick, zombies and deployed units)
     // TODO: Doesn't subtracting the zombies here throw off the calculations in randomHealthyWorker()?
     population.healthy = Math.max(0, population.healthy - population.zombie);
@@ -971,6 +979,7 @@ function calcWorkerCost(num, curPop) {
     }
     return (20 * num) + calcArithSum(0.01, curPop, curPop + num);
 }
+
 function calcZombieCost(num) {
     return calcWorkerCost(num, population.zombie) / 5;
 }
@@ -1064,7 +1073,9 @@ function doStarve() {
 
     if (civData.food.owned < 0) { // starve if there's not enough food.
         //xxx This is very kind.  Only 0.1% deaths no matter how big the shortage?
-        numberStarve = starve(Math.ceil(population.living / 1000));
+        //numberStarve = starve(Math.ceil(population.living / 1000));
+        //xxx This is very kind.  Only 1.0% deaths no matter how big the shortage?
+        numberStarve = starve(Math.ceil(Math.random() * population.living / 100));
         if (numberStarve == 1) {
             gameLog("A citizen starved to death");
         } else if (numberStarve > 1) {
@@ -1328,6 +1339,7 @@ function smiteMob(mobObj) {
 }
 
 function smite() {
+    smiteMob(civData.invader);
     smiteMob(civData.barbarian);
     smiteMob(civData.bandit);
     smiteMob(civData.wolf);
@@ -1512,66 +1524,6 @@ function wonderSelect(resourceId) {
 }
 
 
-
-
-/* Trade functions */
-
-function startTrader() {
-    // Set timer length (12 sec + 5 sec/upgrade)
-    curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
-
-    //then set material and requested amount
-    var tradeItems = [ // Item and base amount
-        { materialId: "food", requested: 5000 },
-        { materialId: "wood", requested: 5000 },
-        { materialId: "stone", requested: 5000 },
-        { materialId: "skins", requested: 500 },
-        { materialId: "herbs", requested: 500 },
-        { materialId: "ore", requested: 500 },
-        { materialId: "leather", requested: 250 },
-        { materialId: "metal", requested: 250 }
-    ];
-
-    // Randomly select and merge one of the above.
-    var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
-    curCiv.trader.materialId = selected.materialId;
-    curCiv.trader.requested = selected.requested * (Math.ceil(Math.random() * 20)); // Up to 20x amount
-
-    updateTrader();
-}
-
-function trade() {
-    //check we have enough of the right type of resources to trade
-    if (!curCiv.trader.materialId || (curCiv.trader.materialId.owned < curCiv.trader.requested)) {
-        gameLog("Not enough resources to trade.");
-        return;
-    }
-
-    //subtract resources, add gold
-    var material = civData[curCiv.trader.materialId];
-
-    material.owned -= curCiv.trader.requested;
-    ++civData.gold.owned;
-    updateResourceTotals();
-    gameLog("Traded " + curCiv.trader.requested + " " + material.getQtyName(curCiv.trader.requested));
-}
-
-function isTraderHere() {
-    return (curCiv.trader.timer > 0);
-}
-
-function buy(materialId) {
-    var material = civData[materialId];
-    if (civData.gold.owned < 1) { return; }
-    --civData.gold.owned;
-
-    if (material == civData.food || material == civData.wood || material == civData.stone) { material.owned += 5000; }
-    if (material == civData.skins || material == civData.herbs || material == civData.ore) { material.owned += 500; }
-    if (material == civData.leather || material == civData.metal) { material.owned += 250; }
-
-    updateResourceTotals();
-}
-
 function getWonderCostMultiplier() { // Based on the most wonders in any single resource.
     var i;
     var mostWonders = 0;
@@ -1598,447 +1550,6 @@ function handleStorageError(err) {
     console.error(msg);
 }
 
-// Migrate an old savegame to the current format.
-// settingsVarReturn is assumed to be a struct containing a property 'val',
-//   which will be initialized with the new settingsVar object.
-//   (We can't set the outer variable directly from within a function)
-function migrateGameData(loadVar, settingsVarReturn) {
-    // BACKWARD COMPATIBILITY SECTION //////////////////
-    // v1.1.35: eliminated 2nd variable
-
-    // v1.1.13: population.corpses moved to corpses.total
-    if (!isValid(loadVar.corpses)) { loadVar.corpses = {}; }
-    if (isValid(loadVar.population) && isValid(loadVar.population.corpses)) {
-        if (!isValid(loadVar.corpses.total)) {
-            loadVar.corpses.total = loadVar.population.corpses;
-        }
-        delete loadVar.population.corpses;
-    }
-    // v1.1.17: population.apothecaries moved to population.healers 
-    if (isValid(loadVar.population) && isValid(loadVar.population.apothecaries)) {
-        if (!isValid(loadVar.population.healers)) {
-            loadVar.population.healers = loadVar.population.apothecaries;
-        }
-        delete loadVar.population.apothecaries;
-    }
-
-    // v1.1.28: autosave changed to a bool
-    loadVar.autosave = (loadVar.autosave !== false && loadVar.autosave !== "off");
-
-    // v1.1.29: 'deity' upgrade renamed to 'worship'
-    if (isValid(loadVar.upgrades) && isValid(loadVar.upgrades.deity)) {
-        if (!isValid(loadVar.upgrades.worship)) {
-            loadVar.upgrades.worship = loadVar.upgrades.deity;
-        }
-        delete loadVar.upgrades.deity;
-    }
-    // v1.1.30: Upgrade flags converted from int to bool (should be transparent)
-    // v1.1.31: deity.devotion moved to devotion.total.
-    if (!isValid(loadVar.devotion)) { loadVar.devotion = {}; }
-    if (isValid(loadVar.deity) && isValid(loadVar.deity.devotion)) {
-        if (!isValid(loadVar.devotion.total)) {
-            loadVar.devotion.total = loadVar.deity.devotion;
-        }
-        delete loadVar.deity.devotion;
-    }
-    // v1.1.33: Achievement flags converted from int to bool (should be transparent)
-    // v1.1.33: upgrades.deityType no longer used
-    if (isValid(loadVar.upgrades)) { delete loadVar.upgrades.deityType; }
-
-    // v1.1.34: Most efficiency values now recomputed from base values.
-    if (isValid(loadVar.efficiency)) {
-        loadVar.efficiency = { happiness: loadVar.efficiency.happiness };
-    }
-
-    // v1.1.38: Most assets moved to curCiv substructure
-    if (!isValid(loadVar.curCiv)) {
-        loadVar.curCiv = {
-            civName: loadVar.civName,
-            rulerName: loadVar.rulerName,
-
-            // Migrate resources
-            food: { owned: loadVar.food.total, net: (loadVar.food.net || 0) },
-            wood: { owned: loadVar.wood.total, net: (loadVar.wood.net || 0) },
-            stone: { owned: loadVar.stone.total, net: (loadVar.stone.net || 0) },
-            skins: { owned: loadVar.skins.total },
-            herbs: { owned: loadVar.herbs.total },
-            ore: { owned: loadVar.ore.total },
-            leather: { owned: loadVar.leather.total },
-            metal: { owned: loadVar.metal.total },
-            piety: { owned: loadVar.piety.total },
-            gold: { owned: loadVar.gold.total },
-            corpses: { owned: loadVar.corpses.total },
-            devotion: { owned: loadVar.devotion.total },
-
-            // land (total land) is now stored as free land, so do that calculation.
-            freeLand: {
-                owned: loadVar.land - (loadVar.tent.total + loadVar.whut.total + loadVar.cottage.total
-                    + loadVar.house.total + loadVar.mansion.total + loadVar.barn.total + loadVar.woodstock.total
-                    + loadVar.stonestock.total + loadVar.tannery.total + loadVar.smithy.total + loadVar.apothecary.total
-                    + loadVar.temple.total + loadVar.barracks.total + loadVar.stable.total + loadVar.mill.total
-                    + loadVar.graveyard.total + loadVar.fortification.total + loadVar.battleAltar.total
-                    + loadVar.fieldsAltar.total + loadVar.underworldAltar.total + loadVar.catAltar.total)
-            },
-
-            // Migrate buildings
-            tent: { owned: loadVar.tent.total },
-            // Hut ID also changed from 'whut' to 'hut'.
-            hut: { owned: loadVar.whut.total },
-            cottage: { owned: loadVar.cottage.total },
-            house: { owned: loadVar.house.total },
-            mansion: { owned: loadVar.mansion.total },
-            barn: { owned: loadVar.barn.total },
-            woodstock: { owned: loadVar.woodstock.total },
-            stonestock: { owned: loadVar.stonestock.total },
-            tannery: { owned: loadVar.tannery.total },
-            smithy: { owned: loadVar.smithy.total },
-            apothecary: { owned: loadVar.apothecary.total },
-            temple: { owned: loadVar.temple.total },
-            barracks: { owned: loadVar.barracks.total },
-            stable: { owned: loadVar.stable.total },
-            mill: { owned: loadVar.mill.total },
-            graveyard: { owned: loadVar.graveyard.total },
-            fortification: { owned: loadVar.fortification.total },
-            battleAltar: { owned: loadVar.battleAltar.total },
-            fieldsAltar: { owned: loadVar.fieldsAltar.total },
-            underworldAltar: { owned: loadVar.underworldAltar.total },
-            catAltar: { owned: loadVar.catAltar.total }
-        };
-        // Delete old values.
-        delete loadVar.civName;
-        delete loadVar.rulerName;
-        delete loadVar.food;
-        delete loadVar.wood;
-        delete loadVar.stone;
-        delete loadVar.skins;
-        delete loadVar.herbs;
-        delete loadVar.ore;
-        delete loadVar.leather;
-        delete loadVar.metal;
-        delete loadVar.piety;
-        delete loadVar.gold;
-        delete loadVar.corpses;
-        delete loadVar.devotion;
-        delete loadVar.land;
-        delete loadVar.tent;
-        delete loadVar.whut;
-        delete loadVar.cottage;
-        delete loadVar.house;
-        delete loadVar.mansion;
-        delete loadVar.barn;
-        delete loadVar.woodstock;
-        delete loadVar.stonestock;
-        delete loadVar.tannery;
-        delete loadVar.smithy;
-        delete loadVar.apothecary;
-        delete loadVar.temple;
-        delete loadVar.barracks;
-        delete loadVar.stable;
-        delete loadVar.mill;
-        delete loadVar.graveyard;
-        delete loadVar.fortification;
-        delete loadVar.battleAltar;
-        delete loadVar.fieldsAltar;
-        delete loadVar.underworldAltar;
-        delete loadVar.catAltar;
-    }
-
-    if (isValid(loadVar.upgrades)) {
-        // Migrate upgrades
-        loadVar.curCiv.skinning = { owned: loadVar.upgrades.skinning };
-        loadVar.curCiv.harvesting = { owned: loadVar.upgrades.harvesting };
-        loadVar.curCiv.prospecting = { owned: loadVar.upgrades.prospecting };
-        loadVar.curCiv.domestication = { owned: loadVar.upgrades.domestication };
-        loadVar.curCiv.ploughshares = { owned: loadVar.upgrades.ploughshares };
-        loadVar.curCiv.irrigation = { owned: loadVar.upgrades.irrigation };
-        loadVar.curCiv.butchering = { owned: loadVar.upgrades.butchering };
-        loadVar.curCiv.gardening = { owned: loadVar.upgrades.gardening };
-        loadVar.curCiv.extraction = { owned: loadVar.upgrades.extraction };
-        loadVar.curCiv.flensing = { owned: loadVar.upgrades.flensing };
-        loadVar.curCiv.macerating = { owned: loadVar.upgrades.macerating };
-        loadVar.curCiv.croprotation = { owned: loadVar.upgrades.croprotation };
-        loadVar.curCiv.selectivebreeding = { owned: loadVar.upgrades.selectivebreeding };
-        loadVar.curCiv.fertilisers = { owned: loadVar.upgrades.fertilisers };
-        loadVar.curCiv.masonry = { owned: loadVar.upgrades.masonry };
-        loadVar.curCiv.construction = { owned: loadVar.upgrades.construction };
-        loadVar.curCiv.architecture = { owned: loadVar.upgrades.architecture };
-        loadVar.curCiv.tenements = { owned: loadVar.upgrades.tenements };
-        loadVar.curCiv.slums = { owned: loadVar.upgrades.slums };
-        loadVar.curCiv.granaries = { owned: loadVar.upgrades.granaries };
-        loadVar.curCiv.palisade = { owned: loadVar.upgrades.palisade };
-        loadVar.curCiv.weaponry = { owned: loadVar.upgrades.weaponry };
-        loadVar.curCiv.shields = { owned: loadVar.upgrades.shields };
-        loadVar.curCiv.horseback = { owned: loadVar.upgrades.horseback };
-        loadVar.curCiv.wheel = { owned: loadVar.upgrades.wheel };
-        loadVar.curCiv.writing = { owned: loadVar.upgrades.writing };
-        loadVar.curCiv.administration = { owned: loadVar.upgrades.administration };
-        loadVar.curCiv.codeoflaws = { owned: loadVar.upgrades.codeoflaws };
-        loadVar.curCiv.mathematics = { owned: loadVar.upgrades.mathematics };
-        loadVar.curCiv.aesthetics = { owned: loadVar.upgrades.aesthetics };
-        loadVar.curCiv.civilservice = { owned: loadVar.upgrades.civilservice };
-        loadVar.curCiv.feudalism = { owned: loadVar.upgrades.feudalism };
-        loadVar.curCiv.guilds = { owned: loadVar.upgrades.guilds };
-        loadVar.curCiv.serfs = { owned: loadVar.upgrades.serfs };
-        loadVar.curCiv.nationalism = { owned: loadVar.upgrades.nationalism };
-        loadVar.curCiv.worship = { owned: loadVar.upgrades.worship };
-        loadVar.curCiv.lure = { owned: loadVar.upgrades.lure };
-        loadVar.curCiv.companion = { owned: loadVar.upgrades.companion };
-        loadVar.curCiv.comfort = { owned: loadVar.upgrades.comfort };
-        loadVar.curCiv.blessing = { owned: loadVar.upgrades.blessing };
-        loadVar.curCiv.waste = { owned: loadVar.upgrades.waste };
-        loadVar.curCiv.stay = { owned: loadVar.upgrades.stay };
-        loadVar.curCiv.riddle = { owned: loadVar.upgrades.riddle };
-        loadVar.curCiv.throne = { owned: loadVar.upgrades.throne };
-        loadVar.curCiv.lament = { owned: loadVar.upgrades.lament };
-        loadVar.curCiv.book = { owned: loadVar.upgrades.book };
-        loadVar.curCiv.feast = { owned: loadVar.upgrades.feast };
-        loadVar.curCiv.secrets = { owned: loadVar.upgrades.secrets };
-        loadVar.curCiv.standard = { owned: loadVar.upgrades.standard };
-        loadVar.curCiv.trade = { owned: loadVar.upgrades.trade };
-        loadVar.curCiv.currency = { owned: loadVar.upgrades.currency };
-        loadVar.curCiv.commerce = { owned: loadVar.upgrades.commerce };
-        delete loadVar.upgrades;
-    }
-    if (isValid(loadVar.achievements)) {
-        // Migrate achievements
-        loadVar.curCiv.hamletAch = { owned: loadVar.achievements.hamlet };
-        loadVar.curCiv.villageAch = { owned: loadVar.achievements.village };
-        loadVar.curCiv.smallTownAch = { owned: loadVar.achievements.smallTown };
-        loadVar.curCiv.largeTownAch = { owned: loadVar.achievements.largeTown };
-        loadVar.curCiv.smallCityAch = { owned: loadVar.achievements.smallCity };
-        loadVar.curCiv.largeCityAch = { owned: loadVar.achievements.largeCity };
-        loadVar.curCiv.metropolisAch = { owned: loadVar.achievements.metropolis };
-        loadVar.curCiv.smallNationAch = { owned: loadVar.achievements.smallNation };
-        loadVar.curCiv.nationAch = { owned: loadVar.achievements.nation };
-        loadVar.curCiv.largeNationAch = { owned: loadVar.achievements.largeNation };
-        loadVar.curCiv.empireAch = { owned: loadVar.achievements.empire };
-        loadVar.curCiv.raiderAch = { owned: loadVar.achievements.raider };
-        loadVar.curCiv.engineerAch = { owned: loadVar.achievements.engineer };
-        loadVar.curCiv.dominationAch = { owned: loadVar.achievements.domination };
-        loadVar.curCiv.hatedAch = { owned: loadVar.achievements.hated };
-        loadVar.curCiv.lovedAch = { owned: loadVar.achievements.loved };
-        loadVar.curCiv.catAch = { owned: loadVar.achievements.cat };
-        loadVar.curCiv.glaringAch = { owned: loadVar.achievements.glaring };
-        loadVar.curCiv.clowderAch = { owned: loadVar.achievements.clowder };
-        loadVar.curCiv.battleAch = { owned: loadVar.achievements.battle };
-        loadVar.curCiv.catsAch = { owned: loadVar.achievements.cats };
-        loadVar.curCiv.fieldsAch = { owned: loadVar.achievements.fields };
-        loadVar.curCiv.underworldAch = { owned: loadVar.achievements.underworld };
-        loadVar.curCiv.fullHouseAch = { owned: loadVar.achievements.fullHouse };
-        // ID 'plague' changed to 'plagued'.
-        loadVar.curCiv.plaguedAch = { owned: loadVar.achievements.plague };
-        loadVar.curCiv.ghostTownAch = { owned: loadVar.achievements.ghostTown };
-        loadVar.curCiv.wonderAch = { owned: loadVar.achievements.wonder };
-        loadVar.curCiv.sevenAch = { owned: loadVar.achievements.seven };
-        loadVar.curCiv.merchantAch = { owned: loadVar.achievements.merchant };
-        loadVar.curCiv.rushedAch = { owned: loadVar.achievements.rushed };
-        loadVar.curCiv.neverclickAch = { owned: loadVar.achievements.neverclick };
-        delete loadVar.achievements;
-    }
-    if (isValid(loadVar.population)) {
-        // Migrate population
-        loadVar.curCiv.cat = { owned: loadVar.population.cats };
-        loadVar.curCiv.zombie = { owned: loadVar.population.zombies };
-        loadVar.curCiv.grave = { owned: loadVar.population.graves };
-        loadVar.curCiv.unemployed = { owned: loadVar.population.unemployed };
-        loadVar.curCiv.farmer = { owned: loadVar.population.farmers };
-        loadVar.curCiv.woodcutter = { owned: loadVar.population.woodcutters };
-        loadVar.curCiv.miner = { owned: loadVar.population.miners };
-        loadVar.curCiv.tanner = { owned: loadVar.population.tanners };
-        loadVar.curCiv.blacksmith = { owned: loadVar.population.blacksmiths };
-        loadVar.curCiv.healer = { owned: loadVar.population.healers };
-        loadVar.curCiv.cleric = { owned: loadVar.population.clerics };
-        loadVar.curCiv.labourer = { owned: loadVar.population.labourers };
-        loadVar.curCiv.soldier = { owned: loadVar.population.soldiers };
-        loadVar.curCiv.cavalry = { owned: loadVar.population.cavalry };
-        loadVar.curCiv.soldierParty = { owned: loadVar.population.soldiersParty };
-        loadVar.curCiv.cavalryParty = { owned: loadVar.population.cavalryParty };
-        loadVar.curCiv.siege = { owned: loadVar.population.siege };
-        loadVar.curCiv.esoldier = { owned: loadVar.population.esoldiers };
-        loadVar.curCiv.efort = { owned: loadVar.population.eforts };
-        loadVar.curCiv.unemployedIll = { owned: loadVar.population.unemployedIll };
-        loadVar.curCiv.farmerIll = { owned: loadVar.population.farmersIll };
-        loadVar.curCiv.woodcutterIll = { owned: loadVar.population.woodcuttersIll };
-        loadVar.curCiv.minerIll = { owned: loadVar.population.minersIll };
-        loadVar.curCiv.tannerIll = { owned: loadVar.population.tannersIll };
-        loadVar.curCiv.blacksmithIll = { owned: loadVar.population.blacksmithsIll };
-        loadVar.curCiv.healerIll = { owned: loadVar.population.healersIll };
-        loadVar.curCiv.clericIll = { owned: loadVar.population.clericsIll };
-        loadVar.curCiv.labourerIll = { owned: loadVar.population.labourersIll };
-        loadVar.curCiv.soldierIll = { owned: loadVar.population.soldiersIll };
-        loadVar.curCiv.cavalryIll = { owned: loadVar.population.cavalryIll };
-        loadVar.curCiv.wolf = { owned: loadVar.population.wolves };
-        loadVar.curCiv.bandit = { owned: loadVar.population.bandits };
-        loadVar.curCiv.barbarian = { owned: loadVar.population.barbarians };
-        loadVar.curCiv.esiege = { owned: loadVar.population.esiege };
-        loadVar.curCiv.enemySlain = { owned: loadVar.population.enemiesSlain };
-        loadVar.curCiv.shade = { owned: loadVar.population.shades };
-        delete loadVar.population;
-    }
-
-    // v1.1.38: Game settings moved to settings object, but we deliberately
-    // don't try to migrate them.  'autosave', 'worksafe', and 'fontSize'
-    // values from earlier versions will be discarded.
-
-    // v1.1.39: Migrate more save fields into curCiv.
-    if (isValid(loadVar.resourceClicks)) {
-        loadVar.curCiv.resourceClicks = loadVar.resourceClicks;
-        delete loadVar.resourceClicks;
-    }
-    if (!isValid(loadVar.curCiv.resourceClicks)) {
-        loadVar.curCiv.resourceClicks = 999; //stops people getting the achievement with an old save version
-    }
-    if (isValid(loadVar.graceCost)) {
-        loadVar.curCiv.graceCost = loadVar.graceCost;
-        delete loadVar.graceCost;
-    }
-    if (isValid(loadVar.walkTotal)) {
-        loadVar.curCiv.walkTotal = loadVar.walkTotal;
-        delete loadVar.walkTotal;
-    }
-
-    // v1.1.39: Migrate deities to use IDs.
-    if (isValid(loadVar.deityArray)) {
-        loadVar.curCiv.deities = [];
-        loadVar.deityArray.forEach(function (row) {
-            loadVar.curCiv.deities.unshift({ name: row[1], domain: typeToId(row[2]), maxDev: row[3] });
-        });
-        delete loadVar.deityArray;
-    }
-
-    if (isValid(loadVar.deity) && isValid(loadVar.curCiv.devotion)) {
-        loadVar.curCiv.deities.unshift({ name: loadVar.deity.name, domain: typeToId(loadVar.deity.type), maxDev: loadVar.curCiv.devotion.owned });
-        delete loadVar.deity;
-    }
-
-    // v1.1.39: Settings moved to their own variable
-    if (isValid(loadVar.settings)) {
-        settingsVarReturn.val = loadVar.settings;
-        delete loadVar.settings;
-    }
-
-    // v1.1.39: Raiding now stores enemy population instead of 'iterations'.
-    if (isValid(loadVar.raiding) && isValid(loadVar.raiding.iterations)) {
-        loadVar.raiding.epop = loadVar.raiding.iterations * 20;
-        // Plunder calculations now moved to the start of the raid.
-        // This should rarely happen, but give a consolation prize.
-        loadVar.raiding.plunderLoot = { gold: 1 };
-        delete loadVar.raiding.iterations;
-    }
-
-    if (isValid(loadVar.throneCount)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.throne)) { loadVar.curCiv.throne = {}; }
-        loadVar.curCiv.throne.count = loadVar.throneCount || 0;
-        delete loadVar.throneCount;
-    }
-
-    if (isValid(loadVar.gloryTimer)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.glory)) { loadVar.curCiv.glory = {}; }
-        loadVar.curCiv.glory.timer = loadVar.gloryTimer || 0;
-        delete loadVar.gloryTimer;
-    }
-
-    if (isValid(loadVar.walkTotal)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.walk)) { loadVar.curCiv.walk = {}; }
-        loadVar.curCiv.walk.rate = loadVar.walkTotal || 0;
-        delete loadVar.walkTotal;
-    }
-
-    if (isValid(loadVar.pestTimer)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.pestControl)) { loadVar.curCiv.pestControl = {}; }
-        loadVar.curCiv.pestControl.timer = loadVar.pestTimer || 0;
-        delete loadVar.pestTimer;
-    }
-
-    if (isValid(loadVar.graceCost)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.grace)) { loadVar.curCiv.grace = {}; }
-        loadVar.curCiv.grace.cost = loadVar.graceCost || 1000;
-        delete loadVar.graceCost;
-    }
-
-    if (isValid(loadVar.cureCounter)) // v1.1.55: Moved to substructure
-    {
-        if (!isValid(loadVar.curCiv.healer)) { loadVar.curCiv.healer = {}; }
-        loadVar.curCiv.healer.cureCount = loadVar.cureCounter || 0;
-        delete loadVar.cureCounter;
-    }
-
-    if (isValid(loadVar.efficiency)) // v1.1.59: efficiency.happiness moved to curCiv.morale.efficiency.
-    {
-        if (!isValid(loadVar.curCiv.morale)) { loadVar.curCiv.morale = {}; }
-        loadVar.curCiv.morale.efficiency = loadVar.efficiency.happiness || 1.0;
-        delete loadVar.efficiency; // happiness was the last remaining efficiency subfield.
-    }
-
-    if (isValid(loadVar.raiding)) // v1.1.59: raiding moved to curCiv.raid
-    {
-        if (!isValid(loadVar.curCiv.raid)) { loadVar.curCiv.raid = loadVar.raiding; }
-        delete loadVar.raiding;
-    }
-
-    if (isValid(loadVar.targetMax)) // v1.1.59: targeMax moved to curCiv.raid.targetMax
-    {
-        if (!isValid(loadVar.curCiv.raid)) { loadVar.curCiv.raid = {}; }
-        loadVar.curCiv.raid.targetMax = loadVar.targetMax;
-        delete loadVar.targetMax;
-    }
-
-    if (isValid(loadVar.curCiv.tradeCounter)) // v1.1.59: curCiv.tradeCounter moved to curCiv.trader.counter
-    {
-        if (!isValid(loadVar.curCiv.trader)) { loadVar.curCiv.trader = {}; }
-        loadVar.curCiv.trader.counter = loadVar.curCiv.tradeCounter || 0;
-        delete loadVar.curCiv.tradeCounter;
-    }
-
-    if (isValid(loadVar.wonder) && isValid(loadVar.wonder.array)) // v1.1.59: wonder.array moved to curCiv.wonders
-    {
-        if (!isValid(loadVar.curCiv.wonders)) {
-            loadVar.curCiv.wonders = [];
-            loadVar.wonder.array.forEach(function (elem) {
-                // Format converted from [name,resourceId] to {name: name, resourceId: resourceId}
-                loadVar.curCiv.wonders.push({ name: elem[0], resourceId: elem[1] });
-            });
-        }
-        delete loadVar.wonder.array;
-    }
-
-    if (isValid(loadVar.wonder)) // v1.1.59: wonder moved to curCiv.curWonder
-    {
-        if (isValid(loadVar.wonder.total)) { delete loadVar.wonder.total; } // wonder.total no longer used.
-        if (isValid(loadVar.wonder.food)) { delete loadVar.wonder.food; } // wonder.food no longer used.
-        if (isValid(loadVar.wonder.wood)) { delete loadVar.wonder.wood; } // wonder.wood no longer used.
-        if (isValid(loadVar.wonder.stone)) { delete loadVar.wonder.stone; } // wonder.stone no longer used.
-        if (isValid(loadVar.wonder.skins)) { delete loadVar.wonder.skins; } // wonder.skins no longer used.
-        if (isValid(loadVar.wonder.herbs)) { delete loadVar.wonder.herbs; } // wonder.herbs no longer used.
-        if (isValid(loadVar.wonder.ore)) { delete loadVar.wonder.ore; } // wonder.ore no longer used.
-        if (isValid(loadVar.wonder.leather)) { delete loadVar.wonder.leather; } // wonder.leather no longer used.
-        if (isValid(loadVar.wonder.piety)) { delete loadVar.wonder.piety; } // wonder.piety no longer used.
-        if (isValid(loadVar.wonder.metal)) { delete loadVar.wonder.metal; } // wonder.metal no longer used.
-        if (!isValid(loadVar.wonder.stage) && isValid(loadVar.wonder.building) && isValid(loadVar.wonder.completed)) {
-            // This ugly formula merges the 'building' and 'completed' fields into 'stage'.
-            loadVar.wonder.stage = (2 * loadVar.wonder.completed) + (loadVar.wonder.building != loadVar.wonder.completed);
-            delete loadVar.wonder.building;
-            delete loadVar.wonder.completed;
-        }
-        if (!isValid(loadVar.curCiv.curWonder)) { loadVar.curCiv.curWonder = loadVar.wonder; }
-        delete loadVar.wonder;
-    }
-    ////////////////////////////////////////////////////
-
-    //v1.4.0
-    // new civ sizes
-    // TODO: do we need to add these here?
-    // We don't need these here.  They just show what's been added
-    if (!isValid(loadVar.curCiv.townAch)) { }
-    if (!isValid(loadVar.curCiv.cityAch)) { }
-    //v1.4.1
-    if (!isValid(loadVar.curCiv.invader)) { }
-}
 
 // Load in saved data
 function load(loadType) {
@@ -2161,6 +1672,16 @@ function load(loadType) {
     ui.find("#rulerName").innerHTML = curCiv.rulerName;
     ui.find("#wonderNameP").innerHTML = curCiv.curWonder.name;
     ui.find("#wonderNameC").innerHTML = curCiv.curWonder.name;
+
+    // todo: tidy this into separate function
+    updateTradeButton("food", curCiv.food.tradeAmount);
+    updateTradeButton("wood", curCiv.wood.tradeAmount);
+    updateTradeButton("stone", curCiv.stone.tradeAmount);
+    updateTradeButton("skins", curCiv.skins.tradeAmount);
+    updateTradeButton("herbs", curCiv.herbs.tradeAmount);
+    updateTradeButton("ore", curCiv.ore.tradeAmount);
+    updateTradeButton("leather", curCiv.leather.tradeAmount);
+    updateTradeButton("metal", curCiv.metal.tradeAmount);
 
     return true;
 }
@@ -2496,6 +2017,14 @@ function healByJob(job, num) {
     return num;
 }
 
+// include sick and healthy
+function totalByJob(job) {
+    if (!isValid(job) || !job) { return 0; }
+
+    var num = civData[job].ill + civData[job].owned;
+    return num;
+}
+
 //Selects random workers, transfers them to their Ill variants
 function spreadPlague(sickNum) {
     var actualNum = 0;
@@ -2668,7 +2197,7 @@ function doFight(attacker, defender) {
     calculatePopulation();
 }
 
-
+// wolves, barbarians, invaders
 function doSlaughter(attacker) {
     var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
     var target = randomHealthyWorker(); //Choose random worker
@@ -2692,11 +2221,12 @@ function doSlaughter(attacker) {
     calculatePopulation();
 }
 
-// wolves
+// bandits, barbarians, invaders
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
     var target = lootable[Math.floor(Math.random() * lootable.length)];
-    var stolenQty = Math.floor((Math.random() * 1000)); //Steal up to 1000.
+    //var stolenQty = Math.floor((Math.random() * 1000)); //Steal up to 1000.
+    var stolenQty = Math.floor((Math.random() * attacker.owned)); //Steal up to however many attackers.
     stolenQty = Math.min(stolenQty, target.owned);
     if (stolenQty > 0) {
         gameLog(stolenQty + " " + target.getQtyName(stolenQty)
@@ -2713,25 +2243,24 @@ function doLoot(attacker) {
     updateResourceTotals();
 }
 
-// bandits
-// TODO: if building employs worker, then decrement worker type and add to idle
+// barbarians, invaders
 function doSack(attacker) {
     //Destroy buildings
     var target = sackable[Math.floor(Math.random() * sackable.length)];
 
-    // Slightly different phrasing for fortifications
-    var destroyVerb = "burned";
-    if (target == civData.fortification) { destroyVerb = "damaged"; }
-
     if (target.owned > 0) {
+        // Slightly different phrasing for fortifications
+        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        if (target == civData.fortification) { destroyVerb = "damaged"; }
+
         --target.owned;
         ++civData.freeLand.owned;
 
-        dismissWorker(target);
         gameLog(target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
     } else {
         //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * (1 / 112));
+        //var leaving = Math.ceil(attacker.owned * Math.random() * (1 / 112));
+        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
 
@@ -2741,59 +2270,62 @@ function doSack(attacker) {
     calculatePopulation(); // Limits might change
 }
 
-function dismissWorker(building) {
-    //TODO: this needs improving.  Maybe an id on the building type to identify the worker type
-    // workerid: tanner
-    // employs: 1
-    // so we could have something generic like
-    /*
-    if (target.workerid) {
-        if (civData[target.workerid].owned > 0) {
-            civData[target.workerid].owned -= civData[target.workerid].employs;
-            ++civData.unemployed.owned;
-        }
+
+// sometime we have more tanners than we have tannerys, for example
+// usually because of buildings being sacked i.e. destroyed
+function dismissWorkers() {
+
+    var diff = 0;
+    var total = 0;
+    // we only lose a worker if an occupied building is destroyed
+
+    total = totalByJob("tanner");
+    if (total > 0 && total > civData.tannery.owned) {
+        diff = total - civData.tannery.owned;
+        civData.tanner.owned -= diff;
+        civData.unemployed.owned += diff;
     }
 
-or perhaps use the purchase function with a negative value
-doPurchase(tanner, -1)
-    */
-    if (building.id == "tannery") {
-        if (civData.tannery.owned > 0) {
-            --civData.tanner.owned;
-            ++civData.unemployed.owned;
-        }
+
+    total = totalByJob("blacksmith");
+    if (total > 0 && total > civData.smithy.owned) {
+        diff = total - civData.smithy.owned;
+        civData.blacksmith.owned -= diff;
+        civData.unemployed.owned += diff;
     }
-    if (building.id == "smithy") {
-        if (civData.blacksmith.owned > 0) {
-            --civData.blacksmith.owned;
-            ++civData.unemployed.owned;
-        }
+
+
+    total = totalByJob("healer");
+    if (total > 0 && total > civData.apothecary.owned) {
+        diff = total - civData.apothecary.owned;
+        civData.healer.owned -= diff;
+        civData.unemployed.owned += diff;
     }
-    if (building.id == "apothecary") {
-        if (civData.healer.owned > 0) {
-            --civData.healer.owned;
-            ++civData.unemployed.owned;
-        }
+
+
+    total = totalByJob("cleric");
+    if (total > 0 && total > civData.temple.owned) {
+        diff = total - civData.temple.owned;
+        civData.cleric.owned -= diff;
+        civData.unemployed.owned += diff;
     }
-    if (building.id == "temple") {
-        if (civData.cleric.owned > 0) {
-            --civData.cleric.owned;
-            ++civData.unemployed.owned;
-        }
+
+
+    // these buildings have 10 units
+    total = totalByJob("soldier");
+    if (total > 0 && total > civData.barracks.owned * 10) {
+        diff = total - (civData.barracks.owned * 10);
+        civData.soldier.owned -= diff;
+        civData.unemployed.owned += diff;
     }
-    // these have 10 units
-    if (building.id == "barracks") {
-        if (civData.soldier.owned > 0) {
-            civData.soldier.owned -= 10;
-            civData.unemployed.owned += 10;
-        }
+
+    total = totalByJob("cavalry");
+    if (total > 0 && total > civData.stable.owned * 10) {
+        diff = total - (civData.stable.owned * 10);
+        civData.cavalry.owned -= diff;
+        civData.unemployed.owned += diff;
     }
-    if (building.id == "stable") {
-        if (civData.cavalry.owned > 0) {
-            civData.cavalry.owned -= 10;
-            civData.unemployed.owned += 10;
-        }
-    }
+
 }
 
 // barbarians
@@ -2812,13 +2344,15 @@ function doConquer(attacker) {
 
     // now conquer some freeland
     if (civData.freeLand.owned > 0) {
-        // random 25% - this might need adjusting
-        var land = Math.floor(Math.random() * civData.freeLand.owned * 0.25);
+        // random 10% - this might need adjusting
+        var land = Math.floor(Math.random() * civData.freeLand.owned * 0.1);
 
         if (land > 0) {
             civData.freeLand.owned -= land;
 
             gameLog(land + " land conquered by " + attacker.getQtyName(attacker.owned));
+
+            if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after conquering land.
         }
     }
 }
@@ -3024,10 +2558,10 @@ function doMobs() {
 
     // we don't want wolves attacking small populations
     //
-    if (population.current > 10 && curCiv.attackCounter > (60 * 5) ) { //Minimum 5 minutes
+    if (population.current > 10 && curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
 
         var rnum = population.current * Math.random();
-        //sysLog("doMobs(): " + rnum + " < " + (population.current / 50));
+
         // attempt at forcing attacks more frequently the larger the civ
         // 50 because that is max pop of a thorp
         //if (600 * Math.random() < 1) {
@@ -3046,7 +2580,13 @@ function doMobs() {
             // we don't want wolves attacking large settlements
             // or bandits attacking small ones
             if (population.current < civSizes.village.min_pop) {
-                mobType = mobTypes.wolf;
+                // mostly wolves
+                if (Math.random() > 0.1) {
+                    mobType = mobTypes.wolf;
+                }
+                else {
+                    mobType = mobTypes.bandit;
+                }
             }
             else if (population.current >= civSizes.village.min_pop && population.current < civSizes.town.min_pop) {
                 // wolf or bandit
@@ -3058,8 +2598,13 @@ function doMobs() {
                 }
             }
             else if (population.current >= civSizes.town.min_pop && population.current < civSizes.smallCity.min_pop) {
-                // just bandits
-                mobType = mobTypes.bandit;
+                // mostly bandits
+                if (Math.random() > 0.1) {
+                    mobType = mobTypes.bandit;
+                }
+                else {
+                    mobType = mobTypes.barbarian;
+                }
             }
             else if (population.current >= civSizes.smallCity.min_pop && population.current < civSizes.largeCity.min_pop) {
                 // bandits or barbarians
@@ -3071,8 +2616,13 @@ function doMobs() {
                 }
             }
             else if (population.current >= civSizes.largeCity.min_pop && population.current < civSizes.smallNation.min_pop) {
-                // just barbarians
-                mobType = mobTypes.barbarian;
+                // mostly barbarians
+                if (Math.random() > 0.1) {
+                    mobType = mobTypes.barbarian;
+                }
+                else {
+                    mobType = mobTypes.invader;
+                }
             }
             else if (population.current >= civSizes.smallNation.min_pop && population.current < civSizes.largeNation.min_pop) {
                 // barbarians or invaders
@@ -3102,25 +2652,6 @@ function doMobs() {
     });
 }
 
-function tickTraders() {
-    var delayMult = 60 * (3 - ((civData.currency.owned) + (civData.commerce.owned)));
-    var check;
-    //traders occasionally show up
-    if (population.current > 0) {
-        ++curCiv.trader.counter;
-    }
-    if (population.current > 0 && curCiv.trader.counter > delayMult) {
-        check = Math.random() * delayMult;
-        if (check < (1 + (0.2 * (civData.comfort.owned)))) {
-            curCiv.trader.counter = 0;
-            startTrader();
-        }
-    }
-
-    if (curCiv.trader.timer > 0) {
-        curCiv.trader.timer--;
-    }
-}
 
 
 function doPestControl() {
@@ -3153,220 +2684,6 @@ function tickGrace() {
     }
 }
 
-//========== UI functions
-
-// Called when user switches between the various panes on the left hand side of the interface
-// Returns the target pane element.
-function paneSelect(control) {
-    var i, oldTarget;
-    //alert("hello");
-
-    // Identify the target pane to be activated, and the currently active
-    // selector tab(s).
-    var newTarget = dataset(control, "target");
-    var selectors = ui.find("#selectors");
-    if (!selectors) {
-        console.log("No selectors found");
-        sysLog("No selectors found");
-        return null;
-    }
-    var curSelects = selectors.getElementsByClassName("selected");
-
-    // Deselect the old panels.
-    for (i = 0; i < curSelects.length; ++i) {
-        oldTarget = dataset(curSelects[i], "target");
-        if (oldTarget == newTarget) { continue; }
-        document.getElementById(oldTarget).classList.remove("selected");
-        curSelects[i].classList.remove("selected");
-    }
-
-    // Select the new panel.
-    control.classList.add("selected");
-    var targetElem = document.getElementById(newTarget);
-    if (targetElem) { targetElem.classList.add("selected"); }
-    return targetElem;
-}
-
-function versionAlert() {
-    console.log("New Version Available");
-    ui.find("#versionAlert").style.display = "inline";
-}
-
-function prettify(input) {
-    //xxx TODO: Add appropriate format options
-    return (settings.delimiters) ? Number(input).toLocaleString() : input.toString();
-}
-
-
-function setAutosave(value) {
-    if (value !== undefined) { settings.autosave = value; }
-    ui.find("#toggleAutosave").checked = settings.autosave;
-}
-function onToggleAutosave(control) { return setAutosave(control.checked); }
-
-function setCustomQuantities(value) {
-    var i;
-    var elems;
-    var curPop = population.current;
-    var totLand = getLandTotals().lands;
-
-    if (value !== undefined) { settings.customIncr = value; }
-    ui.find("#toggleCustomQuantities").checked = settings.customIncr;
-
-    ui.show("#customJobQuantity", settings.customIncr);
-    ui.show("#customPartyQuantity", settings.customIncr);
-    ui.show("#customBuildQuantity", settings.customIncr);
-    ui.show("#customSpawnQuantity", settings.customIncr);
-
-    elems = document.getElementsByClassName("unit10");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 10));
-    }
-
-    elems = document.getElementsByClassName("unit100");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 100));
-    }
-
-    elems = document.getElementsByClassName("unit1000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 1000));
-    }
-
-    elems = document.getElementsByClassName("unit10000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 10000));
-    }
-
-    elems = document.getElementsByClassName("unit100000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 100000));
-    }
-
-    elems = document.getElementsByClassName("unitInfinity");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (curPop >= 1000));
-    }
-
-    //totLand
-    elems = document.getElementsByClassName("building10");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 100));
-    }
-
-    elems = document.getElementsByClassName("building100");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 1000));
-    }
-
-    elems = document.getElementsByClassName("building1000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 10000));
-    }
-
-    elems = document.getElementsByClassName("building10000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 100000));
-    }
-
-    elems = document.getElementsByClassName("building100000");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 1000000));
-    }
-
-    elems = document.getElementsByClassName("buildingInfinity");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], !settings.customIncr && (totLand >= 1000));
-    }
-
-    elems = document.getElementsByClassName("buycustom");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], settings.customIncr);
-    }
-}
-
-function onToggleCustomQuantities(control) {
-    return setCustomQuantities(control.checked);
-}
-
-// Toggles the display of the .notes class
-function setNotes(value) {
-    if (value !== undefined) { settings.notes = value; }
-    ui.find("#toggleNotes").checked = settings.notes;
-
-    var i;
-    var elems = document.getElementsByClassName("note");
-    for (i = 0; i < elems.length; ++i) {
-        ui.show(elems[i], settings.notes);
-    }
-}
-
-function onToggleNotes(control) {
-    return setNotes(control.checked);
-}
-
-// value is the desired change in 0.1em units.
-function textSize(value) {
-    if (value !== undefined) { settings.fontSize += 0.1 * value; }
-    ui.find("#smallerText").disabled = (settings.fontSize <= 0.5);
-
-    //xxx Should this be applied to the document instead of the body?
-    ui.body.style.fontSize = settings.fontSize + "em";
-}
-
-function setShadow(value) {
-    if (value !== undefined) { settings.textShadow = value; }
-    ui.find("#toggleShadow").checked = settings.textShadow;
-    var shadowStyle = "3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff"
-        + ", 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff";
-    ui.body.style.textShadow = settings.textShadow ? shadowStyle : "none";
-}
-function onToggleShadow(control) {
-    return setShadow(control.checked);
-}
-
-// Does nothing yet, will probably toggle display for "icon" and "word" classes 
-// as that's probably the simplest way to do this.
-function setIcons(value) {
-    if (value !== undefined) { settings.useIcons = value; }
-    ui.find("#toggleIcons").checked = settings.useIcons;
-
-    var i;
-    var elems = document.getElementsByClassName("icon");
-    for (i = 0; i < elems.length; ++i) {
-        // Worksafe implies no icons.
-        elems[i].style.visibility = (settings.useIcons && !settings.worksafe) ? "visible" : "hidden";
-    }
-}
-function onToggleIcons(control) {
-    return setIcons(control.checked);
-}
-
-function setDelimiters(value) {
-    if (value !== undefined) { settings.delimiters = value; }
-    ui.find("#toggleDelimiters").checked = settings.delimiters;
-    updateResourceTotals();
-}
-function onToggleDelimiters(control) {
-    return setDelimiters(control.checked);
-}
-
-function setWorksafe(value) {
-    if (value !== undefined) { settings.worksafe = value; }
-    ui.find("#toggleWorksafe").checked = settings.worksafe;
-
-    //xxx Should this be applied to the document instead of the body?
-    if (settings.worksafe) {
-        ui.body.classList.remove("hasBackground");
-    } else {
-        ui.body.classList.add("hasBackground");
-    }
-
-    setIcons(); // Worksafe overrides icon settings.
-}
-function onToggleWorksafe(control) {
-    return setWorksafe(control.checked);
-}
 
 
 //Not strictly a debug function so much as it is letting the user know when 
@@ -3407,7 +2724,7 @@ function sysLog(message) {
 
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#syslogL").innerHTML != message) {
-        logRepeat = 0; //Reset the (xNumber) value
+        sysLogRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
         var i = 20; // Number of lines of log to keep.
@@ -3421,7 +2738,7 @@ function sysLog(message) {
     }
     // Updates most recent line with new time, message, and xNumber.
     var s = "<td id='syslogT'>" + curTime + "</td><td id='syslogL'>" + message + "</td><td id='syslogR'>";
-    if (++logRepeat > 1) { s += "(x" + logRepeat + ")"; } // Optional (xNumber)
+    if (++sysLogRepeat > 1) { s += "(x" + sysLogRepeat + ")"; } // Optional (xNumber)
     s += "</td>";
     ui.find("#syslog0").innerHTML = s;
 }
@@ -3460,6 +2777,8 @@ function gameLoop() {
     // adjustments made each tick; as such they need to be zero'd out at the
     // start of each new tick.
     clearSpecialResourceNets();
+
+    dismissWorkers(); // sometime we end up with more workers than buildings
 
     // Production workers do their thing.
     doFarmers();
@@ -3508,9 +2827,6 @@ function gameLoop() {
 };
 
 
-
-
-
 //========== TESTING (cheating)
 
 function ruinFun() {
@@ -3532,7 +2848,6 @@ function ruinFun() {
     calculatePopulation();
     updateAll();
 };
-
 
 
 //========== SETUP (Functions meant to be run once on the DOM)
@@ -3590,7 +2905,7 @@ setup.civSizes = function () {
 
 setup.game = function () {
     console.log("Setting up game");
-    sysLog("Setting up game");
+    sysLog("Starting game");
     //document.title = "CivClicker ("+versionData+")"; //xxx Not in XML DOM.
 
     addUITable(basicResources, "basicResources"); // Dynamically create the basic resource table.
@@ -3616,7 +2931,7 @@ setup.game = function () {
 setup.loop = function () {
     // This sets up the main game loop, which is scheduled to execute once per second.
     console.log("Setting up Main Loop");
-    sysLog("Setting up Main Loop");
+    //sysLog("Setting up Main Loop");
     gameLoop();
     loopTimer = window.setInterval(gameLoop, 1000); //updates once per second (1000 milliseconds)
 };
