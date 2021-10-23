@@ -103,7 +103,8 @@ var curCiv = {
         materialId: "",
         requested: 0,
         timer: 0, // How many seconds will the trader be around
-        counter: 0 // How long since last trader?
+        counter: 0, // How long since last trader?
+        userTraded: false // did the user trade the requested material?
     },
 
     raid: {
@@ -1926,6 +1927,7 @@ function reset() {
     curCiv.trader.requested = 0;
     curCiv.trader.timer = 0;
     curCiv.trader.counter = 0; // How long since last trader?
+    curCiv.trader.userTraded = false;
 
     curCiv.curWonder.name = "";
     curCiv.curWonder.stage = 0;
@@ -2023,8 +2025,14 @@ function doClerics() {
         * curCiv.morale.efficiency
         * getWonderBonus(civData.piety)
     );
+    // lose piety for having temples but no clerics
+    if (civData.cleric.owned == 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -civData.cleric.efficiency; }
+
     civData.piety.net += pietyEarned;
     civData.piety.owned += pietyEarned;
+
+    //if (civData.piety.net < 0) civData.piety.net = 0;
+    //if (civData.piety.owned < 0) civData.piety.owned = 0;
 }
 
 // Try to heal the specified number of people in the specified job
@@ -2115,33 +2123,66 @@ function doPlague() {
     //    return false;
     //}
 
-    var deathRoll = (100 * Math.random()) + 1;
+    var deathRoll = (100 * Math.random());
 
-    if (deathRoll <= 1) { // 1% chance that up to 0.1% ill people dies
-        var victims = Math.floor(population.totalSick / 1000 * Math.random());
+    if (deathRoll <= 1) { // 1% chance that up to 1% ill people dies
+        var victims = Math.floor(population.totalSick / 100 * Math.random());
+
         if (victims <= 0) { return false; }
         var died = 0;
         var lastVictim = "citizen";
         for (var d = 1; d <= victims; d++) {
             var jobInfected = getRandomPatient();
             var unitInfected = civData[jobInfected];
-            
+
             if (unitInfected.ill > 0 && unitInfected.owned > 0) {
                 killUnit(unitInfected);
                 lastVictim = unitInfected.singular;
                 died++;
             }
         }
-
+        sysLog("died=" + died);
         if (died == 1) {
-            gameLog("A sick " + lastVictim + " dies of plague.");
+            gameLog("A sick " + lastVictim + " died of plague.");
         }
-        else if (died > 1){
+        else if (died > 1) {
             gameLog(died + " sick citizens died of plague.");
         }
         calculatePopulation();
         return true;
-    } else if (deathRoll > 99.9) { // 0.1% chance that it spreads 
+    }
+    else if (deathRoll <= 2) {
+        // some sick victims recover naturally
+        var survivors = Math.floor(population.totalSick / 100 * Math.random());
+        if (survivors <= 0) { return false; }
+        var survived = 0;
+        var lastJob = "citizen";
+        for (var d = 1; d <= survivors; d++) {
+            var job = getRandomPatient();
+            if (job) {
+                healByJob(job);
+                lastJob = job.singular;
+                survived++;
+            }
+        }
+        if (survived == 1) {
+            gameLog("A sick " + lastJob + " survived the plague.");
+        }
+        else if (survived > 1) {
+            gameLog(survived + " sick citizens survived the plague.");
+        }
+        calculatePopulation();
+        return true;
+        /*
+        while (civData.healer.cureCount >= 1 && civData.herbs.owned >= 1) {
+        job = getNextPatient();
+        if (!job) { break; }
+        healByJob(job);
+
+        ++numHealed;
+        */
+
+    } else if (deathRoll > 99) { // 1% chance that it spreads 
         // Infect up to 0.1% of the healthy population.
         var infected = Math.floor(population.healthy / 1000 * Math.random()) + 1;
 
@@ -2149,10 +2190,10 @@ function doPlague() {
         //gameLog("The sickness spreads to a new citizen.");
         var num = spreadPlague(infected);
         if (num == 1) {
-            gameLog("The sickness spreads to a new citizen.");
+            gameLog("The plague spreads to a new citizen.");
         }
         else {
-            gameLog("The sickness spreads to " + num + " new citizens.");
+            gameLog("The plague spreads to " + num + " new citizens.");
         }
         return true;
     }
@@ -2186,8 +2227,10 @@ function doCorpses() {
     var infected;
     // Nothing happens if there are no corpses
     if (civData.corpses.owned <= 0) { return; }
+
     // if we have enough clerics to bury the dead, then do nothing
-    if (civData.corpses.owned <= civData.cleric.owned) { return; }
+    // why 7?  Because after about 7 days corpses start decaying
+    if (civData.corpses.owned <= civData.cleric.owned * 7) { return; }
 
 
 
@@ -2197,18 +2240,13 @@ function doCorpses() {
     //if (sickChance >= 1) { return; }
 
     // more corpses should mean more chance of disease
-    // TODO: sort this out, it's happening too frequently
-    //sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
+    // TODO: sort this out, it's happening too frequently, - or is it? if there are no clerics to bury the dead
     sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
-    var test = (civData.corpses.owned * Math.random());
-    //sysLog(sickChance + " <= " + test);
-    //sysLog(sickChance >= test);
-    //if (sickChance <= civData.corpses.owned / 10000) { return; }
+    var test = civData.corpses.owned * Math.random();
+
     if (sickChance >= test) { return; }
 
-    //sysLog(population.healthy);
-
-    // Infect up to 0.1% of the population.
+    // Infect up to 0.1% of the healthy population.
     if (population.healthy > 0) {
         //infected = Math.floor(population.living / 100 * Math.random());
         infected = Math.floor(population.healthy / 10000 * Math.random());
@@ -2217,7 +2255,12 @@ function doCorpses() {
         infected = spreadPlague(infected);
         if (infected > 0) {
             calculatePopulation();
-            gameLog(prettify(infected) + " citizens caught the plague"); //notify player
+            //notify player
+            if (infected == 1) {
+                gameLog("A citizen caught the plague"); 
+            } else {
+                gameLog(prettify(infected) + " citizens caught the plague"); 
+            }
         }
     }
 
