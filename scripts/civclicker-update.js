@@ -24,7 +24,8 @@ function updateWonderList(){
 		try {
 			wonderhtml += "<tr><td>"+curCiv.wonders[i].name+"</td><td>"+curCiv.wonders[i].resourceId+"</td></tr>";
 		} catch(err) {
-			console.log("Could not build wonder row " + i);
+            console.log("Could not build wonder row " + i);
+            sysLog("Could not build wonder row " + i);
 		}
 	}
 	ui.find("#pastWonders").innerHTML = wonderhtml;
@@ -260,8 +261,11 @@ function updatePopulation (calc) {
 	civData.house.update(); // TODO: Effect might change dynamically.  Need a more general way to do this.
 	civData.barn.update();
 
-	ui.show("#graveTotal", (curCiv.grave.owned > 0));
-	ui.show("#totalSickRow",(population.totalSick > 0));
+	//ui.show("#graveTotal", (curCiv.grave.owned > 0)); // always show grave total
+    ui.show("#totalSickRow", (population.totalSick > 0));
+
+    // alert about sickness and attacks
+    ui.show("#populationSelect .alert", (population.totalSick > 0) || (curCiv.wolf.owned > 0) || (curCiv.bandit.owned > 0)|| (curCiv.barbarian.owned > 0));
 
 	//As population increases, various things change
 	// Update our civ type name
@@ -600,7 +604,11 @@ function updateMorale(){
 
 function addWonderSelectText() {
 	var wcElem = ui.find("#wonderCompleted");
-	if (!wcElem) { console.log("Error: No wonderCompleted element found."); return; }
+    if (!wcElem) {
+        console.log("Error: No wonderCompleted element found.");
+        sysLog("Error: No wonderCompleted element found.");
+        return;
+    }
 	var s = wcElem.innerHTML;
 	wonderResources.forEach(function(elem,i, wr) {
 		s += "<button onmousedown='wonderSelect(\"" +elem.id+"\")'>"+elem.getQtyName(0)+"</button>";
