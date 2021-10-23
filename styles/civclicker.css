@@ -569,6 +569,10 @@ button {
     padding-right: 20px;
     vertical-align: top;
 }
+
+#logT, #sysLogT {
+    width: 4em;
+}
 /*
 #graveTotal {
     display: none;
