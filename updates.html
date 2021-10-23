@@ -11,8 +11,29 @@
 <body>
 
 <h1>CivClicker Updates</h1>
+<h1>SixtySixGames' Development</h1>
+<section>
+	<div id="sixtysixgames-releases">
+		Loading...
+		<!-- populated by ajax -->
+	</div>
+	<p>
+		<a href="updates_sixtysixgames.html">See Depressivecherry's changes</a>
+	</p>
+</section>
+<h1>Depressivecherry's Development</h1>
+<section>
+	<div id="depressivecherry-releases">
+		Loading...
+		<!-- populated by ajax -->
+	</div>
+	<p>
+		<a href="updates_depressivecherry.html">See Depressivecherry's changes</a>
+	</p>
+</section>
+<h1>Deathraygames' Development</h1>
 <section class="updates">
-	<div id="github-releases">
+	<div id="deathray-releases">
 		Loading...
 		<!-- populated by ajax call to github api -->
 	</div>
@@ -62,7 +83,7 @@
 				+ '</ul></div>'
 			);
 		});
-		ui.find("#github-releases").innerHTML = h;
+		ui.find("#deathray-releases").innerHTML = h;
 	});
 	ajax.get("updates_colcord.html", function(responseText){
 		var h = responseText.split('</h1>')[1].split('</body>')[0];
@@ -71,6 +92,14 @@
 	ajax.get("updates_holley.html", function(responseText){
 		var h = responseText.split('</h1>')[1].split('</body>')[0];
 		ui.find("#holley-releases").innerHTML = h;
+	});
+        ajax.get("updates_depressivecherry.html", function(responseText){
+		var h = responseText.split('</h1>')[1].split('</body>')[0];
+		ui.find("#depressivecherry-releases").innerHTML = h;
+	});
+        ajax.get("updates_sixtysixgames.html", function(responseText){
+		var h = responseText.split('</h1>')[1].split('</body>')[0];
+		ui.find("#sixtysixgames-releases").innerHTML = h;
 	});
 </script>
 </body>
