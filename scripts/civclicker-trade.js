@@ -64,7 +64,7 @@ function trade() {
     //curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
     //updateTradeButton(materialId, curCiv[materialId].tradeAmount);
 
-    gameLog("Traded " + curCiv.trader.requested + " " + material.getQtyName(curCiv.trader.requested));
+    gameLog("Traded " + prettify(curCiv.trader.requested) + " " + material.getQtyName(curCiv.trader.requested));
 }
 
 function isTraderHere() {
@@ -140,15 +140,20 @@ function updateTradeAmount() {
     // randomly set new trade amount
     //curCiv[materialId].tradeAmount = Math.round(Math.random() * civData[materialId].baseTradeAmount) * 10;
 
-    // if user trades then price goes down, else price goes up
+    // if user trades then price goes down, else price randomly goes up or down
     // the logic runs something like:
     // if the user sells something then they probably don't need it, so there's no demand, so cost goes down, amount goes up
     // if the user doesn't sell something, they probably need it, so have to pay more, so cost goes up, so amount goes down
     if (curCiv.trader.userTraded) {
-        curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10)
+        curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10);
     }
     else {
-        curCiv[materialId].tradeAmount -= Math.round(curCiv[materialId].tradeAmount / 10)
+        if (Math.random() < 0.5) {
+            curCiv[materialId].tradeAmount -= Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
+        }
+        else {
+            curCiv[materialId].tradeAmount += Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
+        }
     }
     // don't offer less than base amount
     curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
