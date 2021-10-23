@@ -34,6 +34,9 @@
     <script type="application/javascript" src="scripts/civclicker-classes.js" defer="defer"></script>
     <script type="application/javascript" src="scripts/civclicker-data.js" defer="defer"></script>
     <script type="application/javascript" src="scripts/civclicker-update.js" defer="defer"></script>
+    <script type="application/javascript" src="scripts/civclicker-migrate.js" defer="defer"></script>
+    <script type="application/javascript" src="scripts/civclicker-ui-functions.js" defer="defer"></script>
+    <script type="application/javascript" src="scripts/civclicker-trade.js" defer="defer"></script>
     <script type="application/javascript" src="scripts/civclicker.js" defer="defer"></script>
 </head>
 <body class="hasBackground">
@@ -289,7 +292,7 @@
                         <div class="alert">!</div>
                     </div>
                     <div id="sysEventsSelect" class="paneSelector" data-target="sysEventsPane" onclick="paneSelect(this)">
-                        System Events
+                        Event Log
                         <div class="alert">!</div>
                     </div>
                     <div id="settingsSelect" class="paneSelector" data-target="settingsPane" onclick="paneSelect(this)">
@@ -532,14 +535,14 @@
                         <span id="currencyRow"></span>
                         <span id="commerceRow"></span>
                         <h4>Buy Resources (1 gold)</h4>
-                        <button class="tradeResource" onmousedown="buy('food')">Buy 5000 Food</button><br />
-                        <button class="tradeResource" onmousedown="buy('wood')">Buy 5000 Wood</button><br />
-                        <button class="tradeResource" onmousedown="buy('stone')">Buy 5000 Stone</button><br />
-                        <button class="tradeResource" onmousedown="buy('skins')">Buy 500 Skins</button><br />
-                        <button class="tradeResource" onmousedown="buy('herbs')">Buy 500 Herbs</button><br />
-                        <button class="tradeResource" onmousedown="buy('ore')">Buy 500 Ore</button><br />
-                        <button class="tradeResource" onmousedown="buy('leather')">Buy 250 Leather</button><br />
-                        <button class="tradeResource" onmousedown="buy('metal')">Buy 250 Metal</button><br />
+                        <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
+                        <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
+                        <button class="tradeResource" onmousedown="buy('stone')">Buy <span id="stoneCost">5000</span> Stone</button><br />
+                        <button class="tradeResource" onmousedown="buy('skins')">Buy <span id="skinsCost">500</span> Skins</button><br />
+                        <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
+                        <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
+                        <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
+                        <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
                     </div>
                 </div>
                 <div id="achievementsPane" class="selectPane">
