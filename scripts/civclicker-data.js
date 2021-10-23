@@ -503,18 +503,10 @@ function getCivData () {
 		init: function(fullInit) { Upgrade.prototype.init.call(this,fullInit); this.cost = 1000; },
 		get cost() { return this.data.cost; }, // Increasing cost to use Grace to increase morale.
 		set cost(value) { this.data.cost = value; },
-		effectText:"Increase Morale" }),
+            effectText: "Increase Morale"
+        }),
+
 	// Units
-	new Unit({ 
-		id:"totalSick", singular:"sick citizens", plural:"sick citizens", subType:"special",
-		prereqs: undefined,  // Hide until we get one.
-		require: undefined,  // Cannot be purchased.
-		salable: false,  // Cannot be sold.
-		//xxx This (alternate data location) could probably be cleaner.
-		get owned() { return population[this.id]; },
-		set owned(value) { population[this.id]= value; },
-		init: function() { this.owned = this.initOwned; }, //xxx Verify this override is needed.
-		effectText:"Use healers and herbs to cure them" }),
 	new Unit({ 
 		id:"unemployed", singular:"idle citizen", plural:"idle citizens",
 		require: undefined,  // Cannot be purchased (through normal controls) xxx Maybe change this?
@@ -607,7 +599,18 @@ function getCivData () {
 		require:{ food:20, leather:20 },
 		get limit() { return 10*civData.stable.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
-		effectText:"Protect from attack" }),
+            effectText: "Protect from attack"
+        }),
+    new Unit({ 
+		id:"totalSick", singular:"sick citizens", plural:"sick citizens", subType:"special",
+		prereqs: undefined,  // Hide until we get one.
+		require: undefined,  // Cannot be purchased.
+		salable: false,  // Cannot be sold.
+		//xxx This (alternate data location) could probably be cleaner.
+		get owned() { return population[this.id]; },
+		set owned(value) { population[this.id]= value; },
+		init: function() { this.owned = this.initOwned; }, //xxx Verify this override is needed.
+		effectText:"Use healers and herbs to cure them" }),
 	new Unit({ 
 		id:"cat", singular:"cat", plural:"cats", subType:"special",
 		require: undefined,  // Cannot be purchased (through normal controls)
@@ -653,7 +656,19 @@ function getCivData () {
 		lootFatigue:(1/24), // Max fraction that leave after cleaning out a resource
 		killFatigue:(1/3), // Max fraction that leave after killing the last person
 		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
-		effectText:"Slaughter, plunder, and burn" }),
+        effectText: "Slaughter, plunder, and burn"
+        }),
+    new Unit({ 
+		id:"invader", singular:"invader", plural:"invaders",
+		alignment:"enemy",
+		combatType:"infantry", 
+		prereqs: undefined, // Cannot be purchased.
+		efficiency: 0.11,
+		onWin: function() { doConquer(this); },
+		lootFatigue:(1/10), // Max fraction that leave after cleaning out a resource
+		killFatigue:(1/5), // Max fraction that leave after killing the last person
+		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
+		effectText:"Slaughter, plunder, burn and take land" }),
 	new Unit({ 
 		id:"esiege", singular:"siege engine", plural:"siege engines",
 		alignment:"enemy",
