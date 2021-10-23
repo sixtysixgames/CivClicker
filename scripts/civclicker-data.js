@@ -67,7 +67,7 @@ function getCivData () {
 		subType: "land",
 		prereqs: undefined,  // Cannot be purchased.
 		require: undefined,  // Cannot be purchased.
-		vulnerable:false, // Cannot be stolen
+		vulnerable:false, // Cannot be stolen by looting
 		initOwned:1000,  
 		effectText:"Conquer more from your neighbors." }),
 	new Building({ 
@@ -128,22 +128,22 @@ function getCivData () {
 	new Building({ 
 		id: "tannery", singular:"tannery", plural:"tanneries",
 		prereqs:{ masonry: true },
-		require:{ wood:30, stone:70, skins:2 },
+		require:{ wood:30, stone:70, skins:5 },
 		effectText:"allows 1 tanner" }),
 	new Building({ 
 		id: "smithy", singular:"smithy", plural:"smithies",
 		prereqs:{ masonry: true },
-		require:{ wood:30, stone:70, ore:2 },
+		require:{ wood:30, stone:70, ore:5 },
 		effectText:"allows 1 blacksmith" }),
 	new Building({ 
 		id: "apothecary", singular:"apothecary", plural:"apothecaries",
 		prereqs:{ masonry: true },
-		require:{ wood:30, stone:70, herbs:2 },
+		require:{ wood:30, stone:70, herbs:5 },
 		effectText:"allows 1 healer" }),
 	new Building({ 
 		id:"temple", singular:"temple", plural:"temples",
 		prereqs:{ masonry: true },
-		require:{ wood:30, stone:120 },
+		require:{ wood:30, stone:120, herbs:5 },
 		effectText:"allows 1 cleric",
 		// If purchase was a temple and aesthetics has been activated, increase morale
 		// If population is large, temples have less effect.
@@ -563,7 +563,8 @@ function getCivData () {
 		id:"tanner", singular:"tanner", plural:"tanners",
 		source:"unemployed",
 		efficiency: 0.5,
-		prereqs:{ tannery: 1 },
+        prereqs: { tannery: 1 },
+        require:{ skins: 2 },
 		get limit() { return civData.tannery.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
 		effectText:"Convert skins to leather" }),
@@ -571,7 +572,8 @@ function getCivData () {
 		id:"blacksmith", singular:"blacksmith", plural:"blacksmiths",
 		source:"unemployed",
 		efficiency: 0.5,
-		prereqs:{ smithy: 1 },
+        prereqs: { smithy: 1 },
+        require:{ ore: 2 },
 		get limit() { return civData.smithy.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
 		effectText:"Convert ore to metal" }),
@@ -579,7 +581,8 @@ function getCivData () {
 		id:"healer", singular:"healer", plural:"healers",
 		source:"unemployed",
 		efficiency: 0.1,
-		prereqs:{ apothecary: 1 },
+        prereqs: { apothecary: 1 },
+        require:{ herbs: 2 },
 		init: function(fullInit) { Unit.prototype.init.call(this,fullInit); this.cureCount = 0; },
 		get limit() { return civData.apothecary.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
@@ -590,7 +593,8 @@ function getCivData () {
 		id:"cleric", singular:"cleric", plural:"clerics",
 		source:"unemployed",
 		efficiency: 0.05,
-		prereqs:{ temple: 1 },
+        prereqs: { temple: 1 },
+        require:{ herbs: 2 },
 		get limit() { return civData.temple.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
 		effectText:"Generate piety, bury corpses" }),
@@ -656,9 +660,9 @@ function getCivData () {
 		combatType:"animal", 
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.05,
-		onWin: function() { doSlaughter(this); },
+		onWin: function() { doWolves(this); },
 		killFatigue:(1.0), // Max fraction that leave after killing the last person
-		killExhaustion:(1/2), // Chance of an attacker leaving after killing a person
+		killExhaustion:(0.9), // Chance of an attacker leaving after killing a person
 		species:"animal",
 		effectText:"Eat your workers" }),
 	new Unit({ 
@@ -667,8 +671,8 @@ function getCivData () {
 		combatType:"infantry", 
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.07,
-		onWin: function() { doLoot(this); },
-		lootFatigue:(1/8), // Max fraction that leave after cleaning out a resource
+		onWin: function() { doBandits(this); },
+		lootFatigue:(1 / 8), // Max fraction that leave after cleaning out a resource
 		effectText:"Steal your resources" }),
 	new Unit({ 
 		id:"barbarian", singular:"barbarian", plural:"barbarians",
@@ -676,11 +680,11 @@ function getCivData () {
 		combatType:"infantry", 
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.09,
-		onWin: function() { doHavoc(this); },
+		onWin: function() { doBarbarians(this); },
         lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
         sackFatigue: (1 / 17), // Max fraction that leave after destroying a building type
 		killFatigue: (1 / 10), // Max fraction that leave after killing the last person
-		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
+		killExhaustion:(1 / 2), // Chance of an attacker leaving after killing a person
         effectText: "Slaughter, plunder, and burn"
         }),
     new Unit({ 
@@ -689,11 +693,12 @@ function getCivData () {
 		combatType:"infantry", 
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.11,
-		onWin: function() { doConquer(this); },
-        lootFatigue: (1 / 32), // Max fraction that leave after cleaning out a resource
-        sackFatigue: (1 / 34), // Max fraction that leave after destroying a building type
-		killFatigue: (1 / 20), // Max fraction that leave after killing the last person
-		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
+		onWin: function() { doInvaders(this); },
+        lootFatigue: (1 / 25), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 25), // Max fraction that leave after destroying a building type
+        killFatigue: (1 / 25), // Max fraction that leave after killing the last person
+        conquerFatigue: (1 / 25), // Max fraction that leave after conquering the last land
+		killExhaustion:(1 / 10), // Chance of an attacker leaving after killing a person
 		effectText:"Conquer your lands" }),
 	new Unit({ 
 		id:"esiege", singular:"siege engine", plural:"siege engines",
