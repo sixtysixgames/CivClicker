@@ -238,7 +238,9 @@ function updatePopulation (calc) {
 		spawnMaxbutton = ui.find("#spawnMaxbutton"),
 		spawn10button = ui.find("#spawn10button"),
 		spawn100button = ui.find("#spawn100button"),
-		spawn1000button = ui.find("#spawn1000button");
+        spawn1000button = ui.find("#spawn1000button");
+        spawn10000button = ui.find("#spawn10000button");
+        spawn100000button = ui.find("#spawn100000button");
 
 	if (calc) { calculatePopulation(); }
 
@@ -302,15 +304,40 @@ function updatePopulation (calc) {
 				ui.show(elems[i], !settings.customincr);
 			}
 		}
-	}
-	if (population.current >= 10000) {
+    }
+    if (population.current >= 10000) {
 		if (!settings.customIncr){
 			elems = document.getElementsByClassName("building1000");
 			for(i = 0; i < elems.length; i++) {
 				ui.show(elems[i], !settings.customincr);
 			}
+			elems = document.getElementsByClassName("unit10000");
+			for(i = 0; i < elems.length; i++) {
+				ui.show(elems[i], !settings.customincr);
+			}
 		}
 	}
+	if (population.current >= 100000) {
+		if (!settings.customIncr){
+			elems = document.getElementsByClassName("building10000");
+			for(i = 0; i < elems.length; i++) {
+				ui.show(elems[i], !settings.customincr);
+            }
+            elems = document.getElementsByClassName("unit100000");
+			for(i = 0; i < elems.length; i++) {
+				ui.show(elems[i], !settings.customincr);
+			}
+		}
+	}
+
+    if (population.current >= 1000000) {
+		if (!settings.customIncr){
+			elems = document.getElementsByClassName("building100000");
+			for(i = 0; i < elems.length; i++) {
+				ui.show(elems[i], !settings.customincr);
+			}
+		}
+    }
 
 	//Turning on/off buttons based on free space.
 	var maxSpawn = Math.max(0,Math.min((population.limit - population.living),logSearchFn(calcWorkerCost,civData.food.owned)));
@@ -321,6 +348,8 @@ function updatePopulation (calc) {
 	spawn10button.disabled = (maxSpawn < 10);
 	spawn100button.disabled = (maxSpawn < 100);
 	spawn1000button.disabled = (maxSpawn < 1000);
+    spawn10000button.disabled = (maxSpawn < 10000);
+    spawn100000button.disabled = (maxSpawn < 100000);
 
 	var canRaise = (getCurDeityDomain() == "underworld" && civData.devotion.owned >= 20);
 	var maxRaise = canRaise ? logSearchFn(calcZombieCost,civData.piety.owned) : 0;
@@ -337,7 +366,9 @@ function updatePopulation (calc) {
 	spawn1button.title = "Cost: " + prettify(Math.round(calcWorkerCost(1))) + " food";
 	spawn10button.title = "Cost: " + prettify(Math.round(calcWorkerCost(10))) + " food";
 	spawn100button.title = "Cost: " + prettify(Math.round(calcWorkerCost(100))) + " food";
-	spawn1000button.title = "Cost: " + prettify(Math.round(calcWorkerCost(1000))) + " food";
+    spawn1000button.title = "Cost: " + prettify(Math.round(calcWorkerCost(1000))) + " food";
+    spawn10000button.title = "Cost: " + prettify(Math.round(calcWorkerCost(10000))) + " food";
+    spawn100000button.title = "Cost: " + prettify(Math.round(calcWorkerCost(100000))) + " food";
 	spawnMaxbutton.title = "Cost: " + prettify(Math.round(calcWorkerCost(maxSpawn))) + " food";
 
 	ui.find("#workerCost").innerHTML = prettify(Math.round(calcWorkerCost(1)));
@@ -378,8 +409,17 @@ function updatePopulationBar () {
 function updateLandBar () {
 	var barElt = ui.find("#landBar");
 	var landTotals = getLandTotals();
-	var p = (Math.floor(1000 * (landTotals.buildings / landTotals.lands)) / 10);
-	barElt.innerHTML = ('<div style="width: ' + p + '%"></div>');	
+    var p = (Math.floor(1000 * (landTotals.buildings / landTotals.lands)) / 10);
+
+    // show warnings if we're getting close to full
+    var bg = "#aaccaa";
+    var pc = 100 - ((landTotals.buildings * 100) / landTotals.lands);
+    if (pc <= 5) {
+        bg = "#ff3300";
+    } else if (pc <= 10) {
+        bg = "#ffcc00";
+    }
+    barElt.innerHTML = ('<div style="width: ' + p + '%; background-color: ' + bg + '"></div>');	
 }
 
 
@@ -601,8 +641,8 @@ function updateWonder () {
 	ui.show("#speedWonderGroup",(curCiv.curWonder.stage === 1));
 	ui.find("#speedWonder").disabled = (curCiv.curWonder.stage !== 1 || !canAfford({ gold: 100 }));
 	if (curCiv.curWonder.stage === 1){
-		ui.find("#progressBar").style.width = curCiv.curWonder.progress.toFixed(2) + "%";
-		ui.find("#progressNumber").innerHTML = curCiv.curWonder.progress.toFixed(2);
+		ui.find("#progressBar").style.width = curCiv.curWonder.progress.toFixed(4) + "%";
+		ui.find("#progressNumber").innerHTML = curCiv.curWonder.progress.toFixed(4);
 	}
 
 	// Finished, but haven't picked the resource yet.
