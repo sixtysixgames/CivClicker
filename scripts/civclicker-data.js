@@ -1,3 +1,4 @@
+"use strict";
 
 // Requires 
 
@@ -8,7 +9,9 @@ function getCivData () {
 	new Resource({ 
 		id:"food", name:"food", increment:1, specialChance:0.1,
 		subType:"basic",
-		specialMaterial: "skins", verb: "harvest", activity: "harvesting", //I18N
+        specialMaterial: "skins", verb: "harvest", activity: "harvesting", //I18N
+            initTradeAmount: 5000, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 1000, // the least on offer
 		get limit() { 
 			var barnBonus = ((civData.granaries.owned ? 2 : 1) * 200);
 			return 200 + (civData.barn.owned * barnBonus); 
@@ -18,28 +21,49 @@ function getCivData () {
 	new Resource({ 
 		id:"wood", name:"wood", increment:1, specialChance:0.1,
 		subType:"basic",
-		specialMaterial: "herbs", verb: "cut", activity: "woodcutting", //I18N
+        specialMaterial: "herbs", verb: "cut", activity: "woodcutting", //I18N
+        initTradeAmount: 5000, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 1000, // the least on offer
 		get limit() { return 200 + (civData.woodstock.owned  * 200); },
 		set limit(value) { return this.limit; } // Only here for JSLint.
 	}),
 	new Resource({ 
 		id:"stone", name:"stone", increment:1, specialChance:0.1,
 		subType:"basic",
-		specialMaterial: "ore", verb: "mine", activity: "mining", //I18N
+        specialMaterial: "ore", verb: "mine", activity: "mining", //I18N
+        initTradeAmount: 5000, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 1000, // the least on offer
 		get limit() { return 200 + (civData.stonestock.owned  * 200); },
 		set limit(value) { return this.limit; } // Only here for JSLint.
 	}),
-	new Resource({ id:"skins", singular:"skin", plural:"skins"}),
-	new Resource({ id:"herbs", singular:"herb", plural:"herbs" }),
-	new Resource({ id:"ore", name:"ore" }),
-	new Resource({ id:"leather", name:"leather" }),
-	new Resource({ id:"metal", name:"metal" }),
+        new Resource({
+            id: "skins", singular: "skin", plural: "skins",
+            initTradeAmount: 500, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 100, // the least on offer
+        }),
+	new Resource({ id:"herbs", singular:"herb", plural:"herbs",
+            initTradeAmount: 500, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 100, // the least on offer
+        }),
+	new Resource({ id:"ore", name:"ore",
+            initTradeAmount: 500, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 100, // the least on offer
+        }),
+	new Resource({ id:"leather", name:"leather",
+            initTradeAmount: 250, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 50, // the least on offer
+        }),
+	new Resource({ id:"metal", name:"metal",
+            initTradeAmount: 250, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 50, // the least on offer
+        }),
 	new Resource({ id:"piety", name:"piety", vulnerable:false }), // Can't be stolen
 	new Resource({ id:"gold", name:"gold", vulnerable:false }), // Can't be stolen
 	new Resource({ id:"corpses", singular:"corpse", plural:"corpses", vulnerable:false }), // Can't be stolen
 	new Resource({ id:"devotion", name:"devotion", vulnerable:false }), // Can't be stolen
 	// Buildings
-	new Building({ id:"freeLand", name:"free land", plural:"free land", 
+    new Building({
+        id: "freeLand", name: "free land", plural: "free land", 
 		subType: "land",
 		prereqs: undefined,  // Cannot be purchased.
 		require: undefined,  // Cannot be purchased.
@@ -176,29 +200,28 @@ function getCivData () {
 		id: "battleAltar", name:"Build Altar", singular:"battle altar", plural:"battle altars", 
 		subType: "altar", devotion:1,
 		prereqs:{ deity: "battle" },
-		get require() { return { stone:200, piety:200, metal : 50 + (50 * this.owned) }; },
+		get require() { return { stone:200, piety:200 + (this.owned * this.owned), metal : 50 + (50 * this.owned) }; },
 		set require(value) { return this.require; }, // Only here for JSLint.
 		effectText:"+1 Devotion" }),
 	new Building({ 
 		id: "fieldsAltar", name:"Build Altar", singular:"fields altar", plural:"fields altars", 
 		subType: "altar", devotion:1,
 		prereqs:{ deity: "fields" },
-		get require() { return { stone:200, piety:200,
-				food : 500 + (250 * this.owned), wood : 500 + (250 * this.owned) }; },
+		get require() { return { stone:200, piety:200 + (this.owned * this.owned), food : 500 + (250 * this.owned), wood : 500 + (250 * this.owned) }; },
 		set require(value) { return this.require; }, // Only here for JSLint.
 		effectText:"+1 Devotion" }),
 	new Building({ 
 		id: "underworldAltar", name:"Build Altar", singular:"underworld altar", plural:"underworld altars",
 		subType: "altar", devotion:1,
 		prereqs:{ deity: "underworld" },
-		get require() { return { stone:200, piety:200, corpses : 1 + this.owned }; },
+		get require() { return { stone:200, piety:200 + (this.owned * this.owned), corpses : 1 + this.owned }; },
 		set require(value) { return this.require; }, // Only here for JSLint.
 		effectText:"+1 Devotion" }),
 	new Building({ 
 		id: "catAltar", name:"Build Altar", singular:"cat altar", plural:"cat altars", 
 		subType: "altar", devotion:1,
 		prereqs:{ deity: "cats" },
-		get require() { return { stone:200, piety:200, herbs : 100 + (50 * this.owned) }; },
+		get require() { return { stone:200, piety:200 + (this.owned * this.owned), herbs : 100 + (50 * this.owned) }; },
 		set require(value) { return this.require; }, // Only here for JSLint.
 		effectText:"+1 Devotion" }),
 	// Upgrades
@@ -602,7 +625,8 @@ function getCivData () {
             effectText: "Protect from attack"
         }),
     new Unit({ 
-		id:"totalSick", singular:"sick citizens", plural:"sick citizens", subType:"special",
+        id: "totalSick", singular: "sick citizens", plural: "sick citizens",
+        //subType: "special", // it's not special! it's still player it still needs food, it still counts towards population
 		prereqs: undefined,  // Hide until we get one.
 		require: undefined,  // Cannot be purchased.
 		salable: false,  // Cannot be sold.
@@ -653,8 +677,9 @@ function getCivData () {
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.09,
 		onWin: function() { doHavoc(this); },
-		lootFatigue:(1/24), // Max fraction that leave after cleaning out a resource
-		killFatigue:(1/3), // Max fraction that leave after killing the last person
+        lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 17), // Max fraction that leave after destroying a building type
+		killFatigue: (1 / 10), // Max fraction that leave after killing the last person
 		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
         effectText: "Slaughter, plunder, and burn"
         }),
@@ -665,10 +690,11 @@ function getCivData () {
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.11,
 		onWin: function() { doConquer(this); },
-		lootFatigue:(1/10), // Max fraction that leave after cleaning out a resource
-		killFatigue:(1/5), // Max fraction that leave after killing the last person
+        lootFatigue: (1 / 32), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 34), // Max fraction that leave after destroying a building type
+		killFatigue: (1 / 20), // Max fraction that leave after killing the last person
 		killExhaustion:(1.0), // Chance of an attacker leaving after killing a person
-		effectText:"Slaughter, plunder, burn and take land" }),
+		effectText:"Conquer your lands" }),
 	new Unit({ 
 		id:"esiege", singular:"siege engine", plural:"siege engines",
 		alignment:"enemy",
