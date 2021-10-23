@@ -3,7 +3,7 @@
 /* Trade functions */
 
 function startTrader() {
-    // check a couple of things
+    // check a couple of things, if one of these is missing, then all are probably missing
     if (!checkTradeAmounts("food")) { return; }
     if (!checkTradeAmounts("herbs")) { return; }
     if (!checkTradeAmounts("metal")) { return; }
@@ -37,6 +37,7 @@ function startTrader() {
     var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
     curCiv.trader.materialId = selected.materialId;
     curCiv.trader.requested = selected.requested * (Math.ceil(Math.random() * 100)); // Up to 20x amount
+    curCiv.trader.userTraded = false;
 
     updateTrader();
 }
@@ -54,6 +55,7 @@ function trade() {
     var material = civData[curCiv.trader.materialId];
 
     material.owned -= curCiv.trader.requested;
+    curCiv.trader.userTraded = true;
     ++civData.gold.owned;
     updateResourceTotals();
 
@@ -127,11 +129,29 @@ function tickTraders() {
         curCiv.trader.timer--;
     }
     if (curCiv.trader.timer == 1) {
-        // here we call a function to randomly change price on buttons just before it leaves
-        var materialId = curCiv.trader.materialId;
-        curCiv[materialId].tradeAmount = Math.round(Math.random() * civData[materialId].baseTradeAmount) * 10;
-        curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
-        updateTradeButton(materialId, curCiv[materialId].tradeAmount);
+        // here we call a function to change price on trade buttons just before trader leaves
+        updateTradeAmount();
     }
 }
 
+function updateTradeAmount() {
+    
+    var materialId = curCiv.trader.materialId;
+    // randomly set new trade amount
+    //curCiv[materialId].tradeAmount = Math.round(Math.random() * civData[materialId].baseTradeAmount) * 10;
+
+    // if user trades then price goes down, else price goes up
+    // the logic runs something like:
+    // if the user sells something then they probably don't need it, so there's no demand, so cost goes down, amount goes up
+    // if the user doesn't sell something, they probably need it, so have to pay more, so cost goes up, so amount goes down
+    if (curCiv.trader.userTraded) {
+        curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10)
+    }
+    else {
+        curCiv[materialId].tradeAmount -= Math.round(curCiv[materialId].tradeAmount / 10)
+    }
+    // don't offer less than base amount
+    curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
+
+    updateTradeButton(materialId, curCiv[materialId].tradeAmount);
+}
