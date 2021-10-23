@@ -1033,9 +1033,10 @@ function spawn(num) {
 function pickStarveTarget() {
     var modNum, jobNum;
     var modList = ["ill", "owned"]; // The sick starve first
-    //xxx Remove this hard-coded list.
-    var jobList = ["unemployed", "blacksmith", "tanner", "miner", "woodcutter",
-        "cleric", "cavalry", "soldier", "healer", "labourer", "farmer"];
+    //xxx Remove this hard-coded list.  Priority of least to most importance
+    // todo: should probably be random job
+    var jobList = ["unemployed", "labourer", "cleric", "healer", "blacksmith", "tanner", "miner", "woodcutter",
+        "cavalry", "soldier", "farmer"];
 
     for (modNum = 0; modNum < modList.length; ++modNum) {
         for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
@@ -1084,7 +1085,21 @@ function doStarve() {
         adjustMorale(-0.01);
         civData.food.owned = 0;
     }
+}
 
+function doHomeless() {
+
+    if (population.living > population.limit) {
+        // we have homeless, let some die of exposure
+        var numHomeless = population.living - population.limit;
+        // kill off 10% of homeless
+        var numDie = starve(Math.ceil(Math.random() * numHomeless / 10));
+        if (numDie == 1) {
+            gameLog("A citizen died of exposure");
+        } else if (numDie > 1) {
+            gameLog(prettify(numDie) + " citizens died of exposure");
+        }
+    }
 }
 
 function killUnit(unit) {
@@ -1097,9 +1112,15 @@ function killUnit(unit) {
     civData.corpses.owned += 1; //Increments corpse number
     //Workers dying may trigger Book of the Dead
     if (civData.book.owned) { civData.piety.owned += 10; }
+
+    if (population.living > 0) {
+        // the greater the population, the less the drop in morale
+        adjustMorale(-100 / population.living);
+    }
+
     calculatePopulation();
     return 1;
-};
+}
 
 
 // Creates or destroys zombies
@@ -1432,7 +1453,7 @@ function plunder() {
     payFor(curCiv.raid.plunderLoot, -1);  // We pay for -1 of these to receive them.
 
     // Create message to notify player
-    plunderMsg = civSizes[curCiv.raid.last].name + " defeated! ";
+    plunderMsg = civSizes[curCiv.raid.last].name + " raided! ";
     plunderMsg += "Plundered " + getReqText(curCiv.raid.plunderLoot) + ". ";
     gameLog(plunderMsg);
 
@@ -1488,6 +1509,8 @@ function adjustMorale(delta) {
             curCiv.morale.efficiency = min;
         }
         updateMorale(); //update to player
+
+        //sysLog("adjustMorale.delta: " + delta + ". curCiv.morale.efficiency: " + curCiv.morale.efficiency);
     }
 }
 
@@ -2171,7 +2194,8 @@ function doFight(attacker, defender) {
     if ((attacker.owned <= 0) || (defender.owned <= 0)) { return; }
 
     // Defenses vary depending on whether the player is attacking or defending.
-    var fortMod = (defender.alignment == "player" ? (civData.fortification.owned * civData.fortification.efficiency)
+    var fortMod = (defender.alignment == "player" ?
+        (civData.fortification.owned * civData.fortification.efficiency)
         : (civData.efort.owned * civData.efort.efficiency));
     var palisadeMod = ((defender.alignment == "player") && (civData.palisade.owned)) * civData.palisade.efficiency;
 
@@ -2197,7 +2221,33 @@ function doFight(attacker, defender) {
     calculatePopulation();
 }
 
-// wolves, barbarians, invaders
+function doWolves(attacker) {
+    doSlaughter(attacker);
+}
+function doBandits(attacker) {
+    // bandits mainly loot
+    var r = Math.random();
+    if (r < 0.1) { doSlaughter(attacker); }
+    else if (r < 0.2) { doSack(attacker); }
+    else { doLoot(attacker);}
+}
+function doBarbarians(attacker) {
+    //barbarians mainly kill, steal and destroy
+    var r = Math.random(); 
+    if (r < 0.3) { doSlaughter(attacker); }
+    else if (r < 0.6) { doLoot(attacker); }
+    else if (r < 0.9) { doSack(attacker); }
+    else { doConquer(attacker);}
+}
+function doInvaders(attacker) {
+    var r = Math.random(); 
+    if (r < 0.25) { doSlaughterMulti(attacker); }
+    else if (r < 0.5) { doLoot(attacker); }
+    else if (r < 0.75) { doSackMulti(attacker); }
+    else { doConquer(attacker); }
+}
+
+// kill
 function doSlaughter(attacker) {
     var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
     var target = randomHealthyWorker(); //Choose random worker
@@ -2212,6 +2262,12 @@ function doSlaughter(attacker) {
             if (attacker.species != "animal") {
                 civData.corpses.owned += 1;
             }
+
+            if (population.living > 0) {
+                // the greater the population, the less the drop in morale
+                adjustMorale(-100 / population.living);
+            }
+
             gameLog(targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(attacker.owned));
         }
     } else { // Attackers slowly leave once everyone is dead
@@ -2220,14 +2276,49 @@ function doSlaughter(attacker) {
     }
     calculatePopulation();
 }
+function doSlaughterMulti(attacker) {
+    //var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
 
-// bandits, barbarians, invaders
+    // kill up to 1% of attacking force
+    var kills = Math.ceil(Math.random() * attacker.owned * 0.01);
+    for (var k = 1; k <= kills; k++) {
+        var target = randomHealthyWorker(); //Choose random worker
+        var targetUnit = civData[target];
+        if (target) {
+            if (targetUnit.owned >= 1) {
+                // An attacker may disappear after killing
+                if (Math.random() < attacker.killExhaustion) { --attacker.owned; }
+
+                targetUnit.owned -= 1;
+                // Animals will eat the corpse
+                if (attacker.species != "animal") {
+                    civData.corpses.owned += 1;
+                }
+
+                if (population.living > 0) {
+                    // the greater the population, the less the drop in morale
+                    adjustMorale(-100 / population.living);
+                }
+            }
+        } else { // Attackers slowly leave once everyone is dead
+            var leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
+            attacker.owned -= leaving;
+        }
+    }
+    var killVerb = (kills == 1) ? " citizen killed by " : " citizens killed by ";
+    gameLog(kills + killVerb + attacker.getQtyName(2)); // always use plural attacker
+    calculatePopulation();
+}
+
+// rob
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
     var target = lootable[Math.floor(Math.random() * lootable.length)];
-    //var stolenQty = Math.floor((Math.random() * 1000)); //Steal up to 1000.
-    var stolenQty = Math.floor((Math.random() * attacker.owned)); //Steal up to however many attackers.
-    stolenQty = Math.min(stolenQty, target.owned);
+    var stolenQty = Math.floor((Math.random() * attacker.owned * 0.1)); //Steal up to 10% however many attackers.
+
+    // target.owned can decimal
+    stolenQty = Math.min(stolenQty, Math.floor(target.owned));
+    // prettify(val.toFixed(1)
     if (stolenQty > 0) {
         gameLog(stolenQty + " " + target.getQtyName(stolenQty)
             + " stolen by " + attacker.getQtyName(attacker.owned));
@@ -2243,14 +2334,14 @@ function doLoot(attacker) {
     updateResourceTotals();
 }
 
-// barbarians, invaders
+// burn
 function doSack(attacker) {
     //Destroy buildings
     var target = sackable[Math.floor(Math.random() * sackable.length)];
 
     if (target.owned > 0) {
-        // Slightly different phrasing for fortifications
         var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
 
         --target.owned;
@@ -2259,7 +2350,6 @@ function doSack(attacker) {
         gameLog(target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
     } else {
         //some will leave
-        //var leaving = Math.ceil(attacker.owned * Math.random() * (1 / 112));
         var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
@@ -2269,10 +2359,74 @@ function doSack(attacker) {
     updateResourceTotals();
     calculatePopulation(); // Limits might change
 }
+function doSackMulti(attacker) {
+    //Destroy buildings
+    var target = sackable[Math.floor(Math.random() * sackable.length)];
 
+    if (target.owned > 0) {
+        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        // Slightly different phrasing for fortifications
+        if (target == civData.fortification) { destroyVerb = "damaged"; }
+
+        // sack up to 1% of attacking force
+        var sacked = Math.ceil(Math.random() * attacker.owned * 0.01);
+        // can't sack more than we own
+        sacked = Math.min(target.owned, sacked);
+        if (sacked > 0) {
+            target.owned -= sacked;
+            civData.freeLand.owned += sacked;
+
+            gameLog(sacked + " " + target.getQtyName(sacked) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
+            // Attackers leave after sacking something.
+            attacker.owned -= sacked;
+        }
+    } else {
+        //some will leave
+        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
+        attacker.owned -= leaving;
+    }
+
+    if (attacker.owned < 0) { attacker.owned = 0; } 
+    updateRequirements(target);
+    updateResourceTotals();
+    calculatePopulation(); // Limits might change
+}
+// barbarians
+//function doHavoc(attacker) {
+//    var havoc = Math.random(); //barbarians do different things
+//    if (havoc < 0.33) { doSlaughter(attacker); }
+//    else if (havoc < 0.66) { doLoot(attacker); }
+//    else { doSack(attacker); }
+//}
+
+// occupy land
+function doConquer(attacker) {
+
+    // conquer some freeland
+
+    if (civData.freeLand.owned > 0) {
+        // random 10% of attacking force - this might need adjusting
+        var land = Math.ceil(Math.random() * attacker.owned * 0.1);
+        land = Math.min(civData.freeLand.owned, land);
+        if (land > 0) {
+            civData.freeLand.owned -= land;
+            gameLog(land + " land conquered by " + attacker.getQtyName(attacker.owned));
+            // Attackers leave after conquering land.
+            attacker.owned -= land;
+            //if (--attacker.owned < 0) { attacker.owned = 0; } 
+        }
+    }
+    else {
+        //some will leave
+        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
+        attacker.owned -= leaving;
+    }
+    if (attacker.owned < 0) { attacker.owned = 0; }
+}
 
 // sometime we have more tanners than we have tannerys, for example
 // usually because of buildings being sacked i.e. destroyed
+// this is called in the main game loop
 function dismissWorkers() {
 
     var diff = 0;
@@ -2286,14 +2440,12 @@ function dismissWorkers() {
         civData.unemployed.owned += diff;
     }
 
-
     total = totalByJob("blacksmith");
     if (total > 0 && total > civData.smithy.owned) {
         diff = total - civData.smithy.owned;
         civData.blacksmith.owned -= diff;
         civData.unemployed.owned += diff;
     }
-
 
     total = totalByJob("healer");
     if (total > 0 && total > civData.apothecary.owned) {
@@ -2302,14 +2454,12 @@ function dismissWorkers() {
         civData.unemployed.owned += diff;
     }
 
-
     total = totalByJob("cleric");
     if (total > 0 && total > civData.temple.owned) {
         diff = total - civData.temple.owned;
         civData.cleric.owned -= diff;
         civData.unemployed.owned += diff;
     }
-
 
     // these buildings have 10 units
     total = totalByJob("soldier");
@@ -2324,36 +2474,6 @@ function dismissWorkers() {
         diff = total - (civData.stable.owned * 10);
         civData.cavalry.owned -= diff;
         civData.unemployed.owned += diff;
-    }
-
-}
-
-// barbarians
-function doHavoc(attacker) {
-    var havoc = Math.random(); //barbarians do different things
-    if (havoc < 0.3) { doSlaughter(attacker); }
-    else if (havoc < 0.6) { doLoot(attacker); }
-    else { doSack(attacker); }
-}
-
-// invaders - do everything
-function doConquer(attacker) {
-    doSlaughter(attacker);
-    doLoot(attacker);
-    doSack(attacker);
-
-    // now conquer some freeland
-    if (civData.freeLand.owned > 0) {
-        // random 10% - this might need adjusting
-        var land = Math.floor(Math.random() * civData.freeLand.owned * 0.1);
-
-        if (land > 0) {
-            civData.freeLand.owned -= land;
-
-            gameLog(land + " land conquered by " + attacker.getQtyName(attacker.owned));
-
-            if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after conquering land.
-        }
     }
 }
 
@@ -2556,7 +2676,7 @@ function doMobs() {
         ++curCiv.attackCounter;
     }
 
-    // we don't want wolves attacking small populations
+    // we don't want mobs attacking small populations
     //
     if (population.current > 10 && curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
 
@@ -2577,11 +2697,11 @@ function doMobs() {
             //    if (Math.random() > 0.5) { mobType = "bandit"; }
             //}
 
-            // we don't want wolves attacking large settlements
-            // or bandits attacking small ones
+            // we don't want wolves/bandits attacking large settlements/nations
+            // or barbarians/invaders attacking small ones
             if (population.current < civSizes.village.min_pop) {
                 // mostly wolves
-                if (Math.random() > 0.1) {
+                if (Math.random() < 0.9) {
                     mobType = mobTypes.wolf;
                 }
                 else {
@@ -2590,16 +2710,16 @@ function doMobs() {
             }
             else if (population.current >= civSizes.village.min_pop && population.current < civSizes.town.min_pop) {
                 // wolf or bandit
-                if (Math.random() > 0.5) {
-                    mobType = mobTypes.bandit;
+                if (Math.random() < 0.5) {
+                    mobType = mobTypes.wolf;
                 }
                 else {
-                    mobType = mobTypes.wolf;
+                    mobType = mobTypes.bandit;
                 }
             }
             else if (population.current >= civSizes.town.min_pop && population.current < civSizes.smallCity.min_pop) {
                 // mostly bandits
-                if (Math.random() > 0.1) {
+                if (Math.random() < 0.9) {
                     mobType = mobTypes.bandit;
                 }
                 else {
@@ -2608,7 +2728,7 @@ function doMobs() {
             }
             else if (population.current >= civSizes.smallCity.min_pop && population.current < civSizes.largeCity.min_pop) {
                 // bandits or barbarians
-                if (Math.random() > 0.5) {
+                if (Math.random() < 0.5) {
                     mobType = mobTypes.bandit;
                 }
                 else {
@@ -2617,7 +2737,7 @@ function doMobs() {
             }
             else if (population.current >= civSizes.largeCity.min_pop && population.current < civSizes.smallNation.min_pop) {
                 // mostly barbarians
-                if (Math.random() > 0.1) {
+                if (Math.random() < 0.9) {
                     mobType = mobTypes.barbarian;
                 }
                 else {
@@ -2626,7 +2746,7 @@ function doMobs() {
             }
             else if (population.current >= civSizes.smallNation.min_pop && population.current < civSizes.largeNation.min_pop) {
                 // barbarians or invaders
-                if (Math.random() > 0.5) {
+                if (Math.random() < 0.5) {
                     mobType = mobTypes.barbarian;
                 }
                 else {
@@ -2634,8 +2754,13 @@ function doMobs() {
                 }
             }
             else if (population.current >= civSizes.largeNation.min_pop) {
-                // invaders only
-                mobType = mobTypes.invader;
+                // mainly invaders 
+                if (Math.random() < 0.1) {
+                    mobType = mobTypes.barbarian;
+                }
+                else {
+                    mobType = mobTypes.invader;
+                }
             }
             spawnMob(civData[mobType]);
         }
@@ -2722,6 +2847,8 @@ function sysLog(message) {
     var d = new Date();
     var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
 
+    console.log(message);
+
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#syslogL").innerHTML != message) {
         sysLogRepeat = 0; //Reset the (xNumber) value
@@ -2791,6 +2918,7 @@ function gameLoop() {
     // Check for starvation
     doStarve();
     // TODO: Need to kill workers who die from exposure.
+    doHomeless()
 
     checkResourceLimits();
 
