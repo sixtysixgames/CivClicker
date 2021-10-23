@@ -261,13 +261,14 @@ function calculatePopulation() {
             population.current += unit.owned;
 
             if (unit.vulnerable) {
-                // TODO Should this use 'killable'?
+                // TODO Should this use 'killable'? Yes
                 population.healthy += unit.owned;
             }
             if (unit.ill) {
                 population.totalSick += (unit.ill || 0);
+                population.healthy -= (unit.ill || 0);
             } else {
-                population.healthy += 1; // TODO: Not sure if this is calculated right
+                //population.healthy += 1; // TODO: Not sure if this is calculated right
             }
         } else {
             population.extra += unit.owned;
@@ -1092,7 +1093,7 @@ function doHomeless() {
     if (population.living > population.limit) {
         // we have homeless, let some die of exposure
         var numHomeless = population.living - population.limit;
-        // kill off 10% of homeless
+        // kill off up to 10% of homeless
         var numDie = starve(Math.ceil(Math.random() * numHomeless / 10));
         if (numDie == 1) {
             gameLog("A citizen died of exposure");
@@ -2025,6 +2026,7 @@ function doClerics() {
     civData.piety.net += pietyEarned;
     civData.piety.owned += pietyEarned;
 }
+
 // Try to heal the specified number of people in the specified job
 // Makes them sick if the number is negative.
 function healByJob(job, num) {
@@ -2104,27 +2106,59 @@ function doHealers() {
 }
 
 function doPlague() {
-    var jobInfected = getRandomPatient();
-    var unitInfected = civData[jobInfected];
-    var deathRoll = (100 * Math.random()) + 1;
-
-    if (unitInfected.ill <= 0 || unitInfected.owned <= 0) {
+    if (population.totalSick <= 0) {
         return false;
     }
+    //var jobInfected = getRandomPatient();
+    //var unitInfected = civData[jobInfected];
+    //if (unitInfected.ill <= 0 || unitInfected.owned <= 0) {
+    //    return false;
+    //}
 
-    if (deathRoll <= 5) { // 5% chance that 1 person dies
-        killUnit(unitInfected);
-        gameLog("A sick " + unitInfected.singular + " dies.");
-        // TODO: Decrease happiness
+    var deathRoll = (100 * Math.random()) + 1;
+
+    if (deathRoll <= 1) { // 1% chance that up to 0.1% ill people dies
+        var victims = Math.floor(population.totalSick / 1000 * Math.random());
+        if (victims <= 0) { return false; }
+        var died = 0;
+        var lastVictim = "citizen";
+        for (var d = 1; d <= victims; d++) {
+            var jobInfected = getRandomPatient();
+            var unitInfected = civData[jobInfected];
+            
+            if (unitInfected.ill > 0 && unitInfected.owned > 0) {
+                killUnit(unitInfected);
+                lastVictim = unitInfected.singular;
+                died++;
+            }
+        }
+
+        if (died == 1) {
+            gameLog("A sick " + lastVictim + " dies of plague.");
+        }
+        else if (died > 1){
+            gameLog(died + " sick citizens died of plague.");
+        }
         calculatePopulation();
         return true;
-    } else if (deathRoll > 99.9) { // 0.1% chance that it spreads to a new person
-        spreadPlague(1);
-        gameLog("The sickness spreads to a new citizen.");
-        return true;
-    } else {
+    } else if (deathRoll > 99.9) { // 0.1% chance that it spreads 
+        // Infect up to 0.1% of the healthy population.
+        var infected = Math.floor(population.healthy / 1000 * Math.random()) + 1;
 
+        //spreadPlague(1);
+        //gameLog("The sickness spreads to a new citizen.");
+        var num = spreadPlague(infected);
+        if (num == 1) {
+            gameLog("The sickness spreads to a new citizen.");
+        }
+        else {
+            gameLog("The sickness spreads to " + num + " new citizens.");
+        }
+        return true;
     }
+    //else {
+
+    //}
     return false;
 }
 
@@ -2152,26 +2186,47 @@ function doCorpses() {
     var infected;
     // Nothing happens if there are no corpses
     if (civData.corpses.owned <= 0) { return; }
+    // if we have enough clerics to bury the dead, then do nothing
+    if (civData.corpses.owned <= civData.cleric.owned) { return; }
+
+
 
     // Corpses lying around will occasionally make people sick.
     // 1-in-50 chance (1-in-100 with feast)
-    sickChance = 50 * Math.random() * (1 + civData.feast.owned);
-    if (sickChance >= 1) { return; }
+    //sickChance = 50 * Math.random() * (1 + civData.feast.owned);
+    //if (sickChance >= 1) { return; }
 
-    // Infect up to 1% of the population.
-    infected = Math.floor(population.living / 100 * Math.random());
-    if (infected <= 0) { return; }
+    // more corpses should mean more chance of disease
+    // TODO: sort this out, it's happening too frequently
+    //sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
+    sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
+    var test = (civData.corpses.owned * Math.random());
+    //sysLog(sickChance + " <= " + test);
+    //sysLog(sickChance >= test);
+    //if (sickChance <= civData.corpses.owned / 10000) { return; }
+    if (sickChance >= test) { return; }
 
-    infected = spreadPlague(infected);
-    if (infected > 0) {
-        calculatePopulation();
-        gameLog(prettify(infected) + " citizens got sick"); //notify player
+    //sysLog(population.healthy);
+
+    // Infect up to 0.1% of the population.
+    if (population.healthy > 0) {
+        //infected = Math.floor(population.living / 100 * Math.random());
+        infected = Math.floor(population.healthy / 10000 * Math.random());
+        if (infected <= 0) { return; }
+
+        infected = spreadPlague(infected);
+        if (infected > 0) {
+            calculatePopulation();
+            gameLog(prettify(infected) + " citizens caught the plague"); //notify player
+        }
     }
 
-    // Corpse has a 50-50 chance of decaying (at least there is a bright side)
+    // Corpses have a 50-50 chance of decaying (at least there is a bright side)
     if (Math.random() < 0.5) {
-        civData.corpses.owned -= 1;
+        //civData.corpses.owned -= 1;
+        civData.corpses.owned -= 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
     }
+    if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 }
 
 // Returns all of the combatants present for a given place and alignment that.
