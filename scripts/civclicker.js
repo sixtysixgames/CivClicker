@@ -314,8 +314,6 @@ function getCivType() {
     return civType;
 }
 
-
-
 function getCurDeityDomain() {
     return (curCiv.deities.length > 0) ? curCiv.deities[0].domain : undefined;
 }
@@ -336,6 +334,13 @@ function getWonderBonus(resourceObj) {
     return (1 + (wonderCount[resourceObj.id] || 0) / 10);
 }
 
+// there might be a better way to check this
+function isUnderAttack() {
+    return (curCiv.wolf.owned > 0) ||
+        (curCiv.bandit.owned > 0) ||
+        (curCiv.barbarian.owned > 0) ||
+        (curCiv.invader.owned > 0);
+}
 
 // Reset the raid data.
 function resetRaiding() {
@@ -446,7 +451,6 @@ function payFor(costObj, qty) {
         if (!num) { continue; }
         civData[i].owned -= num;
     }
-
     return qty;
 }
 
@@ -733,10 +737,12 @@ function addUpgradeRows() {
 
 function getLandTotals() {
     //Update land values
-    var ret = { lands: 0, buildings: 0, free: 0 };
+    var ret = { lands: 0, buildings: 0, free: 0, sackableTotal: 0 };
     buildingData.forEach(function (elem) {
         if (elem.subType == "land") { ret.free += elem.owned; }
         else { ret.buildings += elem.owned; }
+
+        if (elem.vulnerable == true) { ret.sackableTotal += elem.owned;}
     });
     ret.lands = ret.free + ret.buildings;
     return ret;
@@ -1196,7 +1202,7 @@ function digGraves(num) {
 //xxx Doesn't currently pick from the army
 //xxx Take a parameter for how many people to pick.
 //xxx Make this able to return multiples by returning a cost structure.
-function randomHealthyWorker() {
+function getRandomHealthyWorker() {
     var num = Math.random() * population.healthy;
     var chance = 0;
     var i;
@@ -1207,7 +1213,7 @@ function randomHealthyWorker() {
 
     return "";
 }
-function randomWorker() {
+function getRandomWorker() {
     var num = Math.random() * population.living;
     var chance = 0;
     var i;
@@ -1218,11 +1224,25 @@ function randomWorker() {
 
     return "";
 }
+//Selects a random sackable building based on its proportions in the current distribution.
+function getRandomBuilding() {
+    var landTotals = getLandTotals();
+    var num = Math.random() * landTotals.sackableTotal;
+    var chance = 0;
+    var i;
+    for (i = 0; i < sackable.length; ++i) {
+        chance += civData[sackable[i].id].owned;
+        if (chance > num) { return sackable[i].id; }
+    }
+
+    return "";
+}
+
 //Selects a random worker, kills them, and then adds a random resource
 //xxx This should probably scale based on population (and maybe devotion).
 function wickerman() {
     //Select a random worker
-    var job = randomHealthyWorker();
+    var job = getRandomHealthyWorker();
     if (!job) { return; }
 
     //Pay the price
@@ -1279,7 +1299,7 @@ function tickWalk() {
     if (civData.walk.rate <= 0) { return; }
 
     for (i = 0; i < civData.walk.rate; ++i) {
-        target = randomHealthyWorker(); //xxx Need to modify this to do them all at once.
+        target = getRandomHealthyWorker(); //xxx Need to modify this to do them all at once.
         if (!target) { break; }
         --civData[target].owned;
     }
@@ -1464,7 +1484,15 @@ function plunder() {
     if (civData.lament.owned) { curCiv.attackCounter -= Math.ceil(curCiv.raid.epop / 2000); }
 
     // Collect loot
-    payFor(curCiv.raid.plunderLoot, -1);  // We pay for -1 of these to receive them.
+    //payFor(curCiv.raid.plunderLoot, -1);  // We pay for -1 of these to receive them. 
+    // Why?  If land is negative, this results in incorrect value
+    var i, num;
+    var lootObj = curCiv.raid.plunderLoot;
+    for (i in lootObj) {
+        num = lootObj[i];
+        if (!num) { continue; }
+        civData[i].owned += num;
+    }
 
     // Create message to notify player
     plunderMsg = civSizes[curCiv.raid.last].name + " raided! ";
@@ -1478,6 +1506,7 @@ function plunder() {
     resetRaiding();
     updateResourceTotals();
     updateTargets();
+
 }
 
 function glory(time) {
@@ -2078,7 +2107,7 @@ function spreadPlague(sickNum) {
     calculatePopulation();
     // Apply in 1-worker groups to spread it out.
     for (i = 0; i < sickNum; i++) {
-        actualNum += -healByJob(randomHealthyWorker(), -1);
+        actualNum += -healByJob(getRandomHealthyWorker(), -1);
     }
 
     return actualNum;
@@ -2248,15 +2277,10 @@ function doCorpses() {
     //if (sickChance >= 1) { return; }
 
     // more corpses should mean more chance of disease
-    // TODO: sort this out, it's happening too frequently, - or is it? if there are no clerics to bury the dead
-    //sickChance = civData.corpses.owned * Math.random() * (1 + civData.feast.owned);
-    //var test = civData.corpses.owned * Math.random();
-
     sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
     var test = population.healthy * 0.1 * Math.random();
 
     // if corpses owned is greater than 10% of population, then chance of sickness spreading
-    //sysLog(sickChance < test);
     if (sickChance < test) { return; }
 
     // Infect up to 0.01% of the healthy population.
@@ -2278,7 +2302,7 @@ function doCorpses() {
     }
 
     // Corpses have a 50-50 chance of decaying (at least there is a bright side)
-    if (Math.random() < 0.5) {
+    if (Math.random() < 1 / 30) {
         //civData.corpses.owned -= 1;
         var gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
@@ -2367,9 +2391,21 @@ function doBandits(attacker) {
 function doBarbarians(attacker) {
     //barbarians mainly kill, steal and destroy
     var r = Math.random();
-    if (r < 0.3) { doSlaughter(attacker); }
+    if (r < 0.3) {
+        if (Math.random() < 0.9) {
+            doSlaughter(attacker);
+        } else {
+            doSlaughterMulti(attacker);
+        }
+    }
     else if (r < 0.6) { doLoot(attacker); }
-    else if (r < 0.9) { doSack(attacker); }
+    else if (r < 0.9) {
+        if (Math.random() < 0.9) {
+            doSack(attacker);
+        } else {
+            doSackMulti(attacker);
+        }
+    }
     else { doConquer(attacker); }
 }
 function doInvaders(attacker) {
@@ -2383,8 +2419,8 @@ function doInvaders(attacker) {
 // kill
 function doSlaughter(attacker) {
     var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
-    //var target = randomHealthyWorker(); //Choose random worker
-    var target = randomWorker(); //Choose random worker
+    //var target = getRandomHealthyWorker(); //Choose random worker
+    var target = getRandomWorker(); //Choose random worker
     var targetUnit = civData[target];
     if (target) {
         if (targetUnit.owned >= 1) {
@@ -2418,10 +2454,10 @@ function doSlaughterMulti(attacker) {
     var targets = Math.ceil(Math.random() * attacker.owned * 0.01);
     var kills = 0;
     for (var k = 1; k <= targets; k++) {
-        //var target = randomHealthyWorker(); //Choose random worker
+        //var target = getRandomHealthyWorker(); //Choose random worker
         // sick people get killed as well
-        var target = randomWorker(); //Choose random worker
-
+        var target = getRandomWorker(); //Choose random worker
+        var lastTarget = "citizen";
         var targetUnit = civData[target];
         if (target) {
 
@@ -2431,6 +2467,8 @@ function doSlaughterMulti(attacker) {
 
                 targetUnit.owned -= 1;
                 kills++;
+                lastTarget = targetUnit.singular;
+
                 // Animals will eat the corpse
                 if (attacker.species != "animal") {
                     civData.corpses.owned += 1;
@@ -2447,7 +2485,7 @@ function doSlaughterMulti(attacker) {
         }
     }
     if (kills > 0) {
-        var killVerb = (kills == 1) ? " citizen murdered by " : " citizens slaughtered by ";
+        var killVerb = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens slaughtered by ";
         gameLog(prettify(kills) + killVerb + attacker.getQtyName(2)); // always use plural attacker
         calculatePopulation();
     }
@@ -2479,7 +2517,7 @@ function doLoot(attacker) {
 
 // burn
 function doSack(attacker) {
-    //Destroy buildings
+    //Destroy building
     var target = sackable[Math.floor(Math.random() * sackable.length)];
 
     if (target.owned > 0) {
@@ -2511,14 +2549,17 @@ function doSackMulti(attacker) {
     // sack up to 1% of attacking force
     var targets = Math.ceil(Math.random() * attacker.owned * 0.01);
     var sacks = 0;
+    var lastTarget = "building";
     for (var s = 1; s <= targets; s++) {
-        var target = sackable[Math.floor(Math.random() * sackable.length)];
-
-        if (target.owned > 0) {
+        var targetID = getRandomBuilding(); //sackable[Math.floor(Math.random() * sackable.length)];
+        var target = civData[targetID];
+        
+        if (target && target.owned > 0) {
 
             --target.owned;
             ++civData.freeLand.owned;
             sacks++;
+            lastTarget = target.singular;
 
             if (--attacker.owned < 0) { attacker.owned = 0; } // Attackers leave after sacking something.
             updateRequirements(target);
@@ -2534,58 +2575,17 @@ function doSackMulti(attacker) {
     }
 
     if (sacks > 0) {
-        var destroyVerb = (sacks == 1) ? " building burned by " : " buildings destroyed by ";
+        var destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
         gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
     }
 
     if (attacker.owned < 0) { attacker.owned = 0; }
-
-    /////////
-    //var target = sackable[Math.floor(Math.random() * sackable.length)];
-
-    //if (target.owned > 0) {
-    //    var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
-    //    // Slightly different phrasing for fortifications
-    //    if (target == civData.fortification) { destroyVerb = "damaged"; }
-
-    //    // sack up to 1% of attacking force or target, whichever is smaller sp all building aren't wiped out in one raid
-    //    var targets = Math.min(attacker.owned, target.owned);
-    //    var sacked = Math.ceil(Math.random() * targets * 0.01);
-    //    // can't sack more than we own
-    //    sacked = Math.min(target.owned, sacked);
-    //    if (sacked > 0) {
-    //        target.owned -= sacked;
-    //        civData.freeLand.owned += sacked;
-
-    //        gameLog(prettify(sacked) + " " + target.getQtyName(sacked) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
-    //        // Attackers leave after sacking something.
-    //        attacker.owned -= sacked;
-    //    }
-    //} else {
-    //    //some will leave
-    //    var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
-    //    attacker.owned -= leaving;
-    //}
-
-    //if (attacker.owned < 0) { attacker.owned = 0; }
-    //updateRequirements(target);
-    //updateResourceTotals();
-    //calculatePopulation(); // Limits might change
 }
-// barbarians
-//function doHavoc(attacker) {
-//    var havoc = Math.random(); //barbarians do different things
-//    if (havoc < 0.33) { doSlaughter(attacker); }
-//    else if (havoc < 0.66) { doLoot(attacker); }
-//    else { doSack(attacker); }
-//}
 
 // occupy land
 function doConquer(attacker) {
-
-    // conquer some freeland
 
     if (civData.freeLand.owned > 0) {
         // random 10% of attacking force or land - this might need adjusting
@@ -2611,12 +2611,12 @@ function doConquer(attacker) {
 // sometime we have more tanners than we have tannerys, for example
 // usually because of buildings being sacked i.e. destroyed
 // this is called in the main game loop
+// TODO: this could be improved.  maybe add id of worker to building type
 function dismissWorkers() {
-
+    // we only lose a worker if an occupied building is destroyed
     var diff = 0;
     var total = 0;
-    // we only lose a worker if an occupied building is destroyed
-
+    
     total = totalByJob("tanner");
     if (total > 0 && total > civData.tannery.owned) {
         diff = total - civData.tannery.owned;
@@ -2755,6 +2755,7 @@ function doRaid(place, attackerID, defenderID) {
 
     // Handle siege engines
     doSiege(civData.siege, civData.efort);
+
 }
 
 function doRaidCheck(place, attackerID, defenderID) {
@@ -2772,7 +2773,6 @@ function doRaidCheck(place, attackerID, defenderID) {
         }
     }
 }
-
 
 function doLabourers() {
     if (curCiv.curWonder.stage !== 1) { return; }
@@ -2860,7 +2860,7 @@ function doMobs() {
         ++curCiv.attackCounter;
     }
 
-    // we don't want mobs attacking small populations
+    // we don't want mobs attacking tiny populations
     //
     if (population.current > 10 && curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
 
@@ -2960,7 +2960,6 @@ function doMobs() {
         defenders.forEach(function (defender) { doFight(attacker, defender); }); // FIGHT!
     });
 }
-
 
 
 function doPestControl() {
@@ -3243,7 +3242,6 @@ setup.game = function () {
 setup.loop = function () {
     // This sets up the main game loop, which is scheduled to execute once per second.
     console.log("Setting up Main Loop");
-    //sysLog("Setting up Main Loop");
     gameLoop();
     loopTimer = window.setInterval(gameLoop, 1000); //updates once per second (1000 milliseconds)
 };
