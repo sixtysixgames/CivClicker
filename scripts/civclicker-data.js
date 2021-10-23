@@ -672,7 +672,10 @@ function getCivData () {
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.07,
 		onWin: function() { doBandits(this); },
-		lootFatigue:(1 / 8), // Max fraction that leave after cleaning out a resource
+        lootFatigue: (1 / 2), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 2), // Max fraction that leave after destroying a building type
+		killFatigue: (1 / 2), // Max fraction that leave after killing the last person
+		killExhaustion:(1 / 2), // Chance of an attacker leaving after killing a person
 		effectText:"Steal your resources" }),
 	new Unit({ 
 		id:"barbarian", singular:"barbarian", plural:"barbarians",
@@ -681,10 +684,11 @@ function getCivData () {
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.09,
 		onWin: function() { doBarbarians(this); },
-        lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
-        sackFatigue: (1 / 17), // Max fraction that leave after destroying a building type
+        lootFatigue: (1 / 10), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 10), // Max fraction that leave after destroying a building type
 		killFatigue: (1 / 10), // Max fraction that leave after killing the last person
-		killExhaustion:(1 / 2), // Chance of an attacker leaving after killing a person
+        killExhaustion: (1 / 5), // Chance of an attacker leaving after killing a person
+        conquerFatigue: (1 / 10), // Max fraction that leave after conquering the last land
         effectText: "Slaughter, plunder, and burn"
         }),
     new Unit({ 
@@ -694,11 +698,11 @@ function getCivData () {
 		prereqs: undefined, // Cannot be purchased.
 		efficiency: 0.11,
 		onWin: function() { doInvaders(this); },
-        lootFatigue: (1 / 25), // Max fraction that leave after cleaning out a resource
-        sackFatigue: (1 / 25), // Max fraction that leave after destroying a building type
-        killFatigue: (1 / 25), // Max fraction that leave after killing the last person
-        conquerFatigue: (1 / 25), // Max fraction that leave after conquering the last land
-		killExhaustion:(1 / 10), // Chance of an attacker leaving after killing a person
+        lootFatigue: (1 / 20), // Max fraction that leave after cleaning out a resource
+        sackFatigue: (1 / 20), // Max fraction that leave after destroying a building type
+        killFatigue: (1 / 20), // Max fraction that leave after killing the last person
+        killExhaustion: (1 / 10), // Chance of an attacker leaving after killing a person
+        conquerFatigue: (1 / 20), // Max fraction that leave after conquering the last land
 		effectText:"Conquer your lands" }),
 	new Unit({ 
 		id:"esiege", singular:"siege engine", plural:"siege engines",
