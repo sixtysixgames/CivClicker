@@ -143,7 +143,7 @@ function getCivData () {
 	new Building({ 
 		id:"temple", singular:"temple", plural:"temples",
 		prereqs:{ masonry: true },
-		require:{ wood:30, stone:120, herbs:5 },
+		require:{ wood:30, stone:120, herbs:10 },
 		effectText:"allows 1 cleric",
 		// If purchase was a temple and aesthetics has been activated, increase morale
 		// If population is large, temples have less effect.
@@ -594,7 +594,7 @@ function getCivData () {
 		source:"unemployed",
 		efficiency: 0.05,
         prereqs: { temple: 1 },
-        require:{ herbs: 2 },
+        require:{ herbs: 4 },
 		get limit() { return civData.temple.owned; },
 		set limit(value) { return this.limit; }, // Only here for JSLint.
 		effectText:"Generate piety, bury corpses" }),
