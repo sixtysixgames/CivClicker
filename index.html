@@ -50,7 +50,7 @@
         </div>
     </div>
     <div id="main" class="columns">
-        <div id="leftColumn" class="column left">
+        <div id="leftColumn" class="column left width40">
             <div id="basicResourcesContainer" class="civSection">
                 <table id="basicResources" class="resources">
                     <!-- populated by javascript -->
@@ -99,7 +99,7 @@
                 <!-- populated by javascript -->
             </div>
         </div>
-        <div id="rightColumn" class="column right">
+        <div id="rightColumn" class="column right width60">
             <div id="specialResourcesContainer" class="civSection">
                 <table class="resources">
                     <tbody>
@@ -174,23 +174,16 @@
                                 <img src="images/gold.png" class="icon icon-lg" alt="Gold" />
                                 <label>Gold:</label>
                             </td>
-                            <td colspan="2">
+                            <td>
                                 <span class="number" data-action="display" data-target="gold">0</span>
                             </td>
+                            <td>&nbsp;</td>
                             <td>
                                 <img src="images/carrion.png" class="icon icon-lg" alt="Corpses">
                                 <label>Corpses:</label>
                             </td>
                             <td colspan="2">
-                                <span class="number" data-action="display" data-target="corpses">0</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="4"></td>
-                            <td colspan="2">
-                                <div id="graveTotal">
-                                    Unfilled Graves: <span data-action="display" data-target="grave">...</span>
-                                </div>
+                                <span class="number" data-action="display" data-target="corpses">0</span>&nbsp;/&nbsp;<span data-action="display" data-target="grave">...</span> Empty Graves
                             </td>
                         </tr>
                         <tr>
