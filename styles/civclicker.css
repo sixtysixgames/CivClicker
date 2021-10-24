@@ -41,8 +41,6 @@ body {
             background-image: url('../images/constable_wivenhoe_park_essex_faded.jpg');
         }
 
-
-
 a {
     color: #3366ff;
     text-decoration: none;
@@ -87,12 +85,20 @@ a {
 }
 
     .column.left {
-        padding-right: 2.5%;
+        padding-right: 1.5%;
     }
 
     .column.right {
-        padding-left: 2.5%;
+        padding-left: 1.5%;
     }
+
+.width60 {
+    width: 60%;
+}
+
+.width40 {
+    width: 40%;
+}
 
 .width75 {
     width: 75%;
@@ -141,7 +147,6 @@ a {
         font-weight: normal;
         margin-top: 0;
         margin-bottom: 0;
-       
     }
 
     #header #ruler {
@@ -164,8 +169,6 @@ a {
         #header.condensed #ruler {
             display: none;
         }
-
-
 
 #strip {
     box-sizing: border-box;
@@ -199,7 +202,6 @@ a {
         background: rgba(0,0,0,0.1);
     }
 
-
 .drawer {
     display: none;
     padding: 1em 0;
@@ -213,14 +215,11 @@ a {
         clear: both;
     }
 
-
 #main {
     display: none;
 }
 
 /* tables */
-
-
 table#basicResources,
 #specialResourcesContainer table {
     width: 100%;
@@ -230,9 +229,6 @@ table#basicResources,
     width: 100%;
     margin-bottom: 1em;
 }
-
-
-
 
 #impexpField {
     display: block;
@@ -272,7 +268,6 @@ table#basicResources,
 h3 {
     clear: both;
 }
-
 
 button {
     font-family: 'Suez One', serif;
@@ -361,8 +356,6 @@ button {
     min-width: 12em;
 }
 
-
-
 .panesTabs {
 }
 
@@ -447,7 +440,6 @@ button {
     padding-right: 1em;
 }
 
-
 .tip {
     font-style: italic;
     color: #555;
@@ -467,14 +459,12 @@ button {
 .number {
     text-align: right;
     padding-right: 0.3em;
-    font-size: 1.0em;
+    font-size: 1.1em;
 }
 
 .maxNumber {
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
-
-
 
 .deityDomain {
     padding-right: 2em;
@@ -519,8 +509,6 @@ button {
     margin-left: 1em;
 }
 
-
-
 #victoryGroup {
     display: none;
 }
@@ -529,7 +517,6 @@ button {
     padding-left: 0.3em;
     text-transform: capitalize;
 }
-
 
 .building10,
 .building100,
@@ -546,7 +533,6 @@ button {
 .buycustom {
     display: none;
 }
-
 
 #zombieWorkers {
     display: none;
@@ -758,7 +744,6 @@ button {
     display: none;
 }
 
-
 #purchasedUpgrades, #purchasedPantheon {
     margin-left: 1em;
 }
@@ -773,7 +758,6 @@ button {
 #resetWonder {
     display: none;
 }
-
 
 .bar {
     margin: 1px 0;
@@ -809,7 +793,6 @@ button {
     background-color: #3f6;
     width: 0%;
 }
-
 
 .totalSick {
     background-color: #fcc;
@@ -921,8 +904,6 @@ button {
     display: block;
 }
 
-
-
 #morale {
 }
 
@@ -978,8 +959,6 @@ ol.happinessRanks {
     border: solid 1px rgba(0,0,0,0.25);
 }
 
-
-
 footer {
     padding: 1em 0;
     text-align: center;
@@ -1000,9 +979,7 @@ footer {
     }
 
 
-
 /* Responsiveness */
-
 @media screen and (max-width: 1500px) {
     .columns {
         width: 90%;
@@ -1052,3 +1029,4 @@ footer {
     display: inline !important;
     min-width: unset !important;
 }
+/*1050*/
