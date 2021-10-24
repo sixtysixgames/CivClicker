@@ -216,6 +216,14 @@ function updateResourceTotals() {
     ui.find("#maxfood").innerHTML = prettify(civData.food.limit);
     ui.find("#maxwood").innerHTML = prettify(civData.wood.limit);
     ui.find("#maxstone").innerHTML = prettify(civData.stone.limit);
+
+    ui.find("#maxskins").innerHTML = prettify(civData.skins.limit);
+    ui.find("#maxherbs").innerHTML = prettify(civData.herbs.limit);
+    ui.find("#maxore").innerHTML = prettify(civData.ore.limit);
+    ui.find("#maxleather").innerHTML = prettify(civData.leather.limit);
+    ui.find("#maxmetal").innerHTML = prettify(civData.metal.limit);
+    ui.find("#maxpiety").innerHTML = prettify(civData.piety.limit);
+
     ui.find("#totalBuildings").innerHTML = prettify(landTotals.buildings);
     ui.find("#totalLand").innerHTML = prettify(landTotals.lands);
 
