@@ -470,10 +470,10 @@ function migrateGameData(loadVar, settingsVarReturn) {
 
     // v1.4.4
     // resource stockpiles
-    if (!isValid(curCiv.resourcestock.owned)) {
+    //if (!isValid(curCiv.resourcestock.owned)) {
         // let's be generous and give barns + wood + stone / 5
-        curCiv.resourcestock.owned = Math.ceil((curCiv.barn.owned + curCiv.woodstock.owned + curCiv.stonestock.owned) / 5);
-    }
+    //    curCiv.resourcestock.owned = Math.ceil((curCiv.barn.owned + curCiv.woodstock.owned + curCiv.stonestock.owned) / 5);
+    //}
 
     // v1.4.5
     // remove resource stock
