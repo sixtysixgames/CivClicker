@@ -48,54 +48,7 @@
             </h1>
             
         </div>
-        <!--<div id="stripInner">
-            <span class="title">CivClicker</span>
-            <span class="version">v1.3.3</span>
-            <a href="faq.html" target="_blank">FAQ &amp; Instructions</a>
-            <a href="updates.html" target="_blank">Game Updates Log</a>
-            <a href="https://www.reddit.com/r/CivClicker/" target="_blank">Reddit</a>
-            <a href="#" class="openSettings">Settings</a>
-            <span id="versionAlert"> - <span id="newVersionText" onclick="location.reload()">New Version Available</span></span>
-        </div>-->
     </div>
-    <!--<section id="settings" class="drawer">-->
-        <!--<div class="columns">
-            <div class="column left">
-                <h2>Naming</h2>
-                <button onmousedown="renameCiv()" title="Rename your civilisation">Rename Civilisation</button><br />
-                <button id="renameRuler" onmousedown="renameRuler()" title="Rename yourself">Rename Yourself</button><br />
-                <button id="renameDeity" onmousedown="renameDeity()" title="Rename your deity" disabled="disabled">Rename Current Deity</button>
-                <br />
-                <h2>Display</h2>
-                <span id="textSize">
-                    <button id="smallerText" onmousedown="textSize(-1)" title="Smaller Text">&minus;</button>Text Size
-                    <button id="largerText" onmousedown="textSize(1)" title="Larger Text">+</button>
-                </span><br />
-                <br />
-                <label><input id="toggleCustomQuantities" type="checkbox" onclick="onToggleCustomQuantities(this)" title="Custom Quantity" />Use Custom Quantities</label><br />
-                <label><input id="toggleDelimiters" type="checkbox" onclick="onToggleDelimiters(this)" title="Toggle Delimiters" />Number Delimiters</label><br />
-                <label><input id="toggleShadow" type="checkbox" onclick="onToggleShadow(this)" title="Toggle Text Shadow" />Text Shadows</label><br />
-                <label><input id="toggleNotes" type="checkbox" onclick="onToggleNotes(this)" title="Toggle Notes" />Show Notes</label><br />
-                <label><input id="toggleWorksafe" type="checkbox" onclick="onToggleWorksafe(this)" title="Toggle Worksafe Mode" />Worksafe Mode</label><br />
-                <label><input id="toggleIcons" type="checkbox" onclick="onToggleIcons(this)" title="Toggle Icons" />Use Icons</label><br />
-            </div>
-            <div class="column right">
-                <h2>Save &amp; Load Controls</h2>
-                <button onmousedown="save('manual')" title="Save your current stats">Manual Save</button><br />
-                <label><input id="toggleAutosave" type="checkbox" onclick="onToggleAutosave(this)" title="Autosave" />Autosave</label><br />
-                <button onmousedown="reset()" title="Reset your game">Reset Game</button><span class="note"><span id="resetNote"><br />Resetting allows you to </span><span id="resetDeity">gain another deity</span><span id="resetBoth"><br /> and </span><span id="resetWonder">build another Wonder</span></span><br />
-                <br />
-                <button onmousedown="deleteSave()" title="Delete your saved stats">Delete Save File</button><br />
-                <br />
-                <label>Save game data:</label>
-                <textarea id="impexpField"></textarea>
-                <button id="expButton" onclick="save('export')">Export</button>
-                <button id="expSelect" onclick="document.getElementById('impexpField').select();">Select All</button>
-                <button id="impButton" onclick="load('import')">Import</button>
-            </div>
-        </div>-->
-    <!--</section>-->
-
     <div id="main" class="columns">
         <div id="leftColumn" class="column left">
             <div id="basicResourcesContainer" class="civSection">
@@ -155,20 +108,20 @@
                                 <img src="images/skins.png" class="icon icon-lg" alt="Skins" />
                                 <label>Skins:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="skins">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="skins">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxskins">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="skins">0</span><span class="perSecond">/s</span>
                             </td>
                             <td>
                                 <img src="images/leather.png" class="icon icon-lg" alt="Leather" />
                                 <label>Leather:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="leather">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="leather">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxleather">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="leather">0</span><span class="perSecond">/s</span>
                             </td>
                         </tr>
@@ -177,20 +130,20 @@
                                 <img src="images/herbs.png" class="icon icon-lg" alt="Herbs" />
                                 <label>Herbs:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="herbs">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="herbs">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxherbs">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="herbs">0</span><span class="perSecond">/s</span>
                             </td>
                             <td>
                                 <img src="images/piety.png" class="icon icon-lg" alt="Piety" />
                                 <label>Piety:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="piety">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="piety">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxpiety">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="piety">0</span><span class="perSecond">/s</span>
                             </td>
                         </tr>
@@ -199,20 +152,20 @@
                                 <img src="images/ore.png" class="icon icon-lg" alt="Ore" />
                                 <label>Ore:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="ore">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="ore">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxore">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="ore">0</span><span class="perSecond">/s</span>
                             </td>
                             <td>
                                 <img src="images/metal.png" class="icon icon-lg" alt="Metal" />
                                 <label>Metal:</label>
                             </td>
-                            <td>
-                                <span class="number" data-action="display" data-target="metal">0</span>
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="metal">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxmetal">...</span>
                             </td>
-                            <td>
+                            <td class="number">
                                 <span class="number net" data-action="displayNet" data-target="metal">0</span><span class="perSecond">/s</span>
                             </td>
                         </tr>
@@ -227,11 +180,9 @@
                             <td>
                                 <img src="images/carrion.png" class="icon icon-lg" alt="Corpses">
                                 <label>Corpses:</label>
-
                             </td>
                             <td colspan="2">
                                 <span class="number" data-action="display" data-target="corpses">0</span>
-
                             </td>
                         </tr>
                         <tr>
