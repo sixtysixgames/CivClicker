@@ -24,7 +24,7 @@ var loopTimer = 0;
 // TODO: Update the version numbering internally
 var version = 22; // This is an ordinal used to trigger reloads. 
 //Always increment versionData if adding new element to civData
-var versionData = new VersionData(1, 4, 3, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 4, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
@@ -231,7 +231,6 @@ function setIndexArrays(civData) {
         }
     });
 }
-
 
 function calculatePopulation() {
 
@@ -1992,6 +1991,7 @@ function tickAutosave() {
     }
 }
 
+
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
     var specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
@@ -2009,52 +2009,61 @@ function doFarmers() {
     );
     civData.food.net -= population.living; //The living population eats food.
     civData.food.owned += civData.food.net;
-    if (civData.skinning.owned && civData.farmer.owned > 0) { //and sometimes get skins
-        var skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
-        var skinsEarned = rndRound(skinsChance);
-        civData.skins.net += skinsEarned;
-        civData.skins.owned += skinsEarned;
-    }
+
+        if (civData.skinning.owned && civData.farmer.owned > 0) { //and sometimes get skins
+            var skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
+            var skinsEarned = rndRound(skinsChance);
+            civData.skins.net += skinsEarned;
+            civData.skins.owned += skinsEarned;
+        }
 }
 function doWoodcutters() {
     civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
     civData.wood.owned += civData.wood.net;
-    if (civData.harvesting.owned && civData.woodcutter.owned > 0) { //and sometimes get herbs
-        var herbsChance = civData.wood.specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
-        var herbsEarned = rndRound(herbsChance);
-        civData.herbs.net += herbsEarned;
-        civData.herbs.owned += herbsEarned;
-    }
+
+        if (civData.harvesting.owned && civData.woodcutter.owned > 0) { //and sometimes get herbs
+            var herbsChance = civData.wood.specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
+            var herbsEarned = rndRound(herbsChance);
+            civData.herbs.net += herbsEarned;
+            civData.herbs.owned += herbsEarned;
+        }
+
 }
 
 function doMiners() {
     var specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
     civData.stone.net = civData.miner.owned * (civData.miner.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
     civData.stone.owned += civData.stone.net;
-    if (civData.prospecting.owned && civData.miner.owned > 0) { //and sometimes get ore
-        var oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
-        var oreEarned = rndRound(oreChance);
-        civData.ore.net += oreEarned;
-        civData.ore.owned += oreEarned;
-    }
+        if (civData.prospecting.owned && civData.miner.owned > 0) { //and sometimes get ore
+            var oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
+            var oreEarned = rndRound(oreChance);
+            civData.ore.net += oreEarned;
+            civData.ore.owned += oreEarned;
+        }
 }
 
 function doBlacksmiths() {
-    var oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * civData.blacksmith.efficiency * curCiv.morale.efficiency));
-    var metalEarned = oreUsed * getWonderBonus(civData.metal);
-    civData.ore.net -= oreUsed;
-    civData.ore.owned -= oreUsed;
-    civData.metal.net += metalEarned;
-    civData.metal.owned += metalEarned;
+    
+        var oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * civData.blacksmith.efficiency * curCiv.morale.efficiency));
+        var metalEarned = oreUsed * getWonderBonus(civData.metal);
+        civData.ore.net -= oreUsed;
+        civData.ore.owned -= oreUsed;
+
+        civData.metal.net += metalEarned;
+        civData.metal.owned += metalEarned;
+
 }
 
 function doTanners() {
-    var skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * civData.tanner.efficiency * curCiv.morale.efficiency));
-    var leatherEarned = skinsUsed * getWonderBonus(civData.leather);
-    civData.skins.net -= skinsUsed;
-    civData.skins.owned -= skinsUsed;
-    civData.leather.net += leatherEarned;
-    civData.leather.owned += leatherEarned;
+    
+        var skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * civData.tanner.efficiency * curCiv.morale.efficiency));
+        var leatherEarned = skinsUsed * getWonderBonus(civData.leather);
+        civData.skins.net -= skinsUsed;
+        civData.skins.owned -= skinsUsed;
+
+        civData.leather.net += leatherEarned;
+        civData.leather.owned += leatherEarned;
+
 }
 
 function doClerics() {
@@ -3065,13 +3074,17 @@ function clearSpecialResourceNets() {
     civData.metal.net = 0;
 }
 
+
+
 function checkResourceLimits() {
     //Resources occasionally go above their caps.
     //Cull the excess /after/ other workers have taken their inputs.
     resourceData.forEach(function (resource) {
-        if (resource.owned > resource.limit) {
-            resource.owned = resource.limit;
-        }
+
+            if (resource.owned > resource.limit) {
+                resource.owned = resource.limit;
+            }
+        
     });
 }
 
@@ -3100,7 +3113,7 @@ function gameLoop() {
 
     // Check for starvation
     doStarve();
-    // TODO: Need to kill workers who die from exposure.
+    // Need to kill workers who die from exposure.
     doHomeless()
 
     checkResourceLimits();
