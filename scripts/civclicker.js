@@ -59,7 +59,7 @@ var civSizes = [
     { min_pop: 10000, name: "Small City", id: "smallCity" },
     { min_pop: 25000, name: "City", id: "city" },
     { min_pop: 50000, name: "Large City", id: "largeCity" },
-    { min_pop: 100000, name: "Province", id: "metropolis" },
+    { min_pop: 100000, name: "City State", id: "metropolis" },
     { min_pop: 250000, name: "Small Nation", id: "smallNation" },
     { min_pop: 500000, name: "Nation", id: "nation" },
     { min_pop: 1000000, name: "Large Nation", id: "largeNation" },
@@ -2141,7 +2141,11 @@ function getNextPatient() {
 function getRandomPatient(n) {
     var i = Math.floor(Math.random() * PATIENT_LIST.length);
     n = n || 1; // counter to stop infinite loop
-    if (civData[PATIENT_LIST[i]].ill > 0 || n > 10) {
+    if (n > PATIENT_LIST.length) {
+        return false;
+    }
+    //|| n > 10
+    if (civData[PATIENT_LIST[i]].ill > 0 ) {
         return PATIENT_LIST[i];
     }
     return getRandomPatient(++n);
@@ -2189,12 +2193,15 @@ function doPlague() {
         var lastVictim = "citizen";
         for (var d = 1; d <= victims; d++) {
             var jobInfected = getRandomPatient();
-            var unitInfected = civData[jobInfected];
+            if (!isValid(jobInfected) || !jobInfected) { return false; }
+            if (jobInfected) {
+                var unitInfected = civData[jobInfected];
 
-            if (unitInfected.ill > 0 && unitInfected.owned > 0) {
-                killUnit(unitInfected);
-                lastVictim = unitInfected.singular;
-                died++;
+                if (unitInfected.ill > 0 && unitInfected.owned > 0) {
+                    killUnit(unitInfected);
+                    lastVictim = unitInfected.singular;
+                    died++;
+                }
             }
         }
 
@@ -2215,9 +2222,10 @@ function doPlague() {
         var lastJob = "citizen";
         for (var d = 1; d <= survivors; d++) {
             var job = getRandomPatient();
+            if (!isValid(job) || !job) { return false; }
             if (job) {
                 healByJob(job);
-                lastJob = job.singular;
+                lastJob = civData[job].singular;
                 survived++;
             }
         }
@@ -2313,8 +2321,8 @@ function doCorpses() {
         }
     }
 
-    // Corpses have a 50-50 chance of decaying (at least there is a bright side)
-    if (Math.random() < 1 / 30) {
+    // Corpses have a slight chance of decaying (at least there is a bright side)
+    if (Math.random() < 1 / 50) {
         //civData.corpses.owned -= 1;
         var gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
@@ -2374,6 +2382,11 @@ function doFight(attacker, defender) {
     civData.corpses.owned += (attackerCas + defenderCas);
     if (civData.book.owned) { civData.piety.owned += (attackerCas + defenderCas) * 10; }
 
+    // increase morale for enemy kills.  This is the opposite of losing morale for citizens dying
+    // see doStarve and killUnit
+    if (playerCredit > 0) {
+        adjustMorale(0.0025 / playerCredit);
+    }
     //Updates population figures (including total population)
     calculatePopulation();
 }
@@ -2396,15 +2409,15 @@ function doWolves(attacker) {
 function doBandits(attacker) {
     // bandits mainly loot
     var r = Math.random();
-    if (r < 0.1) { doSlaughter(attacker); }
-    else if (r < 0.2) { doSack(attacker); }
+    if (r < 0.25) { doSlaughter(attacker); }
+    else if (r < 0.5) { doSack(attacker); }
     else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
     //barbarians mainly kill, steal and destroy
     var r = Math.random();
     if (r < 0.3) {
-        if (Math.random() < 0.9) {
+        if (Math.random() < 0.5) {
             doSlaughter(attacker);
         } else {
             doSlaughterMulti(attacker);
@@ -2412,7 +2425,7 @@ function doBarbarians(attacker) {
     }
     else if (r < 0.6) { doLoot(attacker); }
     else if (r < 0.9) {
-        if (Math.random() < 0.9) {
+        if (Math.random() < 0.5) {
             doSack(attacker);
         } else {
             doSackMulti(attacker);
@@ -2450,7 +2463,7 @@ function doSlaughter(attacker) {
                 adjustMorale(-0.0025 / population.living);
             }
 
-            gameLog(targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(attacker.owned));
+            gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
         }
     } else { // Attackers slowly leave once everyone is dead
         var leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
@@ -2463,7 +2476,7 @@ function doSlaughterMulti(attacker) {
     //var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
 
     // kill up to 10% of attacking force
-    var targets = Math.ceil(Math.random() * attacker.owned * 0.1);
+    var targets = 1 + Math.ceil(Math.random() * attacker.owned * 0.1);
     var kills = 0;
     for (var k = 1; k <= targets; k++) {
         //var target = getRandomHealthyWorker(); //Choose random worker
@@ -2533,7 +2546,7 @@ function doSack(attacker) {
     var target = sackable[Math.floor(Math.random() * sackable.length)];
 
     if (target.owned > 0) {
-        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        var destroyVerb = (Math.random() < 0.5) ? "burned" : "burned";
         // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
 
@@ -2545,7 +2558,7 @@ function doSack(attacker) {
         updateResourceTotals();
         calculatePopulation(); // Limits might change
 
-        gameLog(target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(attacker.owned));
+        gameLog("1 " + target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(2)); // always plural
     } else {
         //some will leave
         var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
@@ -2559,14 +2572,14 @@ function doSackMulti(attacker) {
     //Destroy buildings
 
     // sack up to 10% of attacking force
-    var targets = Math.ceil(Math.random() * attacker.owned * 0.1);
+    var targets = 1 + Math.ceil(Math.random() * attacker.owned * 0.1);
     var sacks = 0;
     var lastTarget = "building";
     for (var s = 1; s <= targets; s++) {
         var targetID = getRandomBuilding(); //sackable[Math.floor(Math.random() * sackable.length)];
         var target = civData[targetID];
 
-        if (target && target.owned > 0) {
+        if (isValid(target) && target.owned > 0) {
             --target.owned;
             ++civData.freeLand.owned;
             sacks++;
@@ -2585,7 +2598,7 @@ function doSackMulti(attacker) {
     }
 
     if (sacks > 0) {
-        var destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
+        var destroyVerb = (sacks == 1) ? " " + lastTarget + " destroyed by " : " buildings destroyed by ";
         gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
