@@ -79,7 +79,7 @@ function getCivData() {
         new Resource({
             id: "piety", name: "piety",
             vulnerable: false, // Can't be stolen
-            get limit() { return (civData.temple.owned * 10); },
+            get limit() { return (civData.temple.owned * 50); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
         new Resource({ id: "gold", name: "gold", vulnerable: false }), // Can't be stolen
@@ -176,7 +176,7 @@ function getCivData() {
             id: "temple", singular: "temple", plural: "temples",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 120, herbs: 10 },
-            effectText: "allows 1 cleric; +10 piety storage",
+            effectText: "allows 1 cleric; +50 piety storage",
             // If purchase was a temple and aesthetics has been activated, increase morale
             // If population is large, temples have less effect.
             onGain: function (num) {
