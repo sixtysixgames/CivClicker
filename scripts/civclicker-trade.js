@@ -22,22 +22,28 @@ function startTrader() {
     //    { materialId: "leather", requested: 250 },
     //    { materialId: "metal", requested: 250 }
     //];
-    var tradeItems = [ // Item and base amount
-        { materialId: "food", requested: civData["food"].baseTradeAmount },
-        { materialId: "wood", requested: civData["wood"].baseTradeAmount },
-        { materialId: "stone", requested: civData["stone"].baseTradeAmount },
-        { materialId: "skins", requested: civData["skins"].baseTradeAmount },
-        { materialId: "herbs", requested: civData["herbs"].baseTradeAmount },
-        { materialId: "ore", requested: civData["ore"].baseTradeAmount },
-        { materialId: "leather", requested: civData["leather"].baseTradeAmount },
-        { materialId: "metal", requested: civData["metal"].baseTradeAmount }
-    ];
+    // TODO: should probably use the lootable array
+    //var tradeItems = [ // Item and base amount
+    //    { materialId: "food", requested: civData["food"].baseTradeAmount },
+    //    { materialId: "wood", requested: civData["wood"].baseTradeAmount },
+    //    { materialId: "stone", requested: civData["stone"].baseTradeAmount },
+    //    { materialId: "skins", requested: civData["skins"].baseTradeAmount },
+    //    { materialId: "herbs", requested: civData["herbs"].baseTradeAmount },
+    //    { materialId: "ore", requested: civData["ore"].baseTradeAmount },
+    //    { materialId: "leather", requested: civData["leather"].baseTradeAmount },
+    //    { materialId: "metal", requested: civData["metal"].baseTradeAmount }
+    //];
 
-    // Randomly select and merge one of the above.
-    var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
-    curCiv.trader.materialId = selected.materialId;
-    curCiv.trader.requested = selected.requested * (Math.ceil(Math.random() * 100)); // Up to 20x amount
-    curCiv.trader.userTraded = false;
+    //// Randomly select and merge one of the above.
+    //var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
+    //curCiv.trader.materialId = selected.materialId;
+    //curCiv.trader.requested = selected.requested * (Math.ceil(Math.random() * 100)); // Up to 20x amount
+
+    var selected = lootable[Math.floor(Math.random() * lootable.length)];
+    curCiv.trader.materialId = selected.id;
+    curCiv.trader.requested = selected.baseTradeAmount * (Math.ceil(Math.random() * 100)); // Up to 20x amount
+
+    curCiv.trader.userTraded = false; // has the user sold requested
 
     updateTrader();
 }
@@ -107,7 +113,7 @@ function updateTradeButton(materialId, cost) {
     var elem = ui.find(materialCostID);
     if (!elem) { console.warn("Missing UI element for " + materialCostID); return; }
 
-    elem.innerHTML = cost;
+    elem.innerHTML = prettify(cost);
 }
 
 function tickTraders() {
@@ -144,17 +150,19 @@ function updateTradeAmount() {
     // the logic runs something like:
     // if the user sells something then they probably don't need it, so there's no demand, so cost goes down, amount goes up
     // if the user doesn't sell something, they probably need it, so have to pay more, so cost goes up, so amount goes down
-    if (curCiv.trader.userTraded) {
-        curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10);
-    }
-    else {
-        if (Math.random() < 0.5) {
-            curCiv[materialId].tradeAmount -= Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
-        }
-        else {
-            curCiv[materialId].tradeAmount += Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
-        }
-    }
+    //if (curCiv.trader.userTraded) {
+    //    curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10);
+    //}
+    //else {
+    //    if (Math.random() < 0.5) {
+    //        curCiv[materialId].tradeAmount -= Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
+    //    }
+    //    else {
+    //        curCiv[materialId].tradeAmount += Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
+    //    }
+    //}
+    // far too complicated. simply change to 10% whatever was requested
+    curCiv[materialId].tradeAmount = Math.floor(curCiv.trader.requested / 10);
     // don't offer less than base amount
     curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
 
