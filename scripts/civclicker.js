@@ -2006,6 +2006,7 @@ function tickAutosave() {
 
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
+    //
     var specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
     var millMod = 1;
     if (population.current > 0) {
@@ -2020,20 +2021,25 @@ function doFarmers() {
         * (1 + civData.mill.owned * millMod / 200) //Farmers farm food
     );
     civData.food.net -= population.living; //The living population eats food.
+    //if (civData.food.owned < civData.food.limit) {
     civData.food.owned += civData.food.net;
-
-    if (civData.skinning.owned && civData.farmer.owned > 0) { //and sometimes get skins
+    //}
+    //&& civData.skins.owned < civData.skins.limit
+    if (civData.skinning.owned && civData.farmer.owned > 0 ) { //and sometimes get skins
         var skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
         var skinsEarned = rndRound(skinsChance);
         civData.skins.net += skinsEarned;
         civData.skins.owned += skinsEarned;
     }
 }
+
 function doWoodcutters() {
     civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
+    //if (civData.wood.owned < civData.wood.limit) {
     civData.wood.owned += civData.wood.net;
-
-    if (civData.harvesting.owned && civData.woodcutter.owned > 0) { //and sometimes get herbs
+    //}
+    //&& civData.herbs.owned < civData.herbs.limit
+    if (civData.harvesting.owned && civData.woodcutter.owned > 0 ) { //and sometimes get herbs
         var herbsChance = civData.wood.specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
         var herbsEarned = rndRound(herbsChance);
         civData.herbs.net += herbsEarned;
@@ -2044,8 +2050,11 @@ function doWoodcutters() {
 function doMiners() {
     var specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
     civData.stone.net = civData.miner.owned * (civData.miner.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
+    //if (civData.stone.owned < civData.stone.limit) {
     civData.stone.owned += civData.stone.net;
-    if (civData.prospecting.owned && civData.miner.owned > 0) { //and sometimes get ore
+    //}
+    //&& civData.ore.owned < civData.ore.limit
+    if (civData.prospecting.owned && civData.miner.owned > 0 ) { //and sometimes get ore
         var oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
         var oreEarned = rndRound(oreChance);
         civData.ore.net += oreEarned;
@@ -2054,23 +2063,29 @@ function doMiners() {
 }
 
 function doBlacksmiths() {
-    var oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * civData.blacksmith.efficiency * curCiv.morale.efficiency));
-    var metalEarned = oreUsed * getWonderBonus(civData.metal);
-    civData.ore.net -= oreUsed;
-    civData.ore.owned -= oreUsed;
+    if (civData.metal.owned < civData.metal.limit) {
+        // we don't want to use up ore if we aren't making metal
+        var oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * civData.blacksmith.efficiency * curCiv.morale.efficiency));
+        var metalEarned = oreUsed * getWonderBonus(civData.metal);
+        civData.ore.net -= oreUsed;
+        civData.ore.owned -= oreUsed;
 
-    civData.metal.net += metalEarned;
-    civData.metal.owned += metalEarned;
+        civData.metal.net += metalEarned;
+        civData.metal.owned += metalEarned;
+    }
 }
 
 function doTanners() {
-    var skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * civData.tanner.efficiency * curCiv.morale.efficiency));
-    var leatherEarned = skinsUsed * getWonderBonus(civData.leather);
-    civData.skins.net -= skinsUsed;
-    civData.skins.owned -= skinsUsed;
+    if (civData.leather.owned < civData.leather.limit) {
+        // we don't want to use up skins if we aren't making leather
+        var skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * civData.tanner.efficiency * curCiv.morale.efficiency));
+        var leatherEarned = skinsUsed * getWonderBonus(civData.leather);
+        civData.skins.net -= skinsUsed;
+        civData.skins.owned -= skinsUsed;
 
-    civData.leather.net += leatherEarned;
-    civData.leather.owned += leatherEarned;
+        civData.leather.net += leatherEarned;
+        civData.leather.owned += leatherEarned;
+    }
 }
 
 function doClerics() {
@@ -2141,11 +2156,12 @@ function getNextPatient() {
 function getRandomPatient(n) {
     var i = Math.floor(Math.random() * PATIENT_LIST.length);
     n = n || 1; // counter to stop infinite loop
-    if (n > PATIENT_LIST.length) {
+    var stop = Math.max(PATIENT_LIST.length, population.totalSick);
+    if (n > stop) {
         return false;
     }
     //|| n > 10
-    if (civData[PATIENT_LIST[i]].ill > 0 ) {
+    if (civData[PATIENT_LIST[i]].ill > 0) {
         return PATIENT_LIST[i];
     }
     return getRandomPatient(++n);
@@ -2168,6 +2184,8 @@ function doHealers() {
         healByJob(job);
         --civData.healer.cureCount;
         --civData.herbs.owned;
+        --civData.herbs.net;
+
         ++numHealed;
     }
     return numHealed;
@@ -2193,8 +2211,8 @@ function doPlague() {
         var lastVictim = "citizen";
         for (var d = 1; d <= victims; d++) {
             var jobInfected = getRandomPatient();
-            if (!isValid(jobInfected) || !jobInfected) { return false; }
-            if (jobInfected) {
+            //if (!isValid(jobInfected) || !jobInfected) { continue; }
+            if (isValid(jobInfected)) {
                 var unitInfected = civData[jobInfected];
 
                 if (unitInfected.ill > 0 && unitInfected.owned > 0) {
@@ -2222,8 +2240,8 @@ function doPlague() {
         var lastJob = "citizen";
         for (var d = 1; d <= survivors; d++) {
             var job = getRandomPatient();
-            if (!isValid(job) || !job) { return false; }
-            if (job) {
+            //if (!isValid(job) || !job) { continue; }
+            if (isValid(job)) {
                 healByJob(job);
                 lastJob = civData[job].singular;
                 survived++;
@@ -2248,7 +2266,7 @@ function doPlague() {
 
     } else if (deathRoll > 99) { // 1% chance that it spreads 
         // Infect up to 0.1% of the healthy population.
-        var infected = Math.floor(population.healthy / 1000 * Math.random()) + 1;
+        var infected = Math.floor(population.healthy / 100 * Math.random()) + 1;
 
         var num = spreadPlague(infected);
         if (num == 1) {
@@ -2306,7 +2324,7 @@ function doCorpses() {
     // Infect up to 0.01% of the healthy population.
     // if there are sick already, then see doPlague()
     if (population.healthy > 0 && population.totalSick == 0) {
-        infected = Math.floor(population.healthy / 1000 * Math.random());
+        infected = Math.floor(population.healthy / 100 * Math.random());
         if (infected <= 0) { return; }
 
         infected = spreadPlague(infected);
@@ -2322,7 +2340,7 @@ function doCorpses() {
     }
 
     // Corpses have a slight chance of decaying (at least there is a bright side)
-    if (Math.random() < 1 / 50) {
+    if (Math.random() < 1 / 100) {
         //civData.corpses.owned -= 1;
         var gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
@@ -2521,11 +2539,10 @@ function doSlaughterMulti(attacker) {
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
     var target = lootable[Math.floor(Math.random() * lootable.length)];
-    var stolenQty = Math.floor((Math.random() * attacker.owned * 0.1)); //Steal up to 10% however many attackers.
-
-    // target.owned can decimal
+    var stolenQty = Math.ceil((Math.random() * attacker.owned * 0.1)); //up to 10% of attackers steal.
+    stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items
+    // target.owned can be decimal.  we can't loot more than is available
     stolenQty = Math.min(stolenQty, Math.floor(target.owned));
-    // prettify(val.toFixed(1)
     if (stolenQty > 0) {
         gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(attacker.owned));
     }
@@ -2546,7 +2563,7 @@ function doSack(attacker) {
     var target = sackable[Math.floor(Math.random() * sackable.length)];
 
     if (target.owned > 0) {
-        var destroyVerb = (Math.random() < 0.5) ? "burned" : "burned";
+        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
         // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
 
@@ -2598,7 +2615,7 @@ function doSackMulti(attacker) {
     }
 
     if (sacks > 0) {
-        var destroyVerb = (sacks == 1) ? " " + lastTarget + " destroyed by " : " buildings destroyed by ";
+        var destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
         gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
@@ -2616,7 +2633,7 @@ function doConquer(attacker) {
         land = Math.min(civData.freeLand.owned, land);
         if (land > 0) {
             civData.freeLand.owned -= land;
-            gameLog(prettify(land) + " land conquered by " + attacker.getQtyName(2)); // always plural
+            gameLog(prettify(land) + " land occupied by " + attacker.getQtyName(2)); // always plural
             // Attackers leave after conquering land.
             attacker.owned -= land;
             //if (--attacker.owned < 0) { attacker.owned = 0; } 
