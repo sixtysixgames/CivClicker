@@ -723,6 +723,10 @@ button {
     }
 
 /* #basicResources and special resources */
+#basicResourcesContainer .net {
+    width: 20%;
+}
+
 #specialResourcesContainer {
     margin: 0.5em 0 0.5em 0;
 }
@@ -739,7 +743,9 @@ button {
 #specialResourcesContainer .perSecond {
     font-size: 1em;
 }
-
+#specialResourcesContainer .net {
+    width: 10%;
+}
 #walkGroup {
     display: none;
 }
