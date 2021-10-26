@@ -443,28 +443,28 @@ function migrateGameData(loadVar, settingsVarReturn) {
 
     //v1.4.2
     // variable trading prices
-    if (!isValid(curCiv.food.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.food.tradeAmount)) {
         loadVar.curCiv.food.tradeAmount = civData.food.initTradeAmount;
     }
-    if (!isValid(curCiv.wood.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.wood.tradeAmount)) {
         loadVar.curCiv.wood.tradeAmount = civData.wood.initTradeAmount;
     }
-    if (!isValid(curCiv.stone.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.stone.tradeAmount)) {
         loadVar.curCiv.stone.tradeAmount = civData.stone.initTradeAmount;
     }
-    if (!isValid(curCiv.skins.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.skins.tradeAmount)) {
         loadVar.curCiv.skins.tradeAmount = civData.skins.initTradeAmount;
     }
-    if (!isValid(curCiv.herbs.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.herbs.tradeAmount)) {
         loadVar.curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
     }
-    if (!isValid(curCiv.ore.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.ore.tradeAmount)) {
         loadVar.curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
     }
-    if (!isValid(curCiv.leather.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.leather.tradeAmount)) {
         loadVar.curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
     }
-    if (!isValid(curCiv.metal.tradeAmount)) {
+    if (!isValid(loadVar.curCiv.metal.tradeAmount)) {
         loadVar.curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
     }
 
