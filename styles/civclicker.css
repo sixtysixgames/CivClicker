@@ -56,8 +56,9 @@ a {
     display: block;
     box-sizing: border-box;
     margin: 0 auto;
+    padding: 0 1em;
     clear: both;
-    width: 90%;
+    width: 100%;
 }
 
     .columns:after /* clearfix */ {
@@ -85,13 +86,16 @@ a {
 }
 
     .column.left {
-        padding-right: 1.5%;
+        padding-right: 1em;
     }
 
     .column.right {
-        padding-left: 1.5%;
+        padding-left: 1em;
     }
-
+    .column.middle {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
 .width60 {
     width: 60%;
 }
@@ -106,6 +110,9 @@ a {
 
 .width25 {
     width: 25%;
+}
+.width33 {
+    width: 33.3%;
 }
 
 .landCols {
