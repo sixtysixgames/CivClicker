@@ -26,17 +26,6 @@ function startTrader() {
     //    { materialId: "leather", requested: 250 },
     //    { materialId: "metal", requested: 250 }
     //];
-    // TODO: should probably use the lootable array
-    //var tradeItems = [ // Item and base amount
-    //    { materialId: "food", requested: civData["food"].baseTradeAmount },
-    //    { materialId: "wood", requested: civData["wood"].baseTradeAmount },
-    //    { materialId: "stone", requested: civData["stone"].baseTradeAmount },
-    //    { materialId: "skins", requested: civData["skins"].baseTradeAmount },
-    //    { materialId: "herbs", requested: civData["herbs"].baseTradeAmount },
-    //    { materialId: "ore", requested: civData["ore"].baseTradeAmount },
-    //    { materialId: "leather", requested: civData["leather"].baseTradeAmount },
-    //    { materialId: "metal", requested: civData["metal"].baseTradeAmount }
-    //];
 
     //// Randomly select and merge one of the above.
     //var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
@@ -120,6 +109,17 @@ function updateTradeButton(materialId, cost) {
     elem.innerHTML = prettify(cost);
 }
 
+function updateTradeButtons() {
+    updateTradeButton(resourceType.food, curCiv.food.tradeAmount);
+    updateTradeButton(resourceType.wood, curCiv.wood.tradeAmount);
+    updateTradeButton(resourceType.stone, curCiv.stone.tradeAmount);
+    updateTradeButton(resourceType.skins, curCiv.skins.tradeAmount);
+    updateTradeButton(resourceType.herbs, curCiv.herbs.tradeAmount);
+    updateTradeButton(resourceType.ore, curCiv.ore.tradeAmount);
+    updateTradeButton(resourceType.leather, curCiv.leather.tradeAmount);
+    updateTradeButton(resourceType.metal, curCiv.metal.tradeAmount);
+}
+
 function tickTraders() {
     var delayMult = 60 * (3 - ((civData.currency.owned) + (civData.commerce.owned)));
     var check;
@@ -145,7 +145,6 @@ function tickTraders() {
 }
 
 function updateTradeAmount() {
-    
     var materialId = curCiv.trader.materialId;
     // randomly set new trade amount
     //curCiv[materialId].tradeAmount = Math.round(Math.random() * civData[materialId].baseTradeAmount) * 10;
