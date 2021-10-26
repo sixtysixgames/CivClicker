@@ -156,8 +156,9 @@ function Unit(props) // props is an object containing the desired properties.
     CivObj.call(this, props);
     copyProps(this, props, null, true);
     // Occasional Properties: singular, plural, subType, prereqs, require, effectText, alignment,
-    // source, efficiency_base, efficiency, onWin, lootFatigue, sackFatigue, killFatigue, killExhaustion, species
-    // place, ill
+    // source, efficiency_base, efficiency, onWin, 
+    // lootFatigue, lootStop, sackFatigue, sackStop, killFatigue, killStop, 
+    // species, place, ill
     return this;
 }
 // Common Properties: type="unit"
