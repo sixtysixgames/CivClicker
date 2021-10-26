@@ -138,7 +138,7 @@ function tickTraders() {
     if (curCiv.trader.timer > 0) {
         curCiv.trader.timer--;
     }
-    if (curCiv.trader.timer == 1) {
+    if (curCiv.trader.timer == 1 && civData.cornexchange.owned) {
         // here we call a function to change price on trade buttons just before trader leaves
         updateTradeAmount();
     }
