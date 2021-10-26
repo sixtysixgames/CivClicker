@@ -42,7 +42,6 @@ function valOf (variable) {
     }
 }
 
-
 function bake_cookie(name, value) {
     var exdate=new Date();
     exdate.setDate(exdate.getDate() + 30);
@@ -56,7 +55,6 @@ function read_cookie(name) {
     return result;
 }
 
-
 // Calculates the summation of elements (n...m] of the arithmetic sequence
 // with increment "incr".
 function calcArithSum(incr,n,m)
@@ -65,7 +63,6 @@ function calcArithSum(incr,n,m)
     if (m === undefined) { m = n + 1; }
     return (m-n)*((n*incr)+((m-1)*incr))/2;
 }
-
 
 // Search for the largest integer X that generates func(X) < limitY.
 // func should be a continuous increasing numeric function.
@@ -129,7 +126,6 @@ function mergeObj(o1, o2)
     return o1;
 }
 
-
 // Workaround for IE's lack of support for the dataset property.
 // Also searches up the DOM tree on lookups, to mimic inheritance.
 // Pass 'value' to set the value, otherwise returns the value.
@@ -148,14 +144,12 @@ function dataset(elem,attr,value)
     return (val=="true")?true:(val=="false")?false:val;
 }
 
-
 // Probabilistic rounding function
 function rndRound(num)
 {
     var baseVal = Math.floor(num);
-    return baseVal + ((Math.random() < (num - baseVal)) ? 1 : 0)
+    return baseVal + ((Math.random() < (num - baseVal)) ? 1 : 0);
 }
-
 
 // Copy properties from to dest from src
 // If 'names' array supplied, only copies the named properties
@@ -211,3 +205,19 @@ function indexArrayByAttr(inArray, attr) {
         else { console.log("Duplicate or missing "+attr+" attribute in array: "+elem[attr]); }
 }); }
 
+
+// Number format utility functions.
+// - Allows testing the sign of strings that might be prefixed with '-' (like "-custom")
+// - Output format uses the proper HTML entities for minus sign and infinity.
+// Note that the sign of boolean false is treated as -1, since it indicates a
+//   decrease in quantity (from 1 to 0).
+function sgnnum(x) { return (x > 0) ? 1 : (x < 0) ? -1 : 0; }
+function sgnstr(x) { return (x.length === 0) ? 0 : (x[0] == "-") ? -1 : 1; }
+function sgnbool(x) { return (x ? 1 : -1); }
+function absstr(x) { return (x.length === 0) ? "" : (x[0] == "-") ? x.slice(1) : x; }
+function sgn(x) {
+    return (typeof x == "number") ? sgnnum(x)
+        : (typeof x == "string") ? sgnstr(x)
+            : (typeof x == "boolean") ? sgnbool(x) : 0;
+}
+function abs(x) { return (typeof x == "number") ? Math.abs(x) : (typeof x == "string") ? absstr(x) : x; }
