@@ -17,6 +17,9 @@
 	along with this program in the LICENSE file.
 	If it is not there, see <http://www.gnu.org/licenses/>.
 **/
+/*
+ * Variables
+ */
 
 var setup = {};
 var loopTimer = 0;
@@ -66,21 +69,11 @@ var civSizes = [
     { min_pop: 2500000, name: "Empire", id: "empire" }
 ];
 
-
+//
 var PATIENT_LIST = [
-    "healer", "cleric", "farmer", "soldier", "cavalry", "labourer",
-    "woodcutter", "miner", "tanner", "blacksmith", "unemployed"
+    unitType.healer, unitType.cleric, unitType.farmer, unitType.soldier, unitType.cavalry, unitType.labourer,
+    unitType.woodcutter, unitType.miner, unitType.tanner, unitType.blacksmith, unitType.unemployed
 ];
-
-// attackers enum
-// need a corresponding unit in civData
-// used in doMobs()
-const mobTypes = {
-    wolf: "wolf",
-    bandit: "bandit",
-    barbarian: "barbarian",
-    invader: "invader"
-};
 
 // Declare variables here so they can be referenced later.  
 var curCiv = {
@@ -149,8 +142,6 @@ var population = {
 // Caches the total number of each wonder, so that we don't have to recount repeatedly.
 var wonderCount = {};
 
-var civData = getCivData(); // Giant array of data, defined in "data" js
-
 // Build a variety of additional indices so that we can iterate over specific
 // subsets of our civ objects.
 var resourceData = []; // All resources
@@ -168,9 +159,6 @@ var armyUnits = []; // All units to be displayed in the army area
 var basicResources = []; // All basic (click-to-get) resources
 var normalUpgrades = []; // All upgrades to be listed in the normal upgrades area
 
-// The resources that Wonders consume, and can give bonuses for.
-var wonderResources = getWonderResources(civData); // defined in "data" js
-
 // These are settings that should probably be tied to the browser.
 var settings = {
     autosave: true,
@@ -185,10 +173,24 @@ var settings = {
     useIcons: true
 };
 
-function setInitTradePrice(civObj) {
-    if (!isValid(civObj.initTradeAmount)) { return; }
-    updateTradeButton(civObj.id, civObj.initTradeAmount);
+var civData = getCivData(); // Giant array of data, defined in "data" js
+
+function getWonderResources(civData) {
+    // The resources that Wonders consume, and can give bonuses for.
+    return wonderResources = [
+        civData.food,
+        civData.wood,
+        civData.stone,
+        civData.skins,
+        civData.herbs,
+        civData.ore,
+        civData.leather,
+        civData.metal,
+        civData.piety
+    ];
 }
+// The resources that Wonders consume, and can give bonuses for.
+var wonderResources = getWonderResources(civData); // defined in "data" js
 
 function setIndexArrays(civData) {
     civData.forEach(function (elem) {
@@ -196,36 +198,36 @@ function setIndexArrays(civData) {
             console.error("Unknown type:", elem);
             return;
         }
-        if (elem.type == "resource") {
+        if (elem.type == civObjType.resource) {
             resourceData.push(elem);
             if (elem.vulnerable === true) {
                 lootable.push(elem);
             }
-            if (elem.subType == "basic") {
+            if (elem.subType == subTypes.basic) {
                 basicResources.push(elem);
             }
             setInitTradePrice(elem);
         }
-        if (elem.type == "building") {
+        if (elem.type == civObjType.building) {
             buildingData.push(elem);
             if (elem.vulnerable === true) { sackable.push(elem); }
-            if (elem.subType == "normal" || elem.subType == "land") { homeBuildings.push(elem); }
+            if (elem.subType == subTypes.normal || elem.subType == subTypes.land) { homeBuildings.push(elem); }
         }
-        if (elem.subType == "prayer") {
+        if (elem.subType == subTypes.prayer) {
             powerData.push(elem);
-        } else if (elem.type == "upgrade") {
+        } else if (elem.type == civObjType.upgrade) {
             upgradeData.push(elem);
-            if (elem.subType == "upgrade") {
+            if (elem.subType == subTypes.upgrade) {
                 normalUpgrades.push(elem);
             }
         }
-        if (elem.type == "unit") {
+        if (elem.type == civObjType.unit) {
             unitData.push(elem);
             if (elem.vulnerable === true) { killable.push(elem); }
-            if (elem.place == "home") { homeUnits.push(elem); }
-            if (elem.place == "party") { armyUnits.push(elem); }
+            if (elem.place == placeType.home) { homeUnits.push(elem); }
+            if (elem.place == placeType.party) { armyUnits.push(elem); }
         }
-        if (elem.type == "achievement") {
+        if (elem.type == civObjType.achievement) {
             achData.push(elem);
         }
     });
@@ -332,6 +334,7 @@ function getWonderBonus(resourceObj) {
 }
 
 // there might be a better way to check this
+// loop over all enemy types
 function isUnderAttack() {
     return (curCiv.wolf.owned > 0) ||
         (curCiv.bandit.owned > 0) ||
@@ -348,7 +351,7 @@ function resetRaiding() {
     curCiv.raid.last = "";
 
     // Also reset the enemy party units.
-    unitData.filter(function (elem) { return ((elem.alignment == "enemy") && (elem.place == "party")); })
+    unitData.filter(function (elem) { return ((elem.alignment == alignmentType.enemy) && (elem.place == placeType.party)); })
         .forEach(function (elem) { elem.reset(); });
 }
 
@@ -568,7 +571,7 @@ function getPurchaseCellText(purchaseObj, qty, inTable) {
         if (!qty) { return false; } // No-op
 
         // Can't buy/sell items not controlled by player
-        if (purchaseObj.alignment && (purchaseObj.alignment != "player")) { return false; }
+        if (purchaseObj.alignment && (purchaseObj.alignment != alignmentType.player)) { return false; }
 
         // Quantities > 1 are meaningless for boolean items.
         if ((typeof purchaseObj.initOwned == "boolean") && (abs(qty) > 1)) { return false; }
@@ -606,7 +609,7 @@ function getPurchaseRowText(purchaseObj) {
     [-Infinity, "-custom", -100000, -10000, -1000, -100, -10, -1]
         .forEach(function (elem) { s += getPurchaseCellText(purchaseObj, elem); });
 
-    var enemyFlag = (purchaseObj.alignment == "enemy") ? " enemy" : "";
+    var enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
     s += "<td class='itemname" + enemyFlag + "'>" + purchaseObj.getQtyName(0) + ": </td>";
 
     var action = (isValid(population[objId])) ? "display_pop" : "display"; //xxx Hack
@@ -638,8 +641,8 @@ function onBulkEvent(e) {
 function addUITable(civObjs, groupElemName) {
     var s = "";
     civObjs.forEach(function (elem) {
-        s += elem.type == "resource" ? getResourceRowText(elem)
-            : elem.type == "upgrade" ? getUpgradeRowText(elem)
+        s += elem.type == civObjType.resource ? getResourceRowText(elem)
+            : elem.type == civObjType.upgrade ? getUpgradeRowText(elem)
                 : getPurchaseRowText(elem);
     });
     var groupElem = document.getElementById(groupElemName);
@@ -685,7 +688,7 @@ function getPantheonUpgradeRowText(upgradeObj) {
     s += " disabled='disabled' onmousedown=\"";
     // The event handler can take three forms, depending on whether this is
     // an altar, a prayer, or a pantheon upgrade.
-    s += ((upgradeObj.subType == "prayer") ? (upgradeObj.id + "()")
+    s += ((upgradeObj.subType == subTypes.prayer) ? (upgradeObj.id + "()")
         : ("onPurchase(this)"));
     s += "\">" + upgradeObj.getQtyName() + "</button>";
     s += (isValid(upgradeObj.extraText) ? upgradeObj.extraText : "") + "</td>";
@@ -712,8 +715,8 @@ function addUpgradeRows() {
 
     // Fill in any pre-existing stubs.
     upgradeData.forEach(function (elem) {
-        if (elem.subType == "upgrade") { return; } // Did these above.
-        if (elem.subType == "pantheon") { setPantheonUpgradeRowText(elem); }
+        if (elem.subType == subTypes.upgrade) { return; } // Did these above.
+        if (elem.subType == subTypes.pantheon) { setPantheonUpgradeRowText(elem); }
         else { // One of the 'atypical' upgrades not displayed in the main upgrade list.
             var stubElem = document.getElementById(elem.id + "Row");
             if (!stubElem) {
@@ -728,10 +731,10 @@ function addUpgradeRows() {
     });
 
     // Altars
-    buildingData.forEach(function (elem) { if (elem.subType == "altar") { setPantheonUpgradeRowText(elem); } });
+    buildingData.forEach(function (elem) { if (elem.subType == subTypes.altar) { setPantheonUpgradeRowText(elem); } });
 
     // Deity granted powers
-    powerData.forEach(function (elem) { if (elem.subType == "prayer") { setPantheonUpgradeRowText(elem); } });
+    powerData.forEach(function (elem) { if (elem.subType == subTypes.prayer) { setPantheonUpgradeRowText(elem); } });
 
     // Dynamically create two lists for purchased upgrades.
     // One for regular upgrades, one for pantheon upgrades.
@@ -741,7 +744,7 @@ function addUpgradeRows() {
         text = "<span id='P" + upgradeObj.id + "' class='Pupgrade'>"
             + "<strong>" + upgradeObj.getQtyName() + "</strong>"
             + " &ndash; " + upgradeObj.effectText + "<br/></span>";
-        if (upgradeObj.subType == "pantheon") { pantheonUpgStr += text; }
+        if (upgradeObj.subType == subTypes.pantheon) { pantheonUpgStr += text; }
         else { standardUpgStr += text; }
     });
 
@@ -753,7 +756,7 @@ function getLandTotals() {
     //Update land values
     var ret = { lands: 0, buildings: 0, free: 0, sackableTotal: 0 };
     buildingData.forEach(function (elem) {
-        if (elem.subType == "land") { ret.free += elem.owned; }
+        if (elem.subType == subTypes.land) { ret.free += elem.owned; }
         else { ret.buildings += elem.owned; }
 
         if (elem.vulnerable == true) { ret.sackableTotal += elem.owned; }
@@ -820,18 +823,6 @@ function testAchievements() {
     updateAchievements();
 }
 
-function setDefaultSettings() {
-    // Here, we ensure that UI is properly configured for our settings.
-    // Calling these with no parameter makes them update the UI for the current values.
-    setAutosave();
-    setCustomQuantities();
-    textSize(0);
-    setDelimiters();
-    setShadow();
-    setNotes();
-    setWorksafe();
-    setIcons();
-}
 
 // Game functions
 
@@ -847,8 +838,8 @@ function increment(objId) {
     }
 
     unitData.forEach(function (elem) {
-        if ((elem.alignment == "player") && (elem.species == "human")
-            && (elem.combatType) && (elem.place == "home")) {
+        if ((elem.alignment == alignmentType.player) && (elem.species == speciesType.human)
+            && (elem.combatType) && (elem.place == placeType.home)) {
             numArmy += elem.owned;
         }
     }); // Nationalism adds military units.
@@ -930,7 +921,7 @@ function doPurchase(objId, num) {
     }
 
     // If building, then you use up free land
-    if (purchaseObj.type == "building") {
+    if (purchaseObj.type == civObjType.building) {
         civData.freeLand.owned -= num;
         // check for overcrowding
         if (civData.freeLand.owned < 0) {
@@ -1010,7 +1001,7 @@ function spawnCat() {
 
 // Creates or destroys workers
 function spawn(num) {
-    var newJobId = "unemployed";
+    var newJobId = unitType.unemployed;
     var bums = civData.unemployed;
     if (num == "custom") { num = getCustomNumber(bums); }
     if (num == "-custom") { num = -getCustomNumber(bums); }
@@ -1051,8 +1042,8 @@ function pickStarveTarget() {
     var modList = ["ill", "owned"]; // The sick starve first
     //xxx Remove this hard-coded list.  Priority of least to most importance
     // todo: should probably be random job
-    var jobList = ["unemployed", "labourer", "cleric", "healer", "blacksmith", "tanner", "miner", "woodcutter",
-        "cavalry", "soldier", "farmer"];
+    var jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
+        unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
 
     for (modNum = 0; modNum < modList.length; ++modNum) {
         for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
@@ -1259,19 +1250,19 @@ function wickerman() {
 
     var qty = Math.floor(Math.random() * 1000);
     //xxx Note that this presumes the price is 500 wood.
-    if (rewardObj.id == "wood") { qty = (qty / 2) + 500; } // Guaranteed to at least restore initial cost.
+    if (rewardObj.id == resourceType.wood) { qty = (qty / 2) + 500; } // Guaranteed to at least restore initial cost.
     rewardObj.owned += qty;
 
     function getRewardMessage(rewardObj) {
         switch (rewardObj.id) {
-            case "food": return "The crops are abundant!";
-            case "wood": return "The trees grow stout!";
-            case "stone": return "The stone splits easily!";
-            case "skins": return "The animals are healthy!";
-            case "herbs": return "The gardens flourish!";
-            case "ore": return "A new vein is struck!";
-            case "leather": return "The tanneries are productive!";
-            case "metal": return "The steel runs pure.";
+            case resourceType.food: return "The crops are abundant!";
+            case resourceType.wood: return "The trees grow stout!";
+            case resourceType.stone: return "The stone splits easily!";
+            case resourceType.skins: return "The animals are healthy!";
+            case resourceType.herbs: return "The gardens flourish!";
+            case resourceType.ore: return "A new vein is struck!";
+            case resourceType.leather: return "The tanneries are productive!";
+            case resourceType.metal: return "The steel runs pure.";
             default: return "You gain " + rewardObj.getQtyName(qty) + "!";
         }
     }
@@ -1319,7 +1310,6 @@ function pestControl(length) {
     gameLog("The vermin are exterminated.");
 }
 
-
 /* Iconoclasm */
 function iconoclasmList() {
     var i;
@@ -1363,14 +1353,14 @@ function spawnMob(mobObj, num) {
     var num_sge = 0, msg = "";
 
     if (num === undefined) { // By default, base numbers on current population
-        var max_mob = (population.current / 50);
+        var max_mob = (population.current / 50); // is this too small?
         num = Math.ceil(max_mob * Math.random());
     }
 
     if (num === 0) { return num; }  // Nobody came
 
     // Human mobs might bring siege engines.
-    if (mobObj.species == "human") { num_sge = Math.floor(Math.random() * num / 100); }
+    if (mobObj.species == speciesType.human) { num_sge = Math.floor(Math.random() * num / 100); }
 
     mobObj.owned += num;
     civData.esiege.owned += num_sge;
@@ -1554,7 +1544,7 @@ function adjustMorale(delta) {
         }
         updateMorale(); //update to player
 
-        //sysLog("adjustMorale.delta: " + delta + ". curCiv.morale.efficiency: " + curCiv.morale.efficiency);
+        //debug("adjustMorale.delta: " + delta + ". curCiv.morale.efficiency: " + curCiv.morale.efficiency + ". fraction: " + fraction);
     }
 }
 
@@ -1599,272 +1589,9 @@ function getWonderCostMultiplier() { // Based on the most wonders in any single 
 function speedWonder() {
     if (civData.gold.owned < 100) { return; }
     civData.gold.owned -= 100;
-
     curCiv.curWonder.progress += 1 / getWonderCostMultiplier();
     curCiv.curWonder.rushed = true;
     updateWonder();
-}
-
-// Game infrastructure functions
-function handleStorageError(err) {
-    var msg;
-    if ((err instanceof DOMException) && (err.code == DOMException.SECURITY_ERR)) { msg = "Browser security settings blocked access to local storage."; }
-    else { msg = "Cannot access localStorage - browser may not support localStorage, or storage may be corrupt"; }
-    console.error(err.toString());
-    console.error(msg);
-}
-
-// Load in saved data
-function load(loadType) {
-    //define load variables
-    var loadVar = {},
-        loadVar2 = {},
-        settingsVar = {};
-    var saveVersion = new VersionData(1, 0, 0, "legacy");
-
-    if (loadType === "cookie") {
-        //check for cookies
-        if (read_cookie(saveTag) && read_cookie(saveTag2)) {
-            //set variables to load from
-            loadVar = read_cookie(saveTag);
-            loadVar2 = read_cookie(saveTag2);
-            loadVar = mergeObj(loadVar, loadVar2);
-            loadVar2 = undefined;
-            //notify user
-            sysLog("Loaded saved game from cookie");
-            sysLog("Save system switching to localStorage.");
-        } else {
-            console.log("Unable to find cookie");
-            sysLog("Unable to find cookie");
-            return false;
-        }
-    }
-
-    if (loadType === "localStorage") {
-        //check for local storage
-        var string1;
-        var string2;
-        var settingsString;
-        try {
-            settingsString = localStorage.getItem(saveSettingsTag);
-            string1 = localStorage.getItem(saveTag);
-            string2 = localStorage.getItem(saveTag2);
-
-            if (!string1) {
-                console.log("Unable to find variables in localStorage. Attempting to load cookie.");
-                sysLog("Unable to find variables in localStorage. Attempting to load cookie.");
-                return load("cookie");
-            }
-
-        } catch (err) {
-            if (!string1) { // It could be fine if string2 or settingsString fail.
-                handleStorageError(err);
-                return load("cookie");
-            }
-        }
-
-        // Try to parse the strings
-        if (string1) { try { loadVar = JSON.parse(string1); } catch (ignore) { } }
-        if (string2) { try { loadVar2 = JSON.parse(string2); } catch (ignore) { } }
-        if (settingsString) { try { settingsVar = JSON.parse(settingsString); } catch (ignore) { } }
-
-        // If there's a second string (old save game format), merge it in.
-        if (loadVar2) { loadVar = mergeObj(loadVar, loadVar2); loadVar2 = undefined; }
-
-        if (!loadVar) {
-            console.log("Unable to parse variables in localStorage. Attempting to load cookie.");
-            sysLog("Unable to parse variables in localStorage. Attempting to load cookie.");
-            return load("cookie");
-        }
-
-        //notify user
-        sysLog("Loaded saved game from localStorage");
-    }
-
-    if (loadType === "import") {
-        loadVar = importByInput(ui.find("#impexpField"));
-    }
-
-    saveVersion = mergeObj(saveVersion, loadVar.versionData);
-    if (saveVersion.toNumber() > versionData.toNumber()) {
-        // Refuse to load saved games from future versions.
-        var alertStr = "Cannot load; saved game version " + saveVersion + " is newer than game version " + versionData;
-        console.log(alertStr);
-        sysLog(alertStr);
-        alert(alertStr);
-        return false;
-    }
-    if (saveVersion.toNumber() < versionData.toNumber()) {
-        // Migrate saved game data from older versions.
-        var settingsVarReturn = { val: {} };
-        migrateGameData(loadVar, settingsVarReturn);
-        settingsVar = settingsVarReturn.val;
-
-        // Merge the loaded data into our own, in case we've added fields.
-        mergeObj(curCiv, loadVar.curCiv);
-    } else {
-        curCiv = loadVar.curCiv; // No need to merge if the versions match; this is quicker.
-    }
-
-    var lsgv = "Loaded save game version " + saveVersion.major + "." + saveVersion.minor + "." + saveVersion.sub + "(" + saveVersion.mod + ") via"
-    console.log(lsgv, loadType);
-    sysLog(lsgv);
-
-    if (isValid(settingsVar)) { settings = mergeObj(settings, settingsVar); }
-
-    adjustMorale(0);
-    updateRequirements(civData.mill);
-    updateRequirements(civData.fortification);
-    updateRequirements(civData.battleAltar);
-    updateRequirements(civData.fieldsAltar);
-    updateRequirements(civData.underworldAltar);
-    updateRequirements(civData.catAltar);
-    updateResourceTotals();
-    updateJobButtons();
-    makeDeitiesTables();
-    updateDeity();
-    updateUpgrades();
-    updateTargets();
-    updateDevotion();
-    updatePartyButtons();
-    updateMorale();
-    updateWonder();
-    tallyWonderCount();
-    ui.find("#clicks").innerHTML = prettify(Math.round(curCiv.resourceClicks));
-    ui.find("#civName").innerHTML = curCiv.civName;
-    ui.find("#rulerName").innerHTML = curCiv.rulerName;
-    ui.find("#wonderNameP").innerHTML = curCiv.curWonder.name;
-    ui.find("#wonderNameC").innerHTML = curCiv.curWonder.name;
-
-    // todo: tidy this into separate function
-    updateTradeButton("food", curCiv.food.tradeAmount);
-    updateTradeButton("wood", curCiv.wood.tradeAmount);
-    updateTradeButton("stone", curCiv.stone.tradeAmount);
-    updateTradeButton("skins", curCiv.skins.tradeAmount);
-    updateTradeButton("herbs", curCiv.herbs.tradeAmount);
-    updateTradeButton("ore", curCiv.ore.tradeAmount);
-    updateTradeButton("leather", curCiv.leather.tradeAmount);
-    updateTradeButton("metal", curCiv.metal.tradeAmount);
-
-    return true;
-}
-
-function importByInput(elt) {
-    //take the import string, decompress and parse it
-    var compressed = elt.value;
-    var decompressed = LZString.decompressFromBase64(compressed);
-    var revived = JSON.parse(decompressed);
-    //set variables to load from
-    var loadVar = revived[0];
-    var loadVar2;
-    if (isValid(revived[1])) {
-        loadVar2 = revived[1];
-        // If there's a second string (old save game format), merge it in.
-        if (loadVar2) { loadVar = mergeObj(loadVar, loadVar2); loadVar2 = undefined; }
-    }
-    if (!loadVar) {
-        console.log("Unable to parse saved game string.");
-        sysLog("Unable to parse saved game string.");
-        return false;
-    }
-
-    //notify user
-    sysLog("Imported saved game");
-    //close import/export dialog
-    //impexp();	
-    return loadVar;
-}
-
-// Create objects and populate them with the variables, these will be stored in HTML5 localStorage.
-// Cookie-based saves are no longer supported.
-function save(savetype) {
-    var xmlhttp;
-
-    var saveVar = {
-        versionData: versionData, // Version information header
-        curCiv: curCiv // Game data
-    };
-
-    var settingsVar = settings; // UI Settings are saved separately.
-
-    ////////////////////////////////////////////////////
-
-    // Handle export
-    if (savetype == "export") {
-        var savestring = "[" + JSON.stringify(saveVar) + "]";
-        var compressed = LZString.compressToBase64(savestring);
-        console.log("Compressed save from " + savestring.length + " to " + compressed.length + " characters");
-        ui.find("#impexpField").value = compressed;
-        sysLog("Exported game to text");
-        return true;
-    }
-
-    //set localstorage
-    try {
-        // Delete the old cookie-based save to avoid mismatched saves
-        deleteCookie(saveTag);
-        deleteCookie(saveTag2);
-
-        localStorage.setItem(saveTag, JSON.stringify(saveVar));
-
-        // We always save the game settings.
-        localStorage.setItem(saveSettingsTag, JSON.stringify(settingsVar));
-
-        //Update console for debugging, also the player depending on the type of save (manual/auto)
-        if (savetype == "auto") {
-            console.log("Autosave");
-            sysLog("Autosaved");
-        } else if (savetype == "manual") {
-            alert("Game Saved");
-            console.log("Manual Save");
-            sysLog("Saved game");
-        }
-    } catch (err) {
-        handleStorageError(err);
-
-        if (savetype == "auto") {
-            console.log("Autosave Failed");
-            sysLog("Autosave Failed");
-        } else if (savetype == "manual") {
-            alert("Save Failed!");
-            console.log("Save Failed");
-            sysLog("Save Failed");
-        }
-        return false;
-    }
-
-    return true;
-}
-
-function deleteSave() {
-    //Deletes the current savegame by setting the game's cookies to expire in the past.
-    if (!confirm("All progress and achievements will be lost.\nReally delete save?")) { return; } //Check the player really wanted to do that.
-
-    try {
-        deleteCookie(saveTag);
-        deleteCookie(saveTag2);
-        localStorage.removeItem(saveTag);
-        localStorage.removeItem(saveTag2);
-        localStorage.removeItem(saveSettingsTag);
-        sysLog("Save Deleted");
-        if (confirm("Save Deleted. Refresh page to start over?")) {
-            window.location.reload();
-        }
-    } catch (err) {
-        handleStorageError(err);
-        alert("Save Deletion Failed!");
-    }
-}
-
-function renameCiv(newName) {
-    //Prompts player, uses result as new civName
-    while (!newName) {
-        newName = prompt("Please name your civilization", (newName || curCiv.civName || "Woodstock"));
-        if ((newName === null) && (curCiv.civName)) { return; } // Cancelled
-    }
-
-    curCiv.civName = newName;
-    ui.find("#civName").innerHTML = curCiv.civName;
 }
 
 // Note:  Returns the index (which could be 0), or 'false'.
@@ -1873,135 +1600,7 @@ function haveDeity(name) {
     for (i = 0; i < curCiv.deities.length; ++i) {
         if (curCiv.deities[i].name == name) { return i; }
     }
-
     return false;
-}
-
-function renameRuler(newName) {
-    if (curCiv.rulerName == "Cheater") { return; } // Reputations suck, don't they?
-    //Prompts player, uses result as rulerName
-    while (!newName || haveDeity(newName) !== false) {
-        newName = prompt("What is your name?", (newName || curCiv.rulerName || "Orteil"));
-        if ((newName === null) && (curCiv.rulerName)) { return; } // Cancelled
-        if (haveDeity(newName) !== false) {
-            alert("That would be a blasphemy against the deity " + newName + ".");
-            newName = "";
-        }
-    }
-
-    curCiv.rulerName = newName;
-
-    ui.find("#rulerName").innerHTML = curCiv.rulerName;
-}
-
-// Looks to see if the deity already exists.  If it does, that deity
-// is moved to the first slot, overwriting the current entry, and the
-// player's domain is automatically assigned to match (for free).
-function renameDeity(newName) {
-    var i = false;
-    while (!newName) {
-        // Default to ruler's name.  Hey, despots tend to have big egos.
-        newName = prompt("Whom do your people worship?", (newName || curCiv.deities[0].name || curCiv.rulerName));
-        if ((newName === null) && (curCiv.deities[0].name)) { return; } // Cancelled
-
-        // If haveDeity returns a number > 0, the name is used by a legacy deity.
-        // This is only allowed when naming (not renaming) the active deity.
-        i = haveDeity(newName);
-        if (i && curCiv.deities[0].name) {
-            alert("That deity already exists.");
-            newName = "";
-        }
-    }
-
-    // Rename the active deity.
-    curCiv.deities[0].name = newName;
-
-    // If the name matches a legacy deity, make the legacy deity the active deity.
-    if (i) {
-        curCiv.deities[0] = curCiv.deities[i]; // Copy to front position
-        curCiv.deities.splice(i, 1); // Remove from old position
-        if (getCurDeityDomain()) { // Does deity have a domain?
-            selectDeity(getCurDeityDomain(), true); // Automatically pick that domain.
-        }
-    }
-
-    makeDeitiesTables();
-}
-
-function reset() {
-    console.log("Reset");
-    //Resets the game, keeping some values but resetting most back to their initial values.
-    var msg = "Really reset? You will keep past deities and wonders (and cats)"; //Check player really wanted to do that.
-    if (!confirm(msg)) { return false; } // declined
-
-    // Let each data subpoint re-init.
-    civData.forEach(function (elem) { if (elem instanceof CivObj) { elem.reset(); } });
-
-    curCiv.zombie.owned = 0;
-    curCiv.grave.owned = 0;
-    curCiv.enemySlain.owned = 0;
-    curCiv.resourceClicks = 0; // For NeverClick
-    curCiv.attackCounter = 0; // How long since last attack?
-    curCiv.morale = { mod: 1.0, efficiency: 1.0 };
-
-    // If our current deity is powerless, delete it.
-    if (!curCiv.deities[0].maxDev) {
-        curCiv.deities.shift();
-    }
-    // Insert space for a fresh deity.
-    curCiv.deities.unshift({ name: "", domain: "", maxDev: 0 });
-
-    population = {
-        current: 0,
-        limit: 0,
-        healthy: 0,
-        totalSick: 0
-    };
-
-    resetRaiding();
-    curCiv.raid.targetMax = civSizes[0].id;
-
-    curCiv.trader.materialId = "";
-    curCiv.trader.requested = 0;
-    curCiv.trader.timer = 0;
-    curCiv.trader.counter = 0; // How long since last trader?
-    curCiv.trader.userTraded = false;
-
-    curCiv.curWonder.name = "";
-    curCiv.curWonder.stage = 0;
-    curCiv.curWonder.rushed = false;
-    curCiv.curWonder.progress = 0;
-
-    resetTradeAmounts();
-
-    updateAfterReset();
-    sysLog("Game Reset"); //Inform player.
-
-    renameCiv();
-    renameRuler();
-
-    return true;
-}
-
-function resetTradeAmounts() {
-
-    curCiv.food.tradeAmount = civData.food.initTradeAmount;
-    curCiv.wood.tradeAmount = civData.wood.initTradeAmount;
-    curCiv.stone.tradeAmount = civData.stone.initTradeAmount;
-    curCiv.skins.tradeAmount = civData.skins.initTradeAmount;
-    curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
-    curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
-    curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
-    curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
-
-}
-
-function tickAutosave() {
-    if (settings.autosave && (++settings.autosaveCounter >= settings.autosaveTime)) {
-        settings.autosaveCounter = 0;
-        // If autosave fails, disable it.
-        if (!save("auto")) { settings.autosave = false; }
-    }
 }
 
 // TODO: Need to improve 'net' handling.
@@ -2021,10 +1620,8 @@ function doFarmers() {
         * (1 + civData.mill.owned * millMod / 200) //Farmers farm food
     );
     civData.food.net -= population.living; //The living population eats food.
-    //if (civData.food.owned < civData.food.limit) {
     civData.food.owned += civData.food.net;
-    //}
-    //&& civData.skins.owned < civData.skins.limit
+
     if (civData.skinning.owned && civData.farmer.owned > 0 ) { //and sometimes get skins
         var skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
         var skinsEarned = rndRound(skinsChance);
@@ -2035,10 +1632,8 @@ function doFarmers() {
 
 function doWoodcutters() {
     civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
-    //if (civData.wood.owned < civData.wood.limit) {
     civData.wood.owned += civData.wood.net;
-    //}
-    //&& civData.herbs.owned < civData.herbs.limit
+
     if (civData.harvesting.owned && civData.woodcutter.owned > 0 ) { //and sometimes get herbs
         var herbsChance = civData.wood.specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
         var herbsEarned = rndRound(herbsChance);
@@ -2050,10 +1645,8 @@ function doWoodcutters() {
 function doMiners() {
     var specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
     civData.stone.net = civData.miner.owned * (civData.miner.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
-    //if (civData.stone.owned < civData.stone.limit) {
     civData.stone.owned += civData.stone.net;
-    //}
-    //&& civData.ore.owned < civData.ore.limit
+
     if (civData.prospecting.owned && civData.miner.owned > 0 ) { //and sometimes get ore
         var oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
         var oreEarned = rndRound(oreChance);
@@ -2168,29 +1761,54 @@ function getRandomPatient(n) {
 }
 
 function doHealers() {
+    if (civData.herbs.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without herbs
     var job, numHealed = 0;
     var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
-
     // How much healing can we do?
+    // this doesn't need to be a global variable
     civData.healer.cureCount += (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
 
+    var cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
     // We can't cure more sick people than there are
     civData.healer.cureCount = Math.min(civData.healer.cureCount, population.totalSick);
+    // We can't cure more sick people than there are herbs
+    civData.healer.cureCount = Math.min(civData.healer.cureCount, civData.herbs.owned);
 
     // Cure people until we run out of healing capacity or herbs
     while (civData.healer.cureCount >= 1 && civData.herbs.owned >= 1) {
         job = getNextPatient();
-        if (!job) { break; }
+        if (!job) {break;}
         healByJob(job);
         --civData.healer.cureCount;
         --civData.herbs.owned;
         --civData.herbs.net;
-
         ++numHealed;
     }
     return numHealed;
 }
+//function doHealers() {
+//    if (civData.herbs.owned <= 0) { return 0;} // we can't heal without herbs
+//    var job, numHealed = 0;
+//    var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
+//    // How much healing can we do?
+//    // this doesn't need to be a global variable
+//    var cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
 
+//    // We can't cure more sick people than there are
+//    civData.healer.cureCount = Math.min(cureCount, population.totalSick);
+
+//    // Cure people until we run out of healing capacity or herbs
+//    while (cureCount >= 1 && civData.herbs.owned >= 1) {
+//        job = getNextPatient();
+//        if (!job) {break;}
+//        healByJob(job);
+//        --cureCount;
+//        --civData.herbs.owned;
+//        --civData.herbs.net;
+//        ++numHealed;
+//    }
+//    return numHealed;
+//}
 function doPlague() {
     if (population.totalSick <= 0) {
         return false;
@@ -2255,15 +1873,6 @@ function doPlague() {
         }
         calculatePopulation();
         return true;
-        /*
-        while (civData.healer.cureCount >= 1 && civData.herbs.owned >= 1) {
-        job = getNextPatient();
-        if (!job) { break; }
-        healByJob(job);
-
-        ++numHealed;
-        */
-
     } else if (deathRoll > 99) { // 1% chance that it spreads 
         // Infect up to 0.1% of the healthy population.
         var infected = Math.floor(population.healthy / 100 * Math.random()) + 1;
@@ -2291,7 +1900,7 @@ function doGraveyards() {
                 curCiv.grave.owned -= 1;
             }
             else {
-                // if crieria not met, no point continuing
+                // if criteria not met, no point continuing
                 break;
             }
         }
@@ -2307,7 +1916,7 @@ function doCorpses() {
 
     // if we have enough clerics to bury the dead, then do nothing
     // why 7?  Because after about 7 days corpses start decaying
-    if (civData.corpses.owned <= civData.cleric.owned * 7) { return; }
+    if (civData.corpses.owned <= civData.cleric.owned * 7 && curCiv.grave.owned > 0 ) { return; }
 
     // Corpses lying around will occasionally make people sick.
     // 1-in-50 chance (1-in-100 with feast)
@@ -2316,12 +1925,13 @@ function doCorpses() {
 
     // more corpses should mean more chance of disease
     sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
-    var test = population.healthy * 0.1 * Math.random();
+    // increase percentage to reduce frequency
+    var test = population.healthy * 0.33 * Math.random();
 
-    // if corpses owned is greater than 10% of population, then chance of sickness spreading
+    // if corpses owned is greater than upto %age of population, then chance of sickness spreading
     if (sickChance < test) { return; }
 
-    // Infect up to 0.01% of the healthy population.
+    // Infect up to 1% of the healthy population.
     // if there are sick already, then see doPlague()
     if (population.healthy > 0 && population.totalSick == 0) {
         infected = Math.floor(population.healthy / 100 * Math.random());
@@ -2368,7 +1978,7 @@ function getCombatants(place, alignment) {
 // Some attackers get a damage mod against some defenders
 function getCasualtyMod(attacker, defender) {
     // Cavalry take 50% more casualties vs infantry
-    if ((defender.combatType == "cavalry") && (attacker.combatType == "infantry")) { return 1.50; }
+    if ((defender.combatType == combatTypes.cavalry) && (attacker.combatType == combatTypes.infantry)) { return 1.50; }
 
     return 1.0; // Otherwise no modifier
 }
@@ -2377,10 +1987,10 @@ function doFight(attacker, defender) {
     if ((attacker.owned <= 0) || (defender.owned <= 0)) { return; }
 
     // Defenses vary depending on whether the player is attacking or defending.
-    var fortMod = (defender.alignment == "player" ?
+    var fortMod = (defender.alignment == alignmentType.player ?
         (civData.fortification.owned * civData.fortification.efficiency)
         : (civData.efort.owned * civData.efort.efficiency));
-    var palisadeMod = ((defender.alignment == "player") && (civData.palisade.owned)) * civData.palisade.efficiency;
+    var palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
 
     // Determine casualties on each side.  Round fractional casualties
     // probabilistically, and don't inflict more than 100% casualties.
@@ -2391,8 +2001,7 @@ function doFight(attacker, defender) {
     defender.owned -= defenderCas;
 
     // Give player credit for kills.
-    var playerCredit = ((attacker.alignment == "player") ? defenderCas :
-        (defender.alignment == "player") ? attackerCas : 0);
+    var playerCredit = ((attacker.alignment == alignmentType.player) ? defenderCas : (defender.alignment == alignmentType.player) ? attackerCas : 0);
 
     //Increments enemies slain, corpses, and piety
     curCiv.enemySlain.owned += playerCredit;
@@ -2418,7 +2027,7 @@ function doWolves(attacker) {
         // just in case
         if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 
-        gameLog(prettify(gone) + " rotting corpses devoured by wolves");
+        gameLog(prettify(gone) + " rotting " + civData.corpses.getQtyName(gone) + " devoured by wolves");
 
     } else {
         doSlaughter(attacker);
@@ -2461,18 +2070,18 @@ function doInvaders(attacker) {
 
 // kill
 function doSlaughter(attacker) {
-    var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
+    var killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
     //var target = getRandomHealthyWorker(); //Choose random worker
     var target = getRandomWorker(); //Choose random worker
-    var targetUnit = civData[target];
     if (target) {
+        var targetUnit = civData[target];
         if (targetUnit.owned >= 1) {
             // An attacker may disappear after killing
             if (Math.random() < attacker.killExhaustion) { --attacker.owned; }
 
             targetUnit.owned -= 1;
             // Animals will eat the corpse
-            if (attacker.species != "animal") {
+            if (attacker.species != speciesType.animal) {
                 civData.corpses.owned += 1;
             }
 
@@ -2491,7 +2100,7 @@ function doSlaughter(attacker) {
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
 function doSlaughterMulti(attacker) {
-    //var killVerb = (attacker.species == "animal") ? "eaten" : "killed";
+    //var killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
 
     // kill up to 10% of attacking force
     var targets = 1 + Math.ceil(Math.random() * attacker.owned * 0.1);
@@ -2513,7 +2122,7 @@ function doSlaughterMulti(attacker) {
                 lastTarget = targetUnit.singular;
 
                 // Animals will eat the corpse
-                if (attacker.species != "animal") {
+                if (attacker.species != speciesType.animal) {
                     civData.corpses.owned += 1;
                 }
 
@@ -2544,7 +2153,7 @@ function doLoot(attacker) {
     // target.owned can be decimal.  we can't loot more than is available
     stolenQty = Math.min(stolenQty, Math.floor(target.owned));
     if (stolenQty > 0) {
-        gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(attacker.owned));
+        gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
     }
     target.owned -= stolenQty;
     if (target.owned <= 0) {
@@ -2656,28 +2265,28 @@ function dismissWorkers() {
     var diff = 0;
     var total = 0;
 
-    total = totalByJob("tanner");
+    total = totalByJob(unitType.tanner);
     if (total > 0 && total > civData.tannery.owned) {
         diff = total - civData.tannery.owned;
         civData.tanner.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob("blacksmith");
+    total = totalByJob(unitType.blacksmith);
     if (total > 0 && total > civData.smithy.owned) {
         diff = total - civData.smithy.owned;
         civData.blacksmith.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob("healer");
+    total = totalByJob(unitType.healer);
     if (total > 0 && total > civData.apothecary.owned) {
         diff = total - civData.apothecary.owned;
         civData.healer.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob("cleric");
+    total = totalByJob(unitType.cleric);
     if (total > 0 && total > civData.temple.owned) {
         diff = total - civData.temple.owned;
         civData.cleric.owned -= diff;
@@ -2685,14 +2294,14 @@ function dismissWorkers() {
     }
 
     // these buildings have 10 units
-    total = totalByJob("soldier");
+    total = totalByJob(unitType.soldier);
     if (total > 0 && total > civData.barracks.owned * 10) {
         diff = total - (civData.barracks.owned * 10);
         civData.soldier.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob("cavalry");
+    total = totalByJob(unitType.cavalry);
     if (total > 0 && total > civData.stable.owned * 10) {
         diff = total - (civData.stable.owned * 10);
         civData.cavalry.owned -= diff;
@@ -2705,7 +2314,7 @@ function doShades() {
     if (defender.owned <= 0) { return; }
 
     // Attack each enemy in turn.
-    getCombatants(defender.place, "enemy").forEach(function (attacker) {
+    getCombatants(defender.place, alignmentType.enemy).forEach(function (attacker) {
         var num = Math.floor(Math.min((attacker.owned / 4), defender.owned));
         //xxx Should we give book and throne credit here?
         defender.owned -= num;
@@ -2724,14 +2333,14 @@ function doEsiege(siegeObj, targetObj) {
     if (!getCombatants(siegeObj.place, siegeObj.alignment).length &&
         getCombatants(targetObj.place, targetObj.alignment).length) {
         //the siege engines are undefended; maybe capture them.
-        if ((targetObj.alignment == "player") && civData.mathematics.owned) { //Can we use them?
+        if ((targetObj.alignment == alignmentType.player) && civData.mathematics.owned) { //Can we use them?
             gameLog("Captured " + prettify(siegeObj.owned) + " enemy siege engines.");
             civData.siege.owned += siegeObj.owned; //capture them
         }
         siegeObj.owned = 0;
     }
     else if (doSiege(siegeObj, targetObj) > 0) {
-        if (targetObj.id === "fortification") {
+        if (targetObj.id === buildingType.fortification) {
             updateRequirements(targetObj);
             gameLog("Enemy siege engine damaged our fortifications");
         }
@@ -2757,16 +2366,16 @@ function doSiege(siegeObj, targetObj) {
 }
 
 //Handling raids
-function doRaid(place, attackerID, defenderID) {
+function doRaid(place, attackAlignment, defendAlignment) {
     if (!curCiv.raid.raiding) { return; } // We're not raiding right now.
 
-    var attackers = getCombatants(place, attackerID);
-    var defenders = getCombatants(place, defenderID);
+    var attackers = getCombatants(place, attackAlignment);
+    var defenders = getCombatants(place, defendAlignment);
 
     if (attackers.length && !defenders.length) { // Win check.
         // Slaughter any losing noncombatant units.
         //xxx Should give throne and corpses for any human ones?
-        unitData.filter(function (elem) { return ((elem.alignment == defenderID) && (elem.place == place)); })
+        unitData.filter(function (elem) { return ((elem.alignment == defendAlignment) && (elem.place == place)); })
             .forEach(function (elem) { elem.owned = 0; });
 
         if (!curCiv.raid.victory) { gameLog("Raid victorious!"); } // Notify player on initial win.
@@ -2778,7 +2387,7 @@ function doRaid(place, attackerID, defenderID) {
         curCiv.raid.invadeciv = null;
         // Slaughter any losing noncombatant units.
         //xxx Should give throne and corpses for any human ones?
-        unitData.filter(function (elem) { return ((elem.alignment == attackerID) && (elem.place == place)); })
+        unitData.filter(function (elem) { return ((elem.alignment == attackAlignment) && (elem.place == place)); })
             .forEach(function (elem) { elem.owned = 0; });
 
         gameLog("Raid defeated");  // Notify player
@@ -2795,9 +2404,9 @@ function doRaid(place, attackerID, defenderID) {
     doSiege(civData.siege, civData.efort);
 }
 
-function doRaidCheck(place, attackerID, defenderID) {
+function doRaidCheck(place, attackAlignment, defendAlignment) {
     if (curCiv.raid.raiding && curCiv.raid.victory) {
-        var attackers = getCombatants(place, attackerID);
+        var attackers = getCombatants(place, attackAlignment);
         if (curCiv.raid.left > 0) {
             plunder(); // plunder resources before new raid
             var troopsCount = attackers.reduce((acc, val) => acc + val.owned, 0);
@@ -2898,7 +2507,8 @@ function doMobs() {
     }
 
     // we don't want mobs attacking tiny populations
-    if (population.current > 10 && curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
+    //population.current > 1 &&
+    if ( curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
         var rnum = population.current * Math.random();
 
         // attempt at forcing attacks more frequently the larger the civ
@@ -2907,7 +2517,7 @@ function doMobs() {
         if (rnum < population.current / 50) {
             curCiv.attackCounter = 0;
             //Choose which kind of mob will attack
-            //mobType = mobTypes.wolf; // Default to wolves
+            //mobType = mobTypeIds.wolf; // Default to wolves
             //if (population.current >= 10000) {
             //    choose = Math.random();
             //    if (choose > 0.5) { mobType = "barbarian"; }
@@ -2920,65 +2530,65 @@ function doMobs() {
             // or barbarians/invaders attacking small ones
             if (population.current < civSizes.village.min_pop) {
                 // mostly wolves
-                if (Math.random() < 0.9) {
-                    mobType = mobTypes.wolf;
+                if (Math.random() < 0.75) {
+                    mobType = mobTypeIds.wolf;
                 }
                 else {
-                    mobType = mobTypes.bandit;
+                    mobType = mobTypeIds.bandit;
                 }
             }
             else if (population.current >= civSizes.village.min_pop && population.current < civSizes.town.min_pop) {
                 // wolf or bandit
                 if (Math.random() < 0.5) {
-                    mobType = mobTypes.wolf;
+                    mobType = mobTypeIds.wolf;
                 }
                 else {
-                    mobType = mobTypes.bandit;
+                    mobType = mobTypeIds.bandit;
                 }
             }
             else if (population.current >= civSizes.town.min_pop && population.current < civSizes.smallCity.min_pop) {
                 // mostly bandits
-                if (Math.random() < 0.9) {
-                    mobType = mobTypes.bandit;
+                if (Math.random() < 0.75) {
+                    mobType = mobTypeIds.bandit;
                 }
                 else {
-                    mobType = mobTypes.barbarian;
+                    mobType = mobTypeIds.barbarian;
                 }
             }
             else if (population.current >= civSizes.smallCity.min_pop && population.current < civSizes.largeCity.min_pop) {
                 // bandits or barbarians
                 if (Math.random() < 0.5) {
-                    mobType = mobTypes.bandit;
+                    mobType = mobTypeIds.bandit;
                 }
                 else {
-                    mobType = mobTypes.barbarian;
+                    mobType = mobTypeIds.barbarian;
                 }
             }
             else if (population.current >= civSizes.largeCity.min_pop && population.current < civSizes.smallNation.min_pop) {
                 // mostly barbarians
-                if (Math.random() < 0.9) {
-                    mobType = mobTypes.barbarian;
+                if (Math.random() < 0.75) {
+                    mobType = mobTypeIds.barbarian;
                 }
                 else {
-                    mobType = mobTypes.invader;
+                    mobType = mobTypeIds.invader;
                 }
             }
             else if (population.current >= civSizes.smallNation.min_pop && population.current < civSizes.largeNation.min_pop) {
                 // barbarians or invaders
                 if (Math.random() < 0.5) {
-                    mobType = mobTypes.barbarian;
+                    mobType = mobTypeIds.barbarian;
                 }
                 else {
-                    mobType = mobTypes.invader;
+                    mobType = mobTypeIds.invader;
                 }
             }
             else if (population.current >= civSizes.largeNation.min_pop) {
                 // mainly invaders 
-                if (Math.random() < 0.1) {
-                    mobType = mobTypes.barbarian;
+                if (Math.random() < 0.25) {
+                    mobType = mobTypeIds.barbarian;
                 }
                 else {
-                    mobType = mobTypes.invader;
+                    mobType = mobTypeIds.invader;
                 }
             }
             spawnMob(civData[mobType]);
@@ -2986,10 +2596,10 @@ function doMobs() {
     }
 
     //Handling mob attacks
-    getCombatants("home", "enemy").forEach(function (attacker) {
+    getCombatants(placeType.home, alignmentType.enemy).forEach(function (attacker) {
         if (attacker.owned <= 0) { return; } // In case the last one was killed in an earlier iteration.
 
-        var defenders = getCombatants(attacker.place, "player");
+        var defenders = getCombatants(attacker.place, alignmentType.player);
         if (!defenders.length) { attacker.onWin(); return; } // Undefended 
 
         defenders.forEach(function (defender) { doFight(attacker, defender); }); // FIGHT!
@@ -3026,8 +2636,8 @@ function tickGrace() {
     }
 }
 
-//Not strictly a debug function so much as it is letting the user know when 
-//something happens without needing to watch the console.
+// TODO: we should probably pass the relevant table to a single function
+// even better would be to use a div with a scrollbars so that no messages are lost
 function gameLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
@@ -3054,8 +2664,14 @@ function gameLog(message) {
     s += "</td>";
     ui.find("#log0").innerHTML = s;
 }
-// a copy of the function above
-// TODO: we should probably pass the relevant table to a single function
+
+//Not strictly a debug function so much as it is letting the user know when 
+//something happens without needing to watch the console.
+function debug(message) {
+    sysLog(message); // simply call other method.  Makes it easier to distinguish find when done debugging
+}
+// a copy of the gameLog function above
+// outputs to the Event Log tab
 function sysLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
@@ -3143,8 +2759,8 @@ function gameLoop() {
     tickGlory();
     doShades();
     doEsiege(civData.esiege, civData.fortification);
-    doRaid("party", "player", "enemy");
-    doRaidCheck("party", "player", "enemy");
+    doRaid(placeType.party, alignmentType.player, alignmentType.enemy);
+    doRaidCheck(placeType.party, alignmentType.player, alignmentType.enemy);
 
     //Population-related
     doGraveyards();
