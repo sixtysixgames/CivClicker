@@ -27,71 +27,13 @@ var loopTimer = 0;
 // TODO: Update the version numbering internally
 var version = 24; // This is an ordinal used to trigger reloads. 
 //Always increment versionData if adding new element to civData
-var versionData = new VersionData(1, 4, 6, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 9, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
 var saveSettingsTag = "civSettings";
 var logRepeat = 1;
 var sysLogRepeat = 1;
-
-// Civ size category minimums
-
-//var civSizes = [
-//	{ min_pop :      0, name: "Thorp"       , id : "thorp"      },
-//	{ min_pop :     20, name: "Hamlet"      , id : "hamlet"     },
-//	{ min_pop :     60, name: "Village"     , id : "village"    },
-//	{ min_pop :    200, name: "Small Town"  , id : "smallTown"  },
-//	{ min_pop :   2000, name: "Large Town"  , id : "largeTown"  },
-//	{ min_pop :   5000, name: "Small City"  , id : "smallCity"  },
-//	{ min_pop :  10000, name: "Large City"  , id : "largeCity"  },
-//	{ min_pop :  20000, name: "Metro&shy;polis",id : "metropolis" },
-//	{ min_pop :  50000, name: "Small Nation", id : "smallNation"},
-//	{ min_pop : 100000, name: "Nation"      , id : "nation"     },
-//	{ min_pop : 200000, name: "Large Nation", id : "largeNation"},
-//	{ min_pop : 500000, name: "Empire"      , id : "empire"     }
-//];
-
-//var civSizes = [
-//    { min_pop: 0, name: "Tribe", id: "tribe" },
-//    { min_pop: 10, name: "Thorp", id: "thorp" },
-//    { min_pop: 50, name: "Hamlet", id: "hamlet" },
-//    { min_pop: 100, name: "Village", id: "village" },
-//    { min_pop: 1000, name: "Small Town", id: "smallTown" },
-//    { min_pop: 2500, name: "Town", id: "town" },
-//    { min_pop: 5000, name: "Large Town", id: "largeTown" },
-//    { min_pop: 10000, name: "Small City", id: "smallCity" },
-//    { min_pop: 25000, name: "City", id: "city" },
-//    { min_pop: 50000, name: "Large City", id: "largeCity" },
-//    { min_pop: 100000, name: "City State", id: "metropolis" },
-//    { min_pop: 250000, name: "Small Nation", id: "smallNation" },
-//    { min_pop: 500000, name: "Nation", id: "nation" },
-//    { min_pop: 1000000, name: "Large Nation", id: "largeNation" },
-//    { min_pop: 2500000, name: "Empire", id: "empire" }
-//];
-// 0,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000
-var civSizes = [
-    { min_pop: 0, name: "Tribe", id: "tribe" },
-    { min_pop: 10, name: "Thorp", id: "thorp" },
-    { min_pop: 50, name: "Hamlet", id: "hamlet" },
-    { min_pop: 100, name: "Village", id: "village" },
-    { min_pop: 500, name: "Small Town", id: "smallTown" },
-    { min_pop: 1000, name: "Town", id: "town" },
-    { min_pop: 2500, name: "Large Town", id: "largeTown" },
-    { min_pop: 5000, name: "Small City", id: "smallCity" },
-    { min_pop: 10000, name: "City", id: "city" },
-    { min_pop: 25000, name: "Large City", id: "largeCity" },
-    { min_pop: 50000, name: "City State", id: "metropolis" },
-    { min_pop: 100000, name: "Small Nation", id: "smallNation" },
-    { min_pop: 250000, name: "Nation", id: "nation" },
-    { min_pop: 500000, name: "Large Nation", id: "largeNation" },
-    { min_pop: 1000000, name: "Empire", id: "empire" }
-];
-//
-var PATIENT_LIST = [
-    unitType.healer, unitType.cleric, unitType.farmer, unitType.soldier, unitType.cavalry, unitType.labourer,
-    unitType.woodcutter, unitType.miner, unitType.tanner, unitType.blacksmith, unitType.unemployed
-];
 
 // Declare variables here so they can be referenced later.  
 var curCiv = {
