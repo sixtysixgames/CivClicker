@@ -212,3 +212,103 @@ function setWorksafe(value) {
 function onToggleWorksafe(control) {
     return setWorksafe(control.checked);
 }
+
+
+// Generate two HTML <span> texts to display an item's cost and effect note.
+function getCostNote(civObj) {
+    // Only add a ":" if both items are present.
+    var reqText = getReqText(civObj.require);
+    var effectText = (isValid(civObj.effectText)) ? civObj.effectText : "";
+    var separator = (reqText && effectText) ? ": " : "";
+
+    return "<span id='" + civObj.id + "Cost' class='cost'>" + reqText + "</span>"
+        + "<span id='" + civObj.id + "Note' class='note'>" + separator + civObj.effectText + "</span>";
+}
+
+
+// TODO: we should probably pass the relevant table to a single function
+// even better would be to use a div with a scrollbars so that no messages are lost
+function gameLog(message) {
+    //get the current date, extract the current time in HH.MM format
+    //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
+    var d = new Date();
+    var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
+
+    //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
+    if (ui.find("#logL").innerHTML != message) {
+        logRepeat = 0; //Reset the (xNumber) value
+
+        //Go through all the logs in order, moving them down one and successively overwriting them.
+        var i = 20; // Number of lines of log to keep.
+        while (--i > 1) { ui.find("#log" + i).innerHTML = ui.find("#log" + (i - 1)).innerHTML; }
+        //Since ids need to be unique, log1 strips the ids from the log0 elements when copying the contents.
+        ui.find("#log1").innerHTML = (
+            "<td>" + ui.find("#logT").innerHTML
+            + "</td><td>" + ui.find("#logL").innerHTML
+            + "</td><td>" + ui.find("#logR").innerHTML + "</td>"
+        );
+    }
+    // Updates most recent line with new time, message, and xNumber.
+    var s = "<td id='logT'>" + curTime + "</td><td id='logL'>" + message + "</td><td id='logR'>";
+    if (++logRepeat > 1) { s += "(x" + logRepeat + ")"; } // Optional (xNumber)
+    s += "</td>";
+    ui.find("#log0").innerHTML = s;
+}
+
+//Not strictly a debug function so much as it is letting the user know when 
+//something happens without needing to watch the console.
+function debug(message) {
+    sysLog(message); // simply call other method.  Makes it easier to distinguish find when done debugging
+}
+// a copy of the gameLog function above
+// outputs to the Event Log tab
+function sysLog(message) {
+    //get the current date, extract the current time in HH.MM format
+    //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
+    var d = new Date();
+    var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
+
+    console.log(message);
+
+    //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
+    if (ui.find("#syslogL").innerHTML != message) {
+        sysLogRepeat = 0; //Reset the (xNumber) value
+
+        //Go through all the logs in order, moving them down one and successively overwriting them.
+        var i = 20; // Number of lines of log to keep.
+        while (--i > 1) { ui.find("#syslog" + i).innerHTML = ui.find("#syslog" + (i - 1)).innerHTML; }
+        //Since ids need to be unique, log1 strips the ids from the log0 elements when copying the contents.
+        ui.find("#syslog1").innerHTML = (
+            "<td>" + ui.find("#syslogT").innerHTML
+            + "</td><td>" + ui.find("#syslogL").innerHTML
+            + "</td><td>" + ui.find("#syslogR").innerHTML + "</td>"
+        );
+    }
+    // Updates most recent line with new time, message, and xNumber.
+    var s = "<td id='syslogT'>" + curTime + "</td><td id='syslogL'>" + message + "</td><td id='syslogR'>";
+    if (++sysLogRepeat > 1) { s += "(x" + sysLogRepeat + ")"; } // Optional (xNumber)
+    s += "</td>";
+    ui.find("#syslog0").innerHTML = s;
+}
+
+function getCustomNumber(civObj) {
+    if (!civObj || !civObj.customQtyId) { return undefined; }
+    var elem = document.getElementById(civObj.customQtyId);
+    if (!elem) { return undefined; }
+
+    var num = Number(elem.value);
+
+    // Check the above operations haven't returned NaN
+    // Also don't allow negative increments.
+    if (isNaN(num) || num < 0) {
+        elem.style.background = "#f99"; //notify user that the input failed
+        return 0;
+    }
+
+    num = Math.floor(num); // Round down
+
+    elem.value = num; //reset fractional numbers, check nothing odd happened
+    elem.style.background = "#fff";
+
+    return num;
+}
