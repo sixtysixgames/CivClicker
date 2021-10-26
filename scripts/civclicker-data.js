@@ -129,7 +129,7 @@ function getCivData() {
         new Building({
             id: buildingType.mansion, singular: "mansion", plural: "mansions",
             prereqs: { architecture: true },
-            require: { wood: 200, stone: 200, leather: 20 },
+            require: { wood: 200, stone: 200, leather: 20, metal: 20 },
             effectText: "+50 max pop."
         }),
         new Building({
@@ -237,7 +237,7 @@ function getCivData() {
         new Building({
             id: buildingType.battleAltar, name: "Build Altar", singular: "battle altar", plural: "battle altars",
             subType: subTypes.altar, devotion: 1,
-            prereqs: { deity: "battle" },
+            prereqs: { deity: deityDomains.battle },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), metal: 50 + (50 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
@@ -245,7 +245,7 @@ function getCivData() {
         new Building({
             id: buildingType.fieldsAltar, name: "Build Altar", singular: "fields altar", plural: "fields altars",
             subType: subTypes.altar, devotion: 1,
-            prereqs: { deity: "fields" },
+            prereqs: { deity: deityDomains.fields },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), food: 500 + (250 * this.owned), wood: 500 + (250 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
@@ -253,7 +253,7 @@ function getCivData() {
         new Building({
             id: buildingType.underworldAltar, name: "Build Altar", singular: "underworld altar", plural: "underworld altars",
             subType: subTypes.altar, devotion: 1,
-            prereqs: { deity: "underworld" },
+            prereqs: { deity: deityDomains.underworld },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), corpses: 1 + this.owned }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
@@ -261,7 +261,7 @@ function getCivData() {
         new Building({
             id: buildingType.catAltar, name: "Build Altar", singular: "cat altar", plural: "cat altars",
             subType: subTypes.altar, devotion: 1,
-            prereqs: { deity: "cats" },
+            prereqs: { deity: deityDomains.cats },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), herbs: 100 + (50 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
@@ -490,49 +490,49 @@ function getCivData() {
         // Pantheon Upgrades
         new Upgrade({
             id: "lure", name: "Lure of Civilisation", subType: subTypes.pantheon,
-            prereqs: { deity: "cats", devotion: 10 },
+            prereqs: { deity: deityDomains.cats, devotion: 10 },
             require: { piety: 1000 },
             effectText: "increase chance to get cats"
         }),
         new Upgrade({
             id: "companion", name: "Warmth of the Companion", subType: subTypes.pantheon,
-            prereqs: { deity: "cats", devotion: 30 },
+            prereqs: { deity: deityDomains.cats, devotion: 30 },
             require: { piety: 1000 },
             effectText: "cats help heal the sick"
         }),
         new Upgrade({
             id: "comfort", name: "Comfort of the Hearthfires", subType: subTypes.pantheon,
-            prereqs: { deity: "cats", devotion: 50 },
+            prereqs: { deity: deityDomains.cats, devotion: 50 },
             require: { piety: 5000 },
             effectText: "traders marginally more frequent"
         }),
         new Upgrade({
             id: "blessing", name: "Blessing of Abundance", subType: subTypes.pantheon,
-            prereqs: { deity: "fields", devotion: 10 },
+            prereqs: { deity: deityDomains.fields, devotion: 10 },
             require: { piety: 1000 },
             effectText: "increase farmer food output"
         }),
         new Upgrade({
             id: "waste", name: "Abide No Waste", subType: subTypes.pantheon,
-            prereqs: { deity: "fields", devotion: 30 },
+            prereqs: { deity: deityDomains.fields, devotion: 30 },
             require: { piety: 1000 },
             effectText: "workers will eat corpses if there is no food left"
         }),
         new Upgrade({
             id: "stay", name: "Stay With Us", subType: subTypes.pantheon,
-            prereqs: { deity: "fields", devotion: 50 },
+            prereqs: { deity: deityDomains.fields, devotion: 50 },
             require: { piety: 5000 },
             effectText: "traders stay longer"
         }),
         new Upgrade({
             id: "riddle", name: "Riddle of Steel", subType: subTypes.pantheon,
-            prereqs: { deity: "battle", devotion: 10 },
+            prereqs: { deity: deityDomains.battle, devotion: 10 },
             require: { piety: 1000 },
             effectText: "improve soldiers"
         }),
         new Upgrade({
             id: "throne", name: "Throne of Skulls", subType: subTypes.pantheon,
-            prereqs: { deity: "battle", devotion: 30 },
+            prereqs: { deity: deityDomains.battle, devotion: 30 },
             require: { piety: 1000 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.count = 0; },
             get count() { return this.data.count; }, // Partial temples from Throne
@@ -541,25 +541,25 @@ function getCivData() {
         }),
         new Upgrade({
             id: "lament", name: "Lament of the Defeated", subType: subTypes.pantheon,
-            prereqs: { deity: "battle", devotion: 50 },
+            prereqs: { deity: deityDomains.battle, devotion: 50 },
             require: { piety: 5000 },
             effectText: "Successful raids delay future invasions"
         }),
         new Upgrade({
             id: "book", name: "The Book of the Dead", subType: subTypes.pantheon,
-            prereqs: { deity: "underworld", devotion: 10 },
+            prereqs: { deity: deityDomains.underworld, devotion: 10 },
             require: { piety: 1000 },
             effectText: "gain piety with deaths"
         }),
         new Upgrade({
             id: "feast", name: "A Feast for Crows", subType: subTypes.pantheon,
-            prereqs: { deity: "underworld", devotion: 30 },
+            prereqs: { deity: deityDomains.underworld, devotion: 30 },
             require: { piety: 1000 },
             effectText: "corpses are less likely to cause illness"
         }),
         new Upgrade({
             id: "secrets", name: "Secrets of the Tombs", subType: subTypes.pantheon,
-            prereqs: { deity: "underworld", devotion: 50 },
+            prereqs: { deity: deityDomains.underworld, devotion: 50 },
             require: { piety: 5000 },
             effectText: "graveyards increase cleric piety generation"
         }),
@@ -589,13 +589,13 @@ function getCivData() {
         // Prayers
         new Upgrade({
             id: "smite", name: "Smite Invaders", subType: subTypes.prayer,
-            prereqs: { deity: "battle", devotion: 20 },
+            prereqs: { deity: deityDomains.battle, devotion: 20 },
             require: { piety: 100 },
             effectText: "(per invader killed)"
         }),
         new Upgrade({
             id: "glory", name: "For Glory!", subType: subTypes.prayer,
-            prereqs: { deity: "battle", devotion: 40 },
+            prereqs: { deity: deityDomains.battle, devotion: 40 },
             require: { piety: 1000 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.data.timer = 0; },
             get timer() { return this.data.timer; }, // Glory time left (sec)
@@ -604,13 +604,13 @@ function getCivData() {
         }),
         new Upgrade({
             id: "wickerman", name: "Burn Wicker Man", subType: subTypes.prayer,
-            prereqs: { deity: "fields", devotion: 20 },
+            prereqs: { deity: deityDomains.fields, devotion: 20 },
             require: { wood: 500 },  //xxx +1 Worker
             effectText: "Sacrifice 1 worker to gain a random bonus to a resource"
         }),
         new Upgrade({
             id: "walk", name: "Walk Behind the Rows", subType: subTypes.prayer,
-            prereqs: { deity: "fields", devotion: 40 },
+            prereqs: { deity: deityDomains.fields, devotion: 40 },
             require: {}, //xxx 1 Worker/sec
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.rate = 0; },
             get rate() { return this.data.rate; }, // Sacrifice rate
@@ -620,7 +620,7 @@ function getCivData() {
         }),
         new Upgrade({
             id: "raiseDead", name: "Raise Dead", subType: subTypes.prayer,
-            prereqs: { deity: "underworld", devotion: 20 },
+            prereqs: { deity: deityDomains.underworld, devotion: 20 },
             require: { corpses: 1, piety: 4 }, //xxx Nonlinear cost
             effectText: "Piety to raise the next zombie",
             extraText: "<button onmousedown='raiseDead(100)' id='raiseDead100' class='x100' disabled='disabled'"
@@ -628,13 +628,13 @@ function getCivData() {
         }),
         new Upgrade({
             id: "summonShade", name: "Summon Shades", subType: subTypes.prayer,
-            prereqs: { deity: "underworld", devotion: 40 },
+            prereqs: { deity: deityDomains.underworld, devotion: 40 },
             require: { piety: 1000 },  //xxx Also need slainEnemies
             effectText: "Souls of the defeated rise to fight for you"
         }),
         new Upgrade({
             id: "pestControl", name: "Pest Control", subType: subTypes.prayer,
-            prereqs: { deity: "cats", devotion: 20 },
+            prereqs: { deity: deityDomains.cats, devotion: 20 },
             require: { piety: 100 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.timer = 0; },
             get timer() { return this.data.timer; }, // Pest hunting time left
@@ -643,7 +643,7 @@ function getCivData() {
         }),
         new Upgrade({
             id: "grace", name: "Grace", subType: subTypes.prayer,
-            prereqs: { deity: "cats", devotion: 40 },
+            prereqs: { deity: deityDomains.cats, devotion: 40 },
             require: { piety: 1000 }, //xxx This is not fixed; see curCiv.graceCost
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.cost = 1000; },
             get cost() { return this.data.cost; }, // Increasing cost to use Grace to increase morale.
@@ -961,19 +961,19 @@ function getCivData() {
         //xxx TODO: Should make this loop through the domains
         new Achievement({
             id: "battleAch", name: "Battle",
-            test: function () { return getCurDeityDomain() == "battle"; }
+            test: function () { return getCurDeityDomain() == deityDomains.battle; }
         }),
         new Achievement({
             id: "fieldsAch", name: "Fields",
-            test: function () { return getCurDeityDomain() == "fields"; }
+            test: function () { return getCurDeityDomain() == deityDomains.fields; }
         }),
         new Achievement({
             id: "underworldAch", name: "Under&shy;world",
-            test: function () { return getCurDeityDomain() == "underworld"; }
+            test: function () { return getCurDeityDomain() == deityDomains.underworld; }
         }),
         new Achievement({
             id: "catsAch", name: "Cats",
-            test: function () { return getCurDeityDomain() == "cats"; }
+            test: function () { return getCurDeityDomain() == deityDomains.cats; }
         }),
         //xxx It might be better if this checked for all domains in the Pantheon at once (no iconoclasming old ones away).
         new Achievement({
@@ -1012,7 +1012,7 @@ function getCivData() {
         var testCivSizeAch = function () {
             return (this.id == civSizes.getCivSize(population.living).id + "Ach");
         };
-        // Add the civ size based achivements to the front of the data, so that they come first.
+        // Add the civ size based achievements to the front of the data, so that they come first.
         for (i = civSizes.length - 1; i > 0; --i) {
             civData.unshift(new Achievement({ id: civSizes[i].id + "Ach", name: civSizes[i].name, test: testCivSizeAch }));
         }
