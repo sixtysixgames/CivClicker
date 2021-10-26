@@ -7,9 +7,9 @@ function getCivData() {
     var civData = [
         // Resources
         new Resource({
-            id: "food", name: "food", increment: 1, specialChance: 0.1,
-            subType: "basic",
-            specialMaterial: "skins", verb: "harvest", activity: "harvesting", //I18N
+            id: resourceType.food, name: "food", increment: 1, specialChance: 0.1,
+            subType: subTypes.basic,
+            specialMaterial: resourceType.skins, verb: "harvest", activity: "harvesting", //I18N
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
@@ -19,76 +19,77 @@ function getCivData() {
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "wood", name: "wood", increment: 1, specialChance: 0.1,
-            subType: "basic",
-            specialMaterial: "herbs", verb: "cut", activity: "woodcutting", //I18N
+            id: resourceType.wood, name: "wood", increment: 1, specialChance: 0.1,
+            subType: subTypes.basic,
+            specialMaterial: resourceType.herbs, verb: "cut", activity: "woodcutting", //I18N
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() { return 200 + (civData.woodstock.owned * 200); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "stone", name: "stone", increment: 1, specialChance: 0.1,
-            subType: "basic",
-            specialMaterial: "ore", verb: "mine", activity: "mining", //I18N
+            id: resourceType.stone, name: "stone", increment: 1, specialChance: 0.1,
+            subType: subTypes.basic,
+            specialMaterial: resourceType.ore, verb: "mine", activity: "mining", //I18N
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() { return 200 + (civData.stonestock.owned * 200); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "skins", singular: "skin", plural: "skins",
-            subType: "special",
+            id: resourceType.skins, singular: "skin", plural: "skins",
+            subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() { return 100 + (civData.barn.owned * 100); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "herbs", singular: "herb", plural: "herbs",
-            subType: "special",
+            id: resourceType.herbs, singular: "herb", plural: "herbs",
+            subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() { return 100 + (civData.woodstock.owned * 100); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "ore", name: "ore",
-            subType: "special",
+            id: resourceType.ore, name: "ore",
+            subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() { return 100 + (civData.stonestock.owned * 100); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "leather", name: "leather",
-            subType: "special",
+            id: resourceType.leather, name: "leather",
+            subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() { return 50 + (civData.tannery.owned * 50); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "metal", name: "metal",
-            subType: "special",
+            id: resourceType.metal, name: "metal",
+            subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() { return 50 + (civData.smithy.owned * 50); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
-            id: "piety", name: "piety",
+            id: resourceType.piety, name: "piety",
             vulnerable: false, // Can't be stolen
             get limit() { return (civData.temple.owned * 50); },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
-        new Resource({ id: "gold", name: "gold", vulnerable: false }), // Can't be stolen
-        new Resource({ id: "corpses", singular: "corpse", plural: "corpses", vulnerable: false }), // Can't be stolen
-        new Resource({ id: "devotion", name: "devotion", vulnerable: false }), // Can't be stolen
+        new Resource({ id: resourceType.gold, name: "gold", vulnerable: false }), // Can't be stolen
+        new Resource({ id: resourceType.corpses, singular: "corpse", plural: "corpses", vulnerable: false }), // Can't be stolen
+        new Resource({ id: resourceType.devotion, name: "devotion", vulnerable: false }), // Can't be stolen
+
         // Buildings
         new Building({
-            id: "freeLand", name: "free land", plural: "free land",
-            subType: "land",
+            id: buildingType.freeLand, name: "free land", plural: "free land",
+            subType: subTypes.land,
             prereqs: undefined,  // Cannot be purchased.
             require: undefined,  // Cannot be purchased.
             vulnerable: false, // Cannot be stolen by looting
@@ -96,23 +97,23 @@ function getCivData() {
             effectText: "Conquer more from your neighbors."
         }),
         new Building({
-            id: "tent", singular: "tent", plural: "tents",
+            id: buildingType.tent, singular: "tent", plural: "tents",
             require: { wood: 2, skins: 2 },
             effectText: "+1 max pop."
         }),
         new Building({
-            id: "hut", singular: "wooden hut", plural: "wooden huts",
+            id: buildingType.hut, singular: "wooden hut", plural: "wooden huts",
             require: { wood: 20, skins: 1 },
             effectText: "+3 max pop."
         }),
         new Building({
-            id: "cottage", singular: "cottage", plural: "cottages",
+            id: buildingType.cottage, singular: "cottage", plural: "cottages",
             prereqs: { masonry: true },
             require: { wood: 10, stone: 30 },
             effectText: "+6 max pop."
         }),
         new Building({
-            id: "house", singular: "house", plural: "houses",
+            id: buildingType.house, singular: "house", plural: "houses",
             prereqs: { construction: true },
             require: { wood: 30, stone: 70 },
             get effectText() {
@@ -126,13 +127,13 @@ function getCivData() {
             }
         }),
         new Building({
-            id: "mansion", singular: "mansion", plural: "mansions",
+            id: buildingType.mansion, singular: "mansion", plural: "mansions",
             prereqs: { architecture: true },
             require: { wood: 200, stone: 200, leather: 20 },
             effectText: "+50 max pop."
         }),
         new Building({
-            id: "barn", singular: "barn", plural: "barns",
+            id: buildingType.barn, singular: "barn", plural: "barns",
             require: { wood: 100, stone: 10, skins: 5 },
             get effectText() {
                 var barnBonus = ((civData.granaries.owned ? 2 : 1) * 200);
@@ -145,35 +146,35 @@ function getCivData() {
             }
         }),
         new Building({
-            id: "woodstock", singular: "wood stockpile", plural: "wood stockpiles",
+            id: buildingType.woodstock, singular: "wood stockpile", plural: "wood stockpiles",
             require: { wood: 100, stone: 10, skins: 5 },
             effectText: "+200 wood storage; +100 herb storage"
         }),
         new Building({
-            id: "stonestock", singular: "stone stockpile", plural: "stone stockpiles",
+            id: buildingType.stonestock, singular: "stone stockpile", plural: "stone stockpiles",
             require: { wood: 100, stone: 10, skins: 5 },
             effectText: "+200 stone storage; +100 ore storage"
         }),
         new Building({
-            id: "tannery", singular: "tannery", plural: "tanneries",
+            id: buildingType.tannery, singular: "tannery", plural: "tanneries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, skins: 5 },
             effectText: "allows 1 tanner; +50 leather storage"
         }),
         new Building({
-            id: "smithy", singular: "smithy", plural: "smithies",
+            id: buildingType.smithy, singular: "smithy", plural: "smithies",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, ore: 5 },
             effectText: "allows 1 blacksmith; +50 metal storage"
         }),
         new Building({
-            id: "apothecary", singular: "apothecary", plural: "apothecaries",
+            id: buildingType.apothecary, singular: "apothecary", plural: "apothecaries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
             effectText: "allows 1 healer"
         }),
         new Building({
-            id: "temple", singular: "temple", plural: "temples",
+            id: buildingType.temple, singular: "temple", plural: "temples",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 120, herbs: 10 },
             effectText: "allows 1 cleric; +50 piety storage",
@@ -186,19 +187,19 @@ function getCivData() {
             }
         }),
         new Building({
-            id: "barracks", name: "barracks",
+            id: buildingType.barracks, name: "barracks",
             prereqs: { masonry: true },
             require: { food: 20, wood: 60, stone: 120, metal: 10 },
             effectText: "allows 10 soldiers"
         }),
         new Building({
-            id: "stable", singular: "stable", plural: "stables",
+            id: buildingType.stable, singular: "stable", plural: "stables",
             prereqs: { horseback: true },
             require: { food: 60, wood: 60, stone: 120, leather: 10 },
             effectText: "allows 10 cavalry"
         }),
         new Building({
-            id: "graveyard", singular: "graveyard", plural: "graveyards",
+            id: buildingType.graveyard, singular: "graveyard", plural: "graveyards",
             prereqs: { masonry: true },
             require: { wood: 50, stone: 200, herbs: 50 },
             vulnerable: false, // Graveyards can't be sacked
@@ -206,7 +207,7 @@ function getCivData() {
             onGain: function (num) { if (num === undefined) { num = 1; } digGraves(num); }
         }),
         new Building({
-            id: "mill", singular: "mill", plural: "mills",
+            id: buildingType.mill, singular: "mill", plural: "mills",
             prereqs: { wheel: true },
             get require() {
                 return {
@@ -218,7 +219,7 @@ function getCivData() {
             effectText: "improves farmers"
         }),
         new Building({
-            id: "fortification", singular: "fortification", plural: "fortifications", efficiency: 0.01,
+            id: buildingType.fortification, singular: "fortification", plural: "fortifications", efficiency: 0.01,
             prereqs: { architecture: true },
             //xxx This is testing a new technique that allows a function for the cost items.
             // Eventually, this will take a qty parameter
@@ -234,32 +235,32 @@ function getCivData() {
         // The 'name' on the altars is really the label on the button to make them.
         //xxx This should probably change.
         new Building({
-            id: "battleAltar", name: "Build Altar", singular: "battle altar", plural: "battle altars",
-            subType: "altar", devotion: 1,
+            id: buildingType.battleAltar, name: "Build Altar", singular: "battle altar", plural: "battle altars",
+            subType: subTypes.altar, devotion: 1,
             prereqs: { deity: "battle" },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), metal: 50 + (50 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
         }),
         new Building({
-            id: "fieldsAltar", name: "Build Altar", singular: "fields altar", plural: "fields altars",
-            subType: "altar", devotion: 1,
+            id: buildingType.fieldsAltar, name: "Build Altar", singular: "fields altar", plural: "fields altars",
+            subType: subTypes.altar, devotion: 1,
             prereqs: { deity: "fields" },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), food: 500 + (250 * this.owned), wood: 500 + (250 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
         }),
         new Building({
-            id: "underworldAltar", name: "Build Altar", singular: "underworld altar", plural: "underworld altars",
-            subType: "altar", devotion: 1,
+            id: buildingType.underworldAltar, name: "Build Altar", singular: "underworld altar", plural: "underworld altars",
+            subType: subTypes.altar, devotion: 1,
             prereqs: { deity: "underworld" },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), corpses: 1 + this.owned }; },
             set require(value) { return this.require; }, // Only here for JSLint.
             effectText: "+1 Devotion"
         }),
         new Building({
-            id: "catAltar", name: "Build Altar", singular: "cat altar", plural: "cat altars",
-            subType: "altar", devotion: 1,
+            id: buildingType.catAltar, name: "Build Altar", singular: "cat altar", plural: "cat altars",
+            subType: subTypes.altar, devotion: 1,
             prereqs: { deity: "cats" },
             get require() { return { stone: 200, piety: 200 + (this.owned * this.owned), herbs: 100 + (50 * this.owned) }; },
             set require(value) { return this.require; }, // Only here for JSLint.
@@ -267,217 +268,217 @@ function getCivData() {
         }),
         // Upgrades
         new Upgrade({
-            id: "skinning", name: "Skinning", subType: "upgrade",
+            id: "skinning", name: "Skinning", subType: subTypes.upgrade,
             require: { skins: 10 },
             effectText: "Farmers can collect skins"
         }),
         new Upgrade({
-            id: "harvesting", name: "Harvesting", subType: "upgrade",
+            id: "harvesting", name: "Harvesting", subType: subTypes.upgrade,
             require: { herbs: 10 },
             effectText: "Woodcutters can collect herbs"
         }),
         new Upgrade({
-            id: "prospecting", name: "Prospecting", subType: "upgrade",
+            id: "prospecting", name: "Prospecting", subType: subTypes.upgrade,
             require: { ore: 10 },
             effectText: "Miners can collect ore"
         }),
         new Upgrade({
-            id: "domestication", name: "Domestication", subType: "upgrade",
+            id: "domestication", name: "Domestication", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { leather: 20 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "ploughshares", name: "Ploughshares", subType: "upgrade",
+            id: "ploughshares", name: "Ploughshares", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { metal: 20 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "irrigation", name: "Irrigation", subType: "upgrade",
+            id: "irrigation", name: "Irrigation", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 500, stone: 200 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "butchering", name: "Butchering", subType: "upgrade",
+            id: "butchering", name: "Butchering", subType: subTypes.upgrade,
             prereqs: { construction: true, skinning: true },
             require: { leather: 40 },
             effectText: "More farmers collect more skins"
         }),
         new Upgrade({
-            id: "gardening", name: "Gardening", subType: "upgrade",
+            id: "gardening", name: "Gardening", subType: subTypes.upgrade,
             prereqs: { construction: true, harvesting: true },
             require: { herbs: 40 },
             effectText: "More woodcutters collect more herbs"
         }),
         new Upgrade({
-            id: "extraction", name: "Extraction", subType: "upgrade",
+            id: "extraction", name: "Extraction", subType: subTypes.upgrade,
             prereqs: { construction: true, prospecting: true },
             require: { metal: 40 },
             effectText: "More miners collect more ore"
         }),
         new Upgrade({
-            id: "flensing", name: "Flensing", subType: "upgrade",
+            id: "flensing", name: "Flensing", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { metal: 1000 },
             effectText: "Collect skins more frequently"
         }),
         new Upgrade({
-            id: "macerating", name: "Macerating", subType: "upgrade",
+            id: "macerating", name: "Macerating", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { leather: 500, stone: 500 },
             effectText: "Collect ore more frequently"
         }),
         new Upgrade({
-            id: "croprotation", name: "Crop Rotation", subType: "upgrade",
+            id: "croprotation", name: "Crop Rotation", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { herbs: 5000, piety: 1000 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "selectivebreeding", name: "Selective Breeding", subType: "upgrade",
+            id: "selectivebreeding", name: "Selective Breeding", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { skins: 5000, piety: 1000 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "fertilisers", name: "Fertilisers", subType: "upgrade",
+            id: "fertilisers", name: "Fertilisers", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { ore: 5000, piety: 1000 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
-            id: "masonry", name: "Masonry", subType: "upgrade",
+            id: "masonry", name: "Masonry", subType: subTypes.upgrade,
             require: { wood: 100, stone: 100 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
-            id: "construction", name: "Construction", subType: "upgrade",
+            id: "construction", name: "Construction", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 1000, stone: 1000 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
-            id: "architecture", name: "Architecture", subType: "upgrade",
+            id: "architecture", name: "Architecture", subType: subTypes.upgrade,
             prereqs: { construction: true },
             require: { wood: 10000, stone: 10000 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
-            id: "tenements", name: "Tenements", subType: "upgrade",
+            id: "tenements", name: "Tenements", subType: subTypes.upgrade,
             prereqs: { construction: true },
             require: { food: 200, wood: 500, stone: 500 },
             effectText: "Houses support +2 workers",
             onGain: function () { updatePopulation(); } //due to population limits changing
         }),
         new Upgrade({
-            id: "slums", name: "Slums", subType: "upgrade",
+            id: "slums", name: "Slums", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { food: 500, wood: 1000, stone: 1000 },
             effectText: "Houses support +2 workers",
             onGain: function () { updatePopulation(); } //due to population limits changing
         }),
         new Upgrade({
-            id: "granaries", name: "Granaries", subType: "upgrade",
+            id: "granaries", name: "Granaries", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 1000, stone: 1000 },
             effectText: "Barns store double the amount of food",
             onGain: function () { updateResourceTotals(); } //due to resource limits increasing
         }),
         new Upgrade({
-            id: "palisade", name: "Palisade", subType: "upgrade",
+            id: "palisade", name: "Palisade", subType: subTypes.upgrade,
             efficiency: 0.01, // Subtracted from attacker efficiency.
             prereqs: { construction: true },
             require: { wood: 2000, stone: 1000 },
             effectText: "Enemies do less damage"
         }),
         new Upgrade({
-            id: "weaponry", name: "Basic Weaponry", subType: "upgrade",
+            id: "weaponry", name: "Basic Weaponry", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 500, metal: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
-            id: "shields", name: "Basic Shields", subType: "upgrade",
+            id: "shields", name: "Basic Shields", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
-            id: "horseback", name: "Horseback Riding", subType: "upgrade",
+            id: "horseback", name: "Horseback Riding", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { food: 500, wood: 500 },
             effectText: "Build stables"
         }),
         new Upgrade({
-            id: "wheel", name: "The Wheel", subType: "upgrade",
+            id: "wheel", name: "The Wheel", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 500, stone: 500 },
             effectText: "Build mills"
         }),
         new Upgrade({
-            id: "writing", name: "Writing", subType: "upgrade",
+            id: "writing", name: "Writing", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { skins: 500 },
             effectText: "Increase cleric piety generation"
         }),
         new Upgrade({
-            id: "administration", name: "Administration", subType: "upgrade",
+            id: "administration", name: "Administration", subType: subTypes.upgrade,
             prereqs: { writing: true },
             require: { stone: 1000, skins: 1000 },
             effectText: "Increase land gained from raiding"
         }),
         new Upgrade({
-            id: "codeoflaws", name: "Code of Laws", subType: "upgrade",
+            id: "codeoflaws", name: "Code of Laws", subType: subTypes.upgrade,
             prereqs: { writing: true },
             require: { stone: 1000, skins: 1000 },
             effectText: "Reduce unhappiness caused by overcrowding"
         }),
         new Upgrade({
-            id: "mathematics", name: "Mathematics", subType: "upgrade",
+            id: "mathematics", name: "Mathematics", subType: subTypes.upgrade,
             prereqs: { writing: true },
             require: { herbs: 1000, piety: 1000 },
             effectText: "Create siege engines"
         }),
         new Upgrade({
-            id: "aesthetics", name: "Aesthetics", subType: "upgrade",
+            id: "aesthetics", name: "Aesthetics", subType: subTypes.upgrade,
             prereqs: { writing: true },
             require: { piety: 5000 },
             effectText: "Building temples increases morale"
         }),
         new Upgrade({
-            id: "civilservice", name: "Civil Service", subType: "upgrade",
+            id: "civilservice", name: "Civil Service", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { piety: 5000 },
             effectText: "Increase basic resources from clicking"
         }),
         new Upgrade({
-            id: "feudalism", name: "Feudalism", subType: "upgrade",
+            id: "feudalism", name: "Feudalism", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
             require: { piety: 10000 },
             effectText: "Further increase basic resources from clicking"
         }),
         new Upgrade({
-            id: "guilds", name: "Guilds", subType: "upgrade",
+            id: "guilds", name: "Guilds", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
             require: { piety: 10000 },
             effectText: "Increase special resources from clicking"
         }),
         new Upgrade({
-            id: "serfs", name: "Serfs", subType: "upgrade",
+            id: "serfs", name: "Serfs", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
             require: { piety: 20000 },
             effectText: "Idle workers increase resources from clicking"
         }),
         new Upgrade({
-            id: "nationalism", name: "Nationalism", subType: "upgrade",
+            id: "nationalism", name: "Nationalism", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
             require: { piety: 50000 },
             effectText: "Soldiers increase basic resources from clicking"
         }),
         new Upgrade({
-            id: "worship", name: "Worship", subType: "deity",
+            id: "worship", name: "Worship", subType: subTypes.deity,
             prereqs: { temple: 1 },
             require: { piety: 1000 },
             effectText: "Begin worshipping a deity (requires temple)",
@@ -488,49 +489,49 @@ function getCivData() {
         }),
         // Pantheon Upgrades
         new Upgrade({
-            id: "lure", name: "Lure of Civilisation", subType: "pantheon",
+            id: "lure", name: "Lure of Civilisation", subType: subTypes.pantheon,
             prereqs: { deity: "cats", devotion: 10 },
             require: { piety: 1000 },
             effectText: "increase chance to get cats"
         }),
         new Upgrade({
-            id: "companion", name: "Warmth of the Companion", subType: "pantheon",
+            id: "companion", name: "Warmth of the Companion", subType: subTypes.pantheon,
             prereqs: { deity: "cats", devotion: 30 },
             require: { piety: 1000 },
             effectText: "cats help heal the sick"
         }),
         new Upgrade({
-            id: "comfort", name: "Comfort of the Hearthfires", subType: "pantheon",
+            id: "comfort", name: "Comfort of the Hearthfires", subType: subTypes.pantheon,
             prereqs: { deity: "cats", devotion: 50 },
             require: { piety: 5000 },
             effectText: "traders marginally more frequent"
         }),
         new Upgrade({
-            id: "blessing", name: "Blessing of Abundance", subType: "pantheon",
+            id: "blessing", name: "Blessing of Abundance", subType: subTypes.pantheon,
             prereqs: { deity: "fields", devotion: 10 },
             require: { piety: 1000 },
             effectText: "increase farmer food output"
         }),
         new Upgrade({
-            id: "waste", name: "Abide No Waste", subType: "pantheon",
+            id: "waste", name: "Abide No Waste", subType: subTypes.pantheon,
             prereqs: { deity: "fields", devotion: 30 },
             require: { piety: 1000 },
             effectText: "workers will eat corpses if there is no food left"
         }),
         new Upgrade({
-            id: "stay", name: "Stay With Us", subType: "pantheon",
+            id: "stay", name: "Stay With Us", subType: subTypes.pantheon,
             prereqs: { deity: "fields", devotion: 50 },
             require: { piety: 5000 },
             effectText: "traders stay longer"
         }),
         new Upgrade({
-            id: "riddle", name: "Riddle of Steel", subType: "pantheon",
+            id: "riddle", name: "Riddle of Steel", subType: subTypes.pantheon,
             prereqs: { deity: "battle", devotion: 10 },
             require: { piety: 1000 },
             effectText: "improve soldiers"
         }),
         new Upgrade({
-            id: "throne", name: "Throne of Skulls", subType: "pantheon",
+            id: "throne", name: "Throne of Skulls", subType: subTypes.pantheon,
             prereqs: { deity: "battle", devotion: 30 },
             require: { piety: 1000 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.count = 0; },
@@ -539,61 +540,61 @@ function getCivData() {
             effectText: "slaying enemies creates temples"
         }),
         new Upgrade({
-            id: "lament", name: "Lament of the Defeated", subType: "pantheon",
+            id: "lament", name: "Lament of the Defeated", subType: subTypes.pantheon,
             prereqs: { deity: "battle", devotion: 50 },
             require: { piety: 5000 },
             effectText: "Successful raids delay future invasions"
         }),
         new Upgrade({
-            id: "book", name: "The Book of the Dead", subType: "pantheon",
+            id: "book", name: "The Book of the Dead", subType: subTypes.pantheon,
             prereqs: { deity: "underworld", devotion: 10 },
             require: { piety: 1000 },
             effectText: "gain piety with deaths"
         }),
         new Upgrade({
-            id: "feast", name: "A Feast for Crows", subType: "pantheon",
+            id: "feast", name: "A Feast for Crows", subType: subTypes.pantheon,
             prereqs: { deity: "underworld", devotion: 30 },
             require: { piety: 1000 },
             effectText: "corpses are less likely to cause illness"
         }),
         new Upgrade({
-            id: "secrets", name: "Secrets of the Tombs", subType: "pantheon",
+            id: "secrets", name: "Secrets of the Tombs", subType: subTypes.pantheon,
             prereqs: { deity: "underworld", devotion: 50 },
             require: { piety: 5000 },
             effectText: "graveyards increase cleric piety generation"
         }),
         // Special Upgrades
         new Upgrade({
-            id: "standard", name: "Battle Standard", subType: "conquest",
+            id: "standard", name: "Battle Standard", subType: subTypes.conquest,
             prereqs: { barracks: 1 },
             require: { leather: 1000, metal: 1000 },
             effectText: "Lets you build an army (requires barracks)"
         }),
         new Upgrade({
-            id: "trade", name: "Trade", subType: "trade",
+            id: "trade", name: "Trade", subType: subTypes.trade,
             prereqs: { gold: 1 },
             require: { gold: 1 },
             effectText: "Open the trading post"
         }),
         new Upgrade({
-            id: "currency", name: "Currency", subType: "trade",
+            id: "currency", name: "Currency", subType: subTypes.trade,
             require: { ore: 1000, gold: 10 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         new Upgrade({
-            id: "commerce", name: "Commerce", subType: "trade",
+            id: "commerce", name: "Commerce", subType: subTypes.trade,
             require: { piety: 10000, gold: 100 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         // Prayers
         new Upgrade({
-            id: "smite", name: "Smite Invaders", subType: "prayer",
+            id: "smite", name: "Smite Invaders", subType: subTypes.prayer,
             prereqs: { deity: "battle", devotion: 20 },
             require: { piety: 100 },
             effectText: "(per invader killed)"
         }),
         new Upgrade({
-            id: "glory", name: "For Glory!", subType: "prayer",
+            id: "glory", name: "For Glory!", subType: subTypes.prayer,
             prereqs: { deity: "battle", devotion: 40 },
             require: { piety: 1000 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.data.timer = 0; },
@@ -602,13 +603,13 @@ function getCivData() {
             effectText: "Temporarily makes raids more difficult, increases rewards"
         }),
         new Upgrade({
-            id: "wickerman", name: "Burn Wicker Man", subType: "prayer",
+            id: "wickerman", name: "Burn Wicker Man", subType: subTypes.prayer,
             prereqs: { deity: "fields", devotion: 20 },
             require: { wood: 500 },  //xxx +1 Worker
             effectText: "Sacrifice 1 worker to gain a random bonus to a resource"
         }),
         new Upgrade({
-            id: "walk", name: "Walk Behind the Rows", subType: "prayer",
+            id: "walk", name: "Walk Behind the Rows", subType: subTypes.prayer,
             prereqs: { deity: "fields", devotion: 40 },
             require: {}, //xxx 1 Worker/sec
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.rate = 0; },
@@ -618,7 +619,7 @@ function getCivData() {
             extraText: "<br /><button id='ceaseWalk' onmousedown='walk(false)' disabled='disabled'>Cease Walking</button>"
         }),
         new Upgrade({
-            id: "raiseDead", name: "Raise Dead", subType: "prayer",
+            id: "raiseDead", name: "Raise Dead", subType: subTypes.prayer,
             prereqs: { deity: "underworld", devotion: 20 },
             require: { corpses: 1, piety: 4 }, //xxx Nonlinear cost
             effectText: "Piety to raise the next zombie",
@@ -626,13 +627,13 @@ function getCivData() {
                 + ">+100</button><button onmousedown='raiseDead(Infinity)' id='raiseDeadMax' class='xInfinity' disabled='disabled'>+&infin;</button>"
         }),
         new Upgrade({
-            id: "summonShade", name: "Summon Shades", subType: "prayer",
+            id: "summonShade", name: "Summon Shades", subType: subTypes.prayer,
             prereqs: { deity: "underworld", devotion: 40 },
             require: { piety: 1000 },  //xxx Also need slainEnemies
             effectText: "Souls of the defeated rise to fight for you"
         }),
         new Upgrade({
-            id: "pestControl", name: "Pest Control", subType: "prayer",
+            id: "pestControl", name: "Pest Control", subType: subTypes.prayer,
             prereqs: { deity: "cats", devotion: 20 },
             require: { piety: 100 },
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.timer = 0; },
@@ -641,7 +642,7 @@ function getCivData() {
             effectText: "Give temporary boost to food production"
         }),
         new Upgrade({
-            id: "grace", name: "Grace", subType: "prayer",
+            id: "grace", name: "Grace", subType: subTypes.prayer,
             prereqs: { deity: "cats", devotion: 40 },
             require: { piety: 1000 }, //xxx This is not fixed; see curCiv.graceCost
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.cost = 1000; },
@@ -652,15 +653,15 @@ function getCivData() {
 
         // Units
         new Unit({
-            id: "unemployed", singular: "idle citizen", plural: "idle citizens",
+            id: unitType.unemployed, singular: "idle citizen", plural: "idle citizens",
             require: undefined,  // Cannot be purchased (through normal controls) xxx Maybe change this?
             salable: false,  // Cannot be sold.
             customQtyId: "spawnCustomQty",
             effectText: "Playing idle games"
         }),
         new Unit({
-            id: "farmer", singular: "farmer", plural: "farmers",
-            source: "unemployed",
+            id: unitType.farmer, singular: "farmer", plural: "farmers",
+            source: unitType.unemployed,
             efficiency_base: 0.2,
             get efficiency() {
                 return this.efficiency_base + (0.1 * (
@@ -672,20 +673,20 @@ function getCivData() {
             effectText: "Automatically harvest food"
         }),
         new Unit({
-            id: "woodcutter", singular: "woodcutter", plural: "woodcutters",
-            source: "unemployed",
+            id: unitType.woodcutter, singular: "woodcutter", plural: "woodcutters",
+            source: unitType.unemployed,
             efficiency: 0.5,
             effectText: "Automatically cut wood"
         }),
         new Unit({
-            id: "miner", singular: "miner", plural: "miners",
-            source: "unemployed",
+            id: unitType.miner, singular: "miner", plural: "miners",
+            source: unitType.unemployed,
             efficiency: 0.2,
             effectText: "Automatically mine stone"
         }),
         new Unit({
-            id: "tanner", singular: "tanner", plural: "tanners",
-            source: "unemployed",
+            id: unitType.tanner, singular: "tanner", plural: "tanners",
+            source: unitType.unemployed,
             efficiency: 0.5,
             prereqs: { tannery: 1 },
             require: { skins: 2 },
@@ -694,8 +695,8 @@ function getCivData() {
             effectText: "Convert skins to leather"
         }),
         new Unit({
-            id: "blacksmith", singular: "blacksmith", plural: "blacksmiths",
-            source: "unemployed",
+            id: unitType.blacksmith, singular: "blacksmith", plural: "blacksmiths",
+            source: unitType.unemployed,
             efficiency: 0.5,
             prereqs: { smithy: 1 },
             require: { ore: 2 },
@@ -704,8 +705,8 @@ function getCivData() {
             effectText: "Convert ore to metal"
         }),
         new Unit({
-            id: "healer", singular: "healer", plural: "healers",
-            source: "unemployed",
+            id: unitType.healer, singular: "healer", plural: "healers",
+            source: unitType.unemployed,
             efficiency: 0.1,
             prereqs: { apothecary: 1 },
             require: { herbs: 2 },
@@ -717,8 +718,8 @@ function getCivData() {
             effectText: "Cure sick workers"
         }),
         new Unit({
-            id: "cleric", singular: "cleric", plural: "clerics",
-            source: "unemployed",
+            id: unitType.cleric, singular: "cleric", plural: "clerics",
+            source: unitType.unemployed,
             efficiency: 0.05,
             prereqs: { temple: 1 },
             require: { herbs: 4 },
@@ -727,16 +728,16 @@ function getCivData() {
             effectText: "Generate piety, bury corpses"
         }),
         new Unit({
-            id: "labourer", singular: "labourer", plural: "labourers",
-            source: "unemployed",
+            id: unitType.labourer, singular: "labourer", plural: "labourers",
+            source: unitType.unemployed,
             efficiency: 1.0,
             prereqs: { wonderStage: 1 }, //xxx This is a hack
             effectText: "Use resources to build wonder"
         }),
         new Unit({
-            id: "soldier", singular: "soldier", plural: "soldiers",
-            source: "unemployed",
-            combatType: "infantry",
+            id: unitType.soldier, singular: "soldier", plural: "soldiers",
+            source: unitType.unemployed,
+            combatType: combatTypes.infantry,
             efficiency_base: 0.05,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
@@ -747,9 +748,9 @@ function getCivData() {
             effectText: "Protect from attack"
         }),
         new Unit({
-            id: "cavalry", singular: "cavalry", plural: "cavalry",
-            source: "unemployed",
-            combatType: "cavalry",
+            id: unitType.cavalry, singular: "cavalry", plural: "cavalry",
+            source: unitType.unemployed,
+            combatType: combatTypes.cavalry,
             efficiency_base: 0.08,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
@@ -760,7 +761,7 @@ function getCivData() {
             effectText: "Protect from attack"
         }),
         new Unit({
-            id: "totalSick", singular: "sick citizen", plural: "sick citizens",
+            id: unitType.totalSick, singular: "sick citizen", plural: "sick citizens",
             //subType: "special", // it's not special! it's still player it still needs food, it still counts towards population
             prereqs: undefined,  // Hide until we get one.
             require: undefined,  // Cannot be purchased.
@@ -772,140 +773,140 @@ function getCivData() {
             effectText: "Use healers and herbs to cure them"
         }),
         new Unit({
-            id: "cat", singular: "cat", plural: "cats", subType: "special",
+            id: unitType.cat, singular: "cat", plural: "cats", subType: subTypes.special,
             require: undefined,  // Cannot be purchased (through normal controls)
             prereqs: { cat: 1 }, // Only visible if you have one.
             prestige: true, // Not lost on reset.
             salable: false,  // Cannot be sold.
-            species: "animal",
+            species: speciesType.animal,
             effectText: "Our feline companions"
         }),
         new Unit({
-            id: "shade", singular: "shade", plural: "shades", subType: "special",
+            id: unitType.shade, singular: "shade", plural: "shades", subType: subTypes.special,
             prereqs: undefined,  // Cannot be purchased (through normal controls) xxx Maybe change this?
             require: undefined,  // Cannot be purchased.
             salable: false,  // Cannot be sold.
-            species: "undead",
+            species: speciesType.undead,
             effectText: "Insubstantial spirits"
         }),
         new Unit({
-            id: "wolf", singular: "wolf", plural: "wolves",
-            alignment: "enemy",
-            combatType: "animal",
+            id: unitType.wolf, singular: "wolf", plural: "wolves",
+            alignment: alignmentType.enemy,
+            combatType: combatTypes.animal,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.05,
             onWin: function () { doWolves(this); },
             killFatigue: (1.0), // Max fraction that leave after killing the last person
             killExhaustion: (0.9), // Chance of an attacker leaving after killing a person
-            species: "animal",
+            species: speciesType.animal,
             effectText: "Eat your workers"
         }),
         new Unit({
-            id: "bandit", singular: "bandit", plural: "bandits",
-            alignment: "enemy",
-            combatType: "infantry",
+            id: unitType.bandit, singular: "bandit", plural: "bandits",
+            alignment: alignmentType.enemy,
+            combatType: combatTypes.infantry,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
-            lootFatigue: (1 / 2), // Max fraction that leave after cleaning out a resource
-            sackFatigue: (1 / 2), // Max fraction that leave after destroying a building type
-            killFatigue: (1 / 2), // Max fraction that leave after killing the last person
-            killExhaustion: (1 / 2), // Chance of an attacker leaving after killing a person
+            lootFatigue: (1 / 8), // Max fraction that leave after cleaning out a resource. 8 lootable resources
+            sackFatigue: (1 / 16), // Max fraction that leave after destroying a building type. 16 sackable buildings
+            killFatigue: (1 / 7), // Max fraction that leave after killing the last person. 7 job types
+            killExhaustion: (0.8), // Chance of an attacker leaving after killing a person
             effectText: "Steal your resources"
         }),
         new Unit({
-            id: "barbarian", singular: "barbarian", plural: "barbarians",
-            alignment: "enemy",
-            combatType: "infantry",
+            id: unitType.barbarian, singular: "barbarian", plural: "barbarians",
+            alignment: alignmentType.enemy,
+            combatType: combatTypes.infantry,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
-            lootFatigue: (1 / 10), // Max fraction that leave after cleaning out a resource
-            sackFatigue: (1 / 10), // Max fraction that leave after destroying a building type
-            killFatigue: (1 / 10), // Max fraction that leave after killing the last person
-            killExhaustion: (1 / 5), // Chance of an attacker leaving after killing a person
-            conquerFatigue: (1 / 10), // Max fraction that leave after conquering the last land
+            lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
+            sackFatigue: (1 / 32), // Max fraction that leave after destroying a building type
+            killFatigue: (1 / 14), // Max fraction that leave after killing the last person
+            killExhaustion: (0.7), // Chance of an attacker leaving after killing a person
+            conquerFatigue: (1 / 15), // Max fraction that leave after conquering the last land
             effectText: "Slaughter, plunder, and burn"
         }),
         new Unit({
-            id: "invader", singular: "invader", plural: "invaders",
-            alignment: "enemy",
-            combatType: "infantry",
+            id: unitType.invader, singular: "invader", plural: "invaders",
+            alignment: alignmentType.enemy,
+            combatType: combatTypes.infantry,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
-            lootFatigue: (1 / 20), // Max fraction that leave after cleaning out a resource
-            sackFatigue: (1 / 20), // Max fraction that leave after destroying a building type
-            killFatigue: (1 / 20), // Max fraction that leave after killing the last person
-            killExhaustion: (1 / 10), // Chance of an attacker leaving after killing a person
-            conquerFatigue: (1 / 20), // Max fraction that leave after conquering the last land
+            lootFatigue: (1 / 24), // Max fraction that leave after cleaning out a resource
+            sackFatigue: (1 / 48), // Max fraction that leave after destroying a building type
+            killFatigue: (1 / 21), // Max fraction that leave after killing the last person
+            killExhaustion: (0.6), // Chance of an attacker leaving after killing a person
+            conquerFatigue: (1 / 30), // Max fraction that leave after conquering the last land
             effectText: "Conquer your lands"
         }),
         new Unit({
-            id: "esiege", singular: "siege engine", plural: "siege engines",
-            alignment: "enemy",
+            id: unitType.esiege, singular: "siege engine", plural: "siege engines",
+            alignment: alignmentType.enemy,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.1,  // 10% chance to hit
-            species: "mechanical",
+            species: speciesType.mechanical,
             effectText: "Destroy your fortifications"
         }),
         new Unit({
-            id: "soldierParty", singular: "soldier", plural: "soldiers",
-            source: "soldier",
-            combatType: "infantry",
+            id: unitType.soldierParty, singular: "soldier", plural: "soldiers",
+            source: unitType.soldier,
+            combatType: combatTypes.infantry,
             efficiency_base: 0.05,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
             prereqs: { standard: true, barracks: 1 },
-            place: "party",
+            place: placeType.party,
             effectText: "Your raiding party"
         }),
         new Unit({
-            id: "cavalryParty", singular: "cavalry", plural: "cavalry",
-            source: "cavalry",
-            combatType: "cavalry",
+            id: unitType.cavalryParty, singular: "cavalry", plural: "cavalry",
+            source: unitType.cavalry,
+            combatType: combatTypes.cavalry,
             efficiency_base: 0.08,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
             prereqs: { standard: true, stable: 1 },
-            place: "party",
+            place: placeType.party,
             effectText: "Your mounted raiders"
         }),
         new Unit({
-            id: "siege", singular: "siege engine", plural: "siege engines",
+            id: unitType.siege, singular: "siege engine", plural: "siege engines",
             efficiency: 0.1, // 10% chance to hit
             prereqs: { standard: true, mathematics: true },
             require: { wood: 200, leather: 50, metal: 50 },
-            species: "mechanical",
-            place: "party",
+            species: speciesType.mechanical,
+            place: placeType.party,
             salable: false,
             effectText: "Destroy enemy fortifications"
         }),
         new Unit({
-            id: "esoldier", singular: "soldier", plural: "soldiers",
-            alignment: "enemy",
-            combatType: "infantry",
+            id: unitType.esoldier, singular: "soldier", plural: "soldiers",
+            alignment: alignmentType.enemy,
+            combatType: combatTypes.infantry,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.05,
-            place: "party",
+            place: placeType.party,
             effectText: "Defending enemy troops"
         }),
         /* Not currently used.
-        new Unit({ id:"ecavalry", name:"cavalry",
-            alignment:"enemy",
-            combatType:"cavalry", 
+        new Unit({ id:unitType.ecavalry, name:"cavalry",
+            alignment:alignmentType.enemy,
+            combatType:combatTypes.cavalry, 
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.08,
-            place: "party",
+            place: placeType.party,
             effectText:"Mounted enemy troops" }),
         */
         new Unit({
-            id: "efort", singular: "fortification", plural: "fortifications",
-            alignment: "enemy",
+            id: unitType.efort, singular: "fortification", plural: "fortifications",
+            alignment: alignmentType.enemy,
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.01, // -1% damage
-            species: "mechanical",
-            place: "party",
+            species: speciesType.mechanical,
+            place: placeType.party,
             effectText: "Reduce enemy casualties"
         }),
         // Achievements
@@ -1030,20 +1031,4 @@ function getCivData() {
     });
 
     return civData;
-}
-
-
-function getWonderResources(civData) {
-    // The resources that Wonders consume, and can give bonuses for.
-    return wonderResources = [
-        civData.food,
-        civData.wood,
-        civData.stone,
-        civData.skins,
-        civData.herbs,
-        civData.ore,
-        civData.leather,
-        civData.metal,
-        civData.piety
-    ];
 }
