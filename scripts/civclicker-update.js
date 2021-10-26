@@ -14,7 +14,7 @@ function updateAll() {
     updateDevotion();
     updateWonder();
     updateReset();
-};
+}
 
 function updateWonderList() {
     if (curCiv.wonders.length === 0) { return; }
@@ -151,7 +151,6 @@ function updatePurchaseRow(purchaseObj) {
     ui.show(elem, havePrereqs && !hideBoughtUpgrade);
 }
 
-
 // Only set up for the basic resources right now.
 function updateResourceRows() {
     basicResources.forEach(function (elem) { updatePurchaseRow(elem); });
@@ -169,7 +168,6 @@ function updateJobButtons() {
 function updatePartyButtons() {
     armyUnits.forEach(function (elem) { updatePurchaseRow(elem); });
 }
-
 
 //xxx Maybe add a function here to look in various locations for vars, so it
 //doesn't need multiple action types?
@@ -207,7 +205,6 @@ function updateResourceTotals() {
         // val.toFixed(2)
     }
 
-
     //if (civData.gold.owned >= 1){
     //	ui.show("#goldRow",true);
     //}
@@ -241,7 +238,6 @@ function updateResourceTotals() {
     // Cheaters don't get names.
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
 }
-
 
 //Update page with numbers
 function updatePopulation(calc) {
@@ -367,7 +363,7 @@ function updatePopulation(calc) {
     spawn10000button.disabled = (maxSpawn < 10000);
     spawn100000button.disabled = (maxSpawn < 100000);
 
-    var canRaise = (getCurDeityDomain() == "underworld" && civData.devotion.owned >= 20);
+    var canRaise = (getCurDeityDomain() == deityDomains.underworld && civData.devotion.owned >= 20);
     var maxRaise = canRaise ? logSearchFn(calcZombieCost, civData.piety.owned) : 0;
     ui.show("#raiseDeadRow", canRaise);
     ui.find("#raiseDead").disabled = (maxRaise < 1);
@@ -438,7 +434,6 @@ function updateLandBar() {
     barElt.innerHTML = ('<div style="width: ' + p + '%; background-color: ' + bg + '"></div>');
 }
 
-
 // Check to see if the player has an upgrade and hide as necessary
 // Check also to see if the player can afford an upgrade and enable/disable as necessary
 function updateUpgrades() {
@@ -457,11 +452,11 @@ function updateUpgrades() {
     // Deity techs
     ui.show("#deityPane .notYet", (!hasDomain && !canSelectDomain));
     ui.find("#renameDeity").disabled = (!civData.worship.owned);
-    ui.show("#battleUpgrades", (getCurDeityDomain() == "battle"));
-    ui.show("#fieldsUpgrades", (getCurDeityDomain() == "fields"));
-    ui.show("#underworldUpgrades", (getCurDeityDomain() == "underworld"));
+    ui.show("#battleUpgrades", (getCurDeityDomain() == deityDomains.battle));
+    ui.show("#fieldsUpgrades", (getCurDeityDomain() == deityDomains.fields));
+    ui.show("#underworldUpgrades", (getCurDeityDomain() == deityDomains.underworld));
     ui.show("#zombieWorkers", (curCiv.zombie.owned > 0));
-    ui.show("#catsUpgrades", (getCurDeityDomain() == "cats"));
+    ui.show("#catsUpgrades", (getCurDeityDomain() == deityDomains.cats));
 
     ui.show("#deityDomains", canSelectDomain);
     ui.findAll("#deityDomains button.purchaseFor500Piety").forEach(function (button) {
@@ -479,7 +474,6 @@ function updateUpgrades() {
     ui.show("#tradeUpgradeContainer", civData.trade.owned);
     ui.show("#tradePane .notYet", !civData.trade.owned);
 }
-
 
 function updateDeity() {
     var hasDeity = (curCiv.deities[0].name) ? true : false;
