@@ -133,6 +133,12 @@ function getCivData() {
             effectText: "+50 max pop."
         }),
         new Building({
+            id: buildingType.palace, singular: "palace", plural: "palaces",
+            prereqs: { architecture: true },
+            require: { wood: 1000, stone: 1000, leather: 100, metal: 100, gold: 10 },
+            effectText: "+150 max pop."
+        }),
+        new Building({
             id: buildingType.barn, singular: "barn", plural: "barns",
             require: { wood: 100, stone: 10, skins: 5 },
             get effectText() {
@@ -583,8 +589,13 @@ function getCivData() {
         }),
         new Upgrade({
             id: "commerce", name: "Commerce", subType: subTypes.trade,
-            require: { piety: 10000, gold: 100 },
+            require: { piety: 5000, gold: 50 },
             effectText: "Traders arrive more frequently, stay longer"
+        }),
+        new Upgrade({
+            id: "cornexchange", name: "Corn Exchange", subType: subTypes.trade,
+            require: { piety: 10000, gold: 100 },
+            effectText: "Traders set the cost of resources"
         }),
         // Prayers
         new Upgrade({
@@ -796,8 +807,8 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.05,
             onWin: function () { doWolves(this); },
-            killFatigue: (1.0), // Max fraction that leave after killing the last person
-            killExhaustion: (0.9), // Chance of an attacker leaving after killing a person
+            killFatigue: (1 / 2), // Max fraction that leave after killing the last person
+            killStop: (0.9), // Chance of an attacker leaving after killing a person
             species: speciesType.animal,
             effectText: "Eat your workers"
         }),
@@ -809,9 +820,11 @@ function getCivData() {
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
             lootFatigue: (1 / 8), // Max fraction that leave after cleaning out a resource. 8 lootable resources
+            lootStop: (0.9), // Chance of an attacker leaving after looting a resource
             sackFatigue: (1 / 16), // Max fraction that leave after destroying a building type. 16 sackable buildings
+            sackStop: (0.9), // Chance of an attacker leaving after sacking a building
             killFatigue: (1 / 7), // Max fraction that leave after killing the last person. 7 job types
-            killExhaustion: (0.8), // Chance of an attacker leaving after killing a person
+            killStop: (0.9), // Chance of an attacker leaving after killing a person
             effectText: "Steal your resources"
         }),
         new Unit({
@@ -822,10 +835,13 @@ function getCivData() {
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
             lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.7), // Chance of an attacker leaving after looting a resource
             sackFatigue: (1 / 32), // Max fraction that leave after destroying a building type
+            sackStop: (0.7), // Chance of an attacker leaving after sacking a building
             killFatigue: (1 / 14), // Max fraction that leave after killing the last person
-            killExhaustion: (0.7), // Chance of an attacker leaving after killing a person
+            killStop: (0.7), // Chance of an attacker leaving after killing a person
             conquerFatigue: (1 / 15), // Max fraction that leave after conquering the last land
+            conquerStop: (0.6), // Chance of an attacker leaving after conquering land
             effectText: "Slaughter, plunder, and burn"
         }),
         new Unit({
@@ -836,10 +852,13 @@ function getCivData() {
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
             lootFatigue: (1 / 24), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.5), // Chance of an attacker leaving after looting a resource
             sackFatigue: (1 / 48), // Max fraction that leave after destroying a building type
+            sackStop: (0.5), // Chance of an attacker leaving after sacking a building
             killFatigue: (1 / 21), // Max fraction that leave after killing the last person
-            killExhaustion: (0.6), // Chance of an attacker leaving after killing a person
+            killStop: (0.5), // Chance of an attacker leaving after killing a person
             conquerFatigue: (1 / 30), // Max fraction that leave after conquering the last land
+            conquerStop: (0.5), // Chance of an attacker leaving after conquering land
             effectText: "Conquer your lands"
         }),
         new Unit({
