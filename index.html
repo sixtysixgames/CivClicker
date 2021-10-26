@@ -53,7 +53,7 @@
                 The <span id="civType">Thorp</span> of <span id="civName">Rome</span>
                 <span id="ruler">Ruled by the <span id="appellation">mighty</span> <span id="rulerName">Caesar</span></span>
             </h1>
-            
+
         </div>
     </div>
     <div id="main" class="columns">
@@ -211,8 +211,8 @@
                     </tbody>
                 </table>
             </div>
-            
         </div>
+
         <div id="leftColumn75" class="column left width75">
             <div id="panesSelectors" class="civSection">
                 <div id="selectors" class="panesTabs">
@@ -222,6 +222,10 @@
                     </div>
                     <div id="buildingsSelect" class="paneSelector" data-target="buildingsPane" onclick="paneSelect(this)">
                         Buildings
+                        <div class="alert">!</div>
+                    </div>
+                    <div id="resourcesSelect" class="paneSelector" data-target="resourcesPane" onclick="paneSelect(this)">
+                        Resources
                         <div class="alert">!</div>
                     </div>
                     <div id="upgradesSelect" class="paneSelector" data-target="upgradesPane" onclick="paneSelect(this)">
@@ -242,10 +246,6 @@
                     </div>
                     <div id="achievementsSelect" class="paneSelector" data-target="achievementsPane" onclick="paneSelect(this)">
                         Achievements
-                        <div class="alert">!</div>
-                    </div>
-                    <div id="sysEventsSelect" class="paneSelector" data-target="sysEventsPane" onclick="paneSelect(this)">
-                        Event Log
                         <div class="alert">!</div>
                     </div>
                     <div id="settingsSelect" class="paneSelector" data-target="settingsPane" onclick="paneSelect(this)">
@@ -291,14 +291,18 @@
                 </div>
 
                 <div id="buildingsPane" class="selectPane">
-
                     <p id="customBuildQuantity">
                         Custom Quantity <input id="buildingCustomQty" type="number" min="1" step="1" value="1" />
                     </p>
                     <table id="buildings">
                         <!-- populated by javascript -->
                     </table>
+                </div>
 
+                <div id="resourcesPane" class="selectPane">
+                    <div class="stats">
+                        Resource clicks: <span id="clicks">0</span>
+                    </div>
                 </div>
 
                 <div id="upgradesPane" class="selectPane">
@@ -427,6 +431,7 @@
                         <div id="purchasedPantheon"></div>
                     </div>
                 </div>
+
                 <div id="conquestPane" class="selectPane">
                     <div class="notYet">
                         You cannot command an army yet because you don't own a battle standard.
@@ -468,6 +473,7 @@
                         Total Enemies Slain: <span data-action="display" data-target="enemySlain">...</span>
                     </div>
                 </div>
+
                 <div id="tradePane" class="selectPane">
                     <div class="notYet">
                         You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
@@ -487,6 +493,7 @@
                     <div id="tradeUpgradeContainer">
                         <span id="currencyRow"></span>
                         <span id="commerceRow"></span>
+                        <span id="cornexchangeRow"></span>
                         <h4>Buy Resources (1 gold)</h4>
                         <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
                         <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
@@ -498,44 +505,16 @@
                         <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
                     </div>
                 </div>
+
                 <div id="achievementsPane" class="selectPane">
                     <div id="achievements">
                         <!-- populated by javascript -->
                     </div>
-                    <div class="stats">
-                        Resource clicks: <span id="clicks">0</span>
-                    </div>
                 </div>
-                <div id="sysEventsPane" class="selectPane">
-                    <div id="sysEventsContainer" class="civSection">
-                        <h3>System Events</h3>
-                        <table id="syslogTable">
-                            <tr id="syslog0"><td id="syslogT"></td><td id="syslogL"></td><td id="syslogR"></td></tr>
-                            <tr id="syslog1"><td colspan="3"></td></tr>
-                            <tr id="syslog2"><td colspan="3"></td></tr>
-                            <tr id="syslog3"><td colspan="3"></td></tr>
-                            <tr id="syslog4"><td colspan="3"></td></tr>
-                            <tr id="syslog5"><td colspan="3"></td></tr>
-                            <tr id="syslog6"><td colspan="3"></td></tr>
-                            <tr id="syslog7"><td colspan="3"></td></tr>
-                            <tr id="syslog8"><td colspan="3"></td></tr>
-                            <tr id="syslog9"><td colspan="3"></td></tr>
-                            <tr id="syslog10"><td colspan="3"></td></tr>
-                            <tr id="syslog11"><td colspan="3"></td></tr>
-                            <tr id="syslog12"><td colspan="3"></td></tr>
-                            <tr id="syslog13"><td colspan="3"></td></tr>
-                            <tr id="syslog14"><td colspan="3"></td></tr>
-                            <tr id="syslog15"><td colspan="3"></td></tr>
-                            <tr id="syslog16"><td colspan="3"></td></tr>
-                            <tr id="syslog17"><td colspan="3"></td></tr>
-                            <tr id="syslog18"><td colspan="3"></td></tr>
-                            <tr id="syslog19"><td colspan="3"></td></tr>
-                        </table>
-                    </div>
-                </div>
+
                 <div id="settingsPane" class="selectPane">
                     <div class="columns">
-                        <div class="column left">
+                        <div class="column left width33">
                             <h2>Naming</h2>
                             <button onmousedown="renameCiv()" title="Rename your civilisation">Rename Civilisation</button><br />
                             <button id="renameRuler" onmousedown="renameRuler()" title="Rename yourself">Rename Yourself</button><br />
@@ -554,7 +533,7 @@
                             <label><input id="toggleWorksafe" type="checkbox" onclick="onToggleWorksafe(this)" title="Toggle Worksafe Mode" />Worksafe Mode</label><br />
                             <label><input id="toggleIcons" type="checkbox" onclick="onToggleIcons(this)" title="Toggle Icons" />Use Icons</label><br />
                         </div>
-                        <div class="column right">
+                        <div class="column middle width33">
                             <h2>Save &amp; Load Controls</h2>
                             <button onmousedown="save('manual')" title="Save your current stats">Manual Save</button><br />
                             <label><input id="toggleAutosave" type="checkbox" onclick="onToggleAutosave(this)" title="Autosave" />Autosave</label><br />
@@ -568,10 +547,38 @@
                             <button id="expSelect" onclick="document.getElementById('impexpField').select();">Select All</button>
                             <button id="impButton" onclick="load('import')">Import</button>
                         </div>
+                        <div class="column right width33">
+                            <div id="sysEventsContainer" class="civSection">
+                                <h2>System Events</h2>
+                                <table id="syslogTable">
+                                    <tr id="syslog0"><td id="syslogT"></td><td id="syslogL"></td><td id="syslogR"></td></tr>
+                                    <tr id="syslog1"><td colspan="3"></td></tr>
+                                    <tr id="syslog2"><td colspan="3"></td></tr>
+                                    <tr id="syslog3"><td colspan="3"></td></tr>
+                                    <tr id="syslog4"><td colspan="3"></td></tr>
+                                    <tr id="syslog5"><td colspan="3"></td></tr>
+                                    <tr id="syslog6"><td colspan="3"></td></tr>
+                                    <tr id="syslog7"><td colspan="3"></td></tr>
+                                    <tr id="syslog8"><td colspan="3"></td></tr>
+                                    <tr id="syslog9"><td colspan="3"></td></tr>
+                                    <tr id="syslog10"><td colspan="3"></td></tr>
+                                    <tr id="syslog11"><td colspan="3"></td></tr>
+                                    <tr id="syslog12"><td colspan="3"></td></tr>
+                                    <tr id="syslog13"><td colspan="3"></td></tr>
+                                    <tr id="syslog14"><td colspan="3"></td></tr>
+                                    <tr id="syslog15"><td colspan="3"></td></tr>
+                                    <tr id="syslog16"><td colspan="3"></td></tr>
+                                    <tr id="syslog17"><td colspan="3"></td></tr>
+                                    <tr id="syslog18"><td colspan="3"></td></tr>
+                                    <tr id="syslog19"><td colspan="3"></td></tr>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                </div>
             </div>
+        </div>
+
         <div id="rightColumn25" class="column left width25">
             <div id="eventsContainer" class="civSection">
                 <h3>Latest News</h3>
@@ -599,7 +606,7 @@
                 </table>
             </div>
         </div>
-        </div>
+    </div>
 
     <footer>
         <span class="title">CivClicker</span>
