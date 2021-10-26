@@ -476,11 +476,25 @@ function migrateGameData(loadVar, settingsVarReturn) {
     //}
 
     // v1.4.5
-    // remove resource stock
-    if (isValid(loadVar.curCiv.resourcestock)) {
-        delete loadVar.curCiv.resourcestock;
-    }
-    if (isValid(curCiv.resourcestock)) {
-        delete curCiv.resourcestock;
+    // remove resource stock - failed attempt
+    //if (isValid(loadVar.curCiv.resourcestock)) {
+    //    delete loadVar.curCiv.resourcestock;
+    //}
+    //if (isValid(curCiv.resourcestock)) {
+    //    delete curCiv.resourcestock;
+    //}
+
+    //v1.4.7 - palace
+
+    //v1.4.8 - cornexchange
+    if (!isValid(loadVar.curCiv.cornexchange)) {
+        loadVar.curCiv.food.tradeAmount = civData.food.initTradeAmount;
+        loadVar.curCiv.wood.tradeAmount = civData.wood.initTradeAmount;
+        loadVar.curCiv.stone.tradeAmount = civData.stone.initTradeAmount;
+        loadVar.curCiv.skins.tradeAmount = civData.skins.initTradeAmount;
+        loadVar.curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
+        loadVar.curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
+        loadVar.curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
+        loadVar.curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
     }
 }
