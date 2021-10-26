@@ -43,7 +43,6 @@ function prettify(input) {
     return (settings.delimiters) ? Number(input).toLocaleString() : input.toString();
 }
 
-
 function setAutosave(value) {
     if (value !== undefined) { settings.autosave = value; }
     ui.find("#toggleAutosave").checked = settings.autosave;
