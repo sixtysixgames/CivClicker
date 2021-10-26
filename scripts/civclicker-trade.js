@@ -1,12 +1,16 @@
 ﻿"use strict";
 
 /* Trade functions */
+function setInitTradePrice(civObj) {
+    if (!isValid(civObj.initTradeAmount)) { return; }
+    updateTradeButton(civObj.id, civObj.initTradeAmount);
+}
 
 function startTrader() {
     // check a couple of things, if one of these is missing, then all are probably missing
-    if (!checkTradeAmounts("food")) { return; }
-    if (!checkTradeAmounts("herbs")) { return; }
-    if (!checkTradeAmounts("metal")) { return; }
+    if (!checkTradeAmounts(resourceType.food)) { return; }
+    if (!checkTradeAmounts(resourceType.herbs)) { return; }
+    if (!checkTradeAmounts(resourceType.metal)) { return; }
 
     // Set timer length (12 sec + 5 sec/upgrade)
     curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
