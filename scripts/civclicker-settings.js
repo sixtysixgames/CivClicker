@@ -71,9 +71,9 @@ function load(loadType) {
         }
 
         // Try to parse the strings
-        if (string1) { try { loadVar = JSON.parse(string1); } catch (ignore) { } }
-        if (string2) { try { loadVar2 = JSON.parse(string2); } catch (ignore) { } }
-        if (settingsString) { try { settingsVar = JSON.parse(settingsString); } catch (ignore) { } }
+        if (string1) { try { loadVar = JSON.parse(string1); } catch (ignore) { sysLog("Failed to parse string1");} }
+        if (string2) { try { loadVar2 = JSON.parse(string2); } catch (ignore) { sysLog("Failed to parse string2");} }
+        if (settingsString) { try { settingsVar = JSON.parse(settingsString); } catch (ignore) { sysLog("Failed to parse settingsString");} }
 
         // If there's a second string (old save game format), merge it in.
         if (loadVar2) { loadVar = mergeObj(loadVar, loadVar2); loadVar2 = undefined; }
@@ -113,7 +113,7 @@ function load(loadType) {
         curCiv = loadVar.curCiv; // No need to merge if the versions match; this is quicker.
     }
 
-    var lsgv = "Loaded save game version " + saveVersion.major + "." + saveVersion.minor + "." + saveVersion.sub + "(" + saveVersion.mod + ") via"
+    var lsgv = "Loaded save game version " + saveVersion.major + "." + saveVersion.minor + "." + saveVersion.sub + "(" + saveVersion.mod + ") via";
     console.log(lsgv, loadType);
     sysLog(lsgv);
 
@@ -143,15 +143,7 @@ function load(loadType) {
     ui.find("#wonderNameP").innerHTML = curCiv.curWonder.name;
     ui.find("#wonderNameC").innerHTML = curCiv.curWonder.name;
 
-    // todo: tidy this into separate function
-    updateTradeButton(resourceType.food, curCiv.food.tradeAmount);
-    updateTradeButton(resourceType.wood, curCiv.wood.tradeAmount);
-    updateTradeButton(resourceType.stone, curCiv.stone.tradeAmount);
-    updateTradeButton(resourceType.skins, curCiv.skins.tradeAmount);
-    updateTradeButton(resourceType.herbs, curCiv.herbs.tradeAmount);
-    updateTradeButton(resourceType.ore, curCiv.ore.tradeAmount);
-    updateTradeButton(resourceType.leather, curCiv.leather.tradeAmount);
-    updateTradeButton(resourceType.metal, curCiv.metal.tradeAmount);
+    updateTradeButtons();
 
     return true;
 }
@@ -194,10 +186,8 @@ function save(savetype) {
 
     var settingsVar = settings; // UI Settings are saved separately.
 
-    ////////////////////////////////////////////////////
-
     // Handle export
-    if (savetype == "export") {
+    if (savetype == saveTypes.export) {
         var savestring = "[" + JSON.stringify(saveVar) + "]";
         var compressed = LZString.compressToBase64(savestring);
         console.log("Compressed save from " + savestring.length + " to " + compressed.length + " characters");
@@ -218,10 +208,10 @@ function save(savetype) {
         localStorage.setItem(saveSettingsTag, JSON.stringify(settingsVar));
 
         //Update console for debugging, also the player depending on the type of save (manual/auto)
-        if (savetype == "auto") {
+        if (savetype == saveTypes.auto) {
             console.log("Autosave");
             sysLog("Autosaved");
-        } else if (savetype == "manual") {
+        } else if (savetype == saveTypes.manual) {
             alert("Game Saved");
             console.log("Manual Save");
             sysLog("Saved game");
@@ -229,10 +219,10 @@ function save(savetype) {
     } catch (err) {
         handleStorageError(err);
 
-        if (savetype == "auto") {
+        if (savetype == saveTypes.auto) {
             console.log("Autosave Failed");
             sysLog("Autosave Failed");
-        } else if (savetype == "manual") {
+        } else if (savetype == saveTypes.manual) {
             alert("Save Failed!");
             console.log("Save Failed");
             sysLog("Save Failed");
@@ -391,10 +381,37 @@ function resetTradeAmounts() {
     curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
 }
 
+function setInitTradeAmount() {
+    if (!isValid(curCiv.food.tradeAmount)) {
+        curCiv.food.tradeAmount = civData.food.initTradeAmount;
+    }
+    if (!isValid(curCiv.wood.tradeAmount)) {
+        curCiv.wood.tradeAmount = civData.wood.initTradeAmount;
+    }
+    if (!isValid(curCiv.stone.tradeAmount)) {
+        curCiv.stone.tradeAmount = civData.stone.initTradeAmount;
+    }
+    if (!isValid(curCiv.skins.tradeAmount)) {
+        curCiv.skins.tradeAmount = civData.skins.initTradeAmount;
+    }
+    if (!isValid(curCiv.herbs.tradeAmount)) {
+        curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
+    }
+    if (!isValid(curCiv.ore.tradeAmount)) {
+        curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
+    }
+    if (!isValid(curCiv.leather.tradeAmount)) {
+        curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
+    }
+    if (!isValid(curCiv.metal.tradeAmount)) {
+        curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
+    }
+}
+
 function tickAutosave() {
     if (settings.autosave && (++settings.autosaveCounter >= settings.autosaveTime)) {
         settings.autosaveCounter = 0;
         // If autosave fails, disable it.
-        if (!save("auto")) { settings.autosave = false; }
+        if (!save(saveTypes.auto)) { settings.autosave = false; }
     }
 }
