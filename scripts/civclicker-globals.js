@@ -101,7 +101,7 @@ const subTypes = {
     pantheon: "pantheon",
     conquest: "conquest",
     trade: "trade",
-    prayer: "prayer",
+    prayer: "prayer"
 };
 const alignmentType = {
     player: "player",
@@ -122,3 +122,22 @@ const combatTypes = {
     cavalry: "cavalry",
     animal: "animal"
 };
+
+const saveTypes = {
+    auto: "auto",
+    export: "export",
+    manual: "manual"
+};
+const deityDomains = {
+    underworld: "underworld",
+    battle: "battle",
+    fields: "fields",
+    cats: "cats"
+};
+const deityTypes = {
+    Battle: "Battle",
+    Underworld: "Underworld",
+    Fields: "Fields",
+    Cats: "Cats"
+};
+
