@@ -124,12 +124,12 @@ function updatePurchaseRow(purchaseObj) {
 
     // Already having one reveals it as though we met the prereq.
     // freeLand added to stop annoying UI jump
-    var havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == "freeLand";
+    var havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == buildingType.freeLand;
     //|| (purchaseObj.id == "freeLand" && purchaseObj.owned == 0)
 
     // Special check: Hide one-shot upgrades after purchase; they're
     // redisplayed elsewhere.
-    var hideBoughtUpgrade = ((purchaseObj.type == "upgrade") && (purchaseObj.owned == purchaseObj.limit) && !purchaseObj.salable);
+    var hideBoughtUpgrade = ((purchaseObj.type == civObjType.upgrade) && (purchaseObj.owned == purchaseObj.limit) && !purchaseObj.salable);
 
     var maxQty = canPurchase(purchaseObj);
     var minQty = canPurchase(purchaseObj, -Infinity);
@@ -503,7 +503,7 @@ function updateDevotion() {
 
     // Process altars
     buildingData.forEach(function (elem) {
-        if (elem.subType == "altar") {
+        if (elem.subType === subTypes.altar) {
             ui.show(("#" + elem.id + "Row"), meetsPrereqs(elem.prereqs));
             document.getElementById(elem.id).disabled = (!(meetsPrereqs(elem.prereqs) && canAfford(elem.require)));
         }
@@ -511,7 +511,7 @@ function updateDevotion() {
 
     // Process activated powers
     powerData.forEach(function (elem) {
-        if (elem.subType == "prayer") {
+        if (elem.subType === subTypes.prayer) {
             //xxx raiseDead buttons updated by UpdatePopulationUI
             if (elem.id == "raiseDead") { return; }
             ui.show(("#" + elem.id + "Row"), meetsPrereqs(elem.prereqs));
@@ -580,7 +580,7 @@ function updateTargets() {
 
     // Raid buttons are only visible when not already raiding.
     if (ui.show("#raidGroup", !curCiv.raid.raiding)) {
-        if (getCombatants("party", "player").length > 0) { haveArmy = true; }
+        if (getCombatants(placeType.party, alignmentType.player).length > 0) { haveArmy = true; }
 
         var curElem;
         for (i = 0; i < raidButtons.length; ++i) {
