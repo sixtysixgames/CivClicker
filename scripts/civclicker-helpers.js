@@ -188,7 +188,6 @@ function getRandomHealthyWorker() {
         chance += civData[killable[i].id].owned;
         if (chance > num) { return killable[i].id; }
     }
-
     return "";
 }
 function getRandomWorker() {
@@ -199,7 +198,6 @@ function getRandomWorker() {
         chance += civData[killable[i].id].owned;
         if (chance > num) { return killable[i].id; }
     }
-
     return "";
 }
 //Selects a random sackable building based on its proportions in the current distribution.
@@ -212,10 +210,26 @@ function getRandomBuilding() {
         chance += civData[sackable[i].id].owned;
         if (chance > num) { return sackable[i].id; }
     }
-
     return "";
 }
+//Selects a random sackable building based on its proportions in the current distribution.
+function getRandomResource() {
+    var i;
+    var total = 0;
+    for (i = 0; i < lootable.length; ++i) {
+        //total += civData[lootable[i].id].owned;
+        total += lootable[i].owned;
+    }
+    var num = Math.random() * total;
+    var chance = 0;
 
+    for (i = 0; i < lootable.length; ++i) {
+        //chance += civData[lootable[i].id].owned;
+        chance += lootable[i].owned;
+        if (chance > num) { return lootable[i].id; }
+    }
+    return "";
+}
 //xxx Eventually, we should have events like deaths affect morale (scaled by %age of total pop)
 function adjustMorale(delta) {
     //Changes and updates morale given a delta value
@@ -338,12 +352,14 @@ function calculatePopulation() {
     };
 
     //Update population limit by multiplying out housing numbers
+    // 66g todo: limits should be hardcoded with civData
     population.limit = (
         civData.tent.owned
         + (civData.hut.owned * 3)
         + (civData.cottage.owned * 6)
-        + (civData.house.owned * (10 + ((civData.tenements.owned) * 2) + ((civData.slums.owned) * 2)))
+        + (civData.house.owned * (10 + (civData.tenements.owned * 2) + (civData.slums.owned * 2)))
         + (civData.mansion.owned * 50)
+        + (civData.palace.owned * 150)
     );
     population.limitIncludingUndead = population.limit + population.zombie;
 
