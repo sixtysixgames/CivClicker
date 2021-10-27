@@ -324,6 +324,7 @@ function clearSpecialResourceNets() {
     civData.herbs.net = 0;
     civData.ore.net = 0;
     civData.leather.net = 0;
+    civData.potions.net = 0;
     civData.piety.net = 0;
     civData.metal.net = 0;
 }
