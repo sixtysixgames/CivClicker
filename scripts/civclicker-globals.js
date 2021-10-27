@@ -26,6 +26,7 @@ const resourceType = {
     herbs: "herbs",
     ore: "ore",
     leather: "leather",
+    potions: "potions",
     metal: "metal",
     piety: "piety",
     gold: "gold",
