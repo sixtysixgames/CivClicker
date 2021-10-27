@@ -138,6 +138,7 @@ function wickerman() {
             case resourceType.herbs: return "The gardens flourish!";
             case resourceType.ore: return "A new vein is struck!";
             case resourceType.leather: return "The tanneries are productive!";
+            case resourceType.potions: return "The apothecaries are productive!";
             case resourceType.metal: return "The steel runs pure.";
             default: return "You gain " + rewardObj.getQtyName(qty) + "!";
         }
