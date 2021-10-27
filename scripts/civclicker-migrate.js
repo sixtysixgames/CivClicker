@@ -488,6 +488,7 @@ function migrateGameData(loadVar, settingsVarReturn) {
 
     //v1.4.8 - cornexchange
     if (!isValid(loadVar.curCiv.cornexchange)) {
+        // reset tradeAmount from previous versions
         loadVar.curCiv.food.tradeAmount = civData.food.initTradeAmount;
         loadVar.curCiv.wood.tradeAmount = civData.wood.initTradeAmount;
         loadVar.curCiv.stone.tradeAmount = civData.stone.initTradeAmount;
@@ -495,9 +496,17 @@ function migrateGameData(loadVar, settingsVarReturn) {
         loadVar.curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
         loadVar.curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
         loadVar.curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
-        //loadVar.curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
         loadVar.curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
     }
 
     //v1.4.10 - potions
+    if (!isValid(loadVar.curCiv.potions.tradeAmount)) {
+        loadVar.curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
+    }
+
+    //v1.4.11 - carpentry
+    if (!isValid(loadVar.curCiv.carpentry) && isValid(loadVar.curCiv.masonry.owned)) {
+        debug("carpentry");
+        loadVar.curCiv.carpentry = { owned: 1 };
+    }
 }
