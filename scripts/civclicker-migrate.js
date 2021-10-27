@@ -506,7 +506,27 @@ function migrateGameData(loadVar, settingsVarReturn) {
 
     //v1.4.11 - carpentry
     if (!isValid(loadVar.curCiv.carpentry) && isValid(loadVar.curCiv.masonry.owned)) {
-        debug("carpentry");
         loadVar.curCiv.carpentry = { owned: 1 };
+    }
+
+    //v1.4.19 - engineering, rampart, battlement
+    if (!isValid(loadVar.curCiv.engineering) && isValid(loadVar.curCiv.architecture.owned)) {
+        loadVar.curCiv.engineering = { owned: 1 };
+    }
+
+    //v1.4.20 - more upgrades
+    if (!isValid(loadVar.curCiv.farming) && isValid(loadVar.curCiv.flensing.owned)) {
+        loadVar.curCiv.farming = { owned: 1 };
+    }
+    if (!isValid(loadVar.curCiv.agriculture) && isValid(loadVar.curCiv.croprotation.owned)) {
+        loadVar.curCiv.agriculture = { owned: 1 };
+    }
+    if (!isValid(loadVar.curCiv.metalwork) && isValid(loadVar.curCiv.weaponry.owned)) {
+        loadVar.curCiv.metalwork = { owned: 1 };
+    }
+
+    //v1.4.21 - more upgrades
+    if (!isValid(loadVar.curCiv.mining) && isValid(loadVar.curCiv.prospecting.owned)) {
+        loadVar.curCiv.mining = { owned: 1 };
     }
 }
