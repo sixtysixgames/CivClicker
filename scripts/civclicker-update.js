@@ -267,8 +267,14 @@ function updatePopulation(calc) {
         elt.innerHTML = prettify(Math.floor(population[prop]));
     });
 
-    civData.house.update(); // TODO: Effect might change dynamically.  Need a more general way to do this.
-    civData.barn.update();
+    //civData.house.update(); // TODO: Effect might change dynamically.  Need a more general way to do this.
+    //civData.barn.update();
+    // todo: need to loop over elements and if has an update then call it
+    buildingData.forEach(function (elt) {
+        if (isValid(elt.update)) {
+            elt.update();
+        }
+    });
 
     //ui.show("#graveTotal", (curCiv.grave.owned > 0)); // always show grave total
     ui.show("#totalSickRow", (population.totalSick > 0));
@@ -569,6 +575,7 @@ function updateTargets() {
     var haveArmy = false;
 
     ui.show("#victoryGroup", curCiv.raid.victory);
+    ui.show("#conquestSelect .alert", curCiv.raid.victory);
 
     ui.show("#exitRaidLoop", curCiv.raid.left > 0);
     document.getElementById("raidLoop").innerText = curCiv.raid.left;
@@ -664,4 +671,11 @@ function updateWonder() {
     ui.show("#wonderCompleted", (curCiv.curWonder.stage === 2));
 
     updateWonderList();
+}
+
+function updateNote(id, text) {
+    if (!isValid(id) || !isValid(text)) {
+        return;
+    }
+    document.getElementById(id + "Note").innerHTML = ": " + text;
 }
