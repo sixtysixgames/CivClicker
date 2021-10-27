@@ -69,6 +69,14 @@ function getCivData() {
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
+            id: resourceType.potions, singular: "potion", plural: "potions",
+            subType: subTypes.special,
+            initTradeAmount: 250, // how much to offer on Trade for 1 gold
+            baseTradeAmount: 50, // the least on offer
+            get limit() { return 50 + (civData.apothecary.owned * 50); },
+            set limit(value) { return this.limit; } // Only here for JSLint.
+        }),
+        new Resource({
             id: resourceType.metal, name: "metal",
             subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
@@ -177,7 +185,7 @@ function getCivData() {
             id: buildingType.apothecary, singular: "apothecary", plural: "apothecaries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
-            effectText: "allows 1 healer"
+            effectText: "allows 1 healer; +50 potion storage"
         }),
         new Building({
             id: buildingType.temple, singular: "temple", plural: "temples",
@@ -329,6 +337,12 @@ function getCivData() {
             prereqs: { architecture: true },
             require: { metal: 1000 },
             effectText: "Collect skins more frequently"
+        }),
+        new Upgrade({
+            id: "reaping", name: "Reaping", subType: subTypes.upgrade,
+            prereqs: { architecture: true },
+            require: { metal: 500, wood: 500 },
+            effectText: "Collect herbs more frequently"
         }),
         new Upgrade({
             id: "macerating", name: "Macerating", subType: subTypes.upgrade,
@@ -584,17 +598,19 @@ function getCivData() {
         }),
         new Upgrade({
             id: "currency", name: "Currency", subType: subTypes.trade,
-            require: { ore: 1000, gold: 10 },
+            require: { food: 1000, wood: 1000, stone: 1000, gold: 10 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         new Upgrade({
             id: "commerce", name: "Commerce", subType: subTypes.trade,
-            require: { piety: 5000, gold: 50 },
+            prereqs: { currency: true },
+            require: { food: 2000, wood: 2000, stone: 2000, skins: 1000, herbs: 1000, ore: 1000, gold: 50 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         new Upgrade({
             id: "cornexchange", name: "Corn Exchange", subType: subTypes.trade,
-            require: { piety: 10000, gold: 100 },
+            prereqs: { commerce: true },
+            require: { food: 5000, wood: 5000, stone: 5000, skins: 2000, herbs: 2000, ore: 2000, leather: 1000, potions: 1000, metal: 1000, gold: 100 },
             effectText: "Traders set the cost of resources"
         }),
         // Prayers
@@ -726,7 +742,7 @@ function getCivData() {
             set limit(value) { return this.limit; }, // Only here for JSLint.
             get cureCount() { return this.data.cureCount; }, // Carryover fractional healing
             set cureCount(value) { this.data.cureCount = value; }, // Only here for JSLint.
-            effectText: "Cure sick workers"
+            effectText: "Make potions from herbs. Cure sick workers"
         }),
         new Unit({
             id: unitType.cleric, singular: "cleric", plural: "clerics",
@@ -766,7 +782,7 @@ function getCivData() {
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
             prereqs: { stable: 1 },
-            require: { food: 20, leather: 20 },
+            require: { food: 20, leather: 20, metal: 4 },
             get limit() { return 10 * civData.stable.owned; },
             set limit(value) { return this.limit; }, // Only here for JSLint.
             effectText: "Protect from attack"
