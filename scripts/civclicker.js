@@ -27,7 +27,7 @@ var loopTimer = 0;
 // TODO: Update the version numbering internally
 var version = 24; // This is an ordinal used to trigger reloads. 
 //Always increment versionData if adding new element to civData
-var versionData = new VersionData(1, 4, 9, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 11, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
@@ -145,6 +145,7 @@ function getWonderResources(civData) {
         civData.herbs,
         civData.ore,
         civData.leather,
+        civData.potions,
         civData.metal,
         civData.piety
     ];
@@ -236,6 +237,7 @@ function increment(objId) {
     if (specialChance && purchaseObj.specialMaterial && civData[purchaseObj.specialMaterial]) {
         if ((purchaseObj === civData.food) && (civData.flensing.owned)) { specialChance += 0.1; }
         if ((purchaseObj === civData.stone) && (civData.macerating.owned)) { specialChance += 0.1; }
+        if ((purchaseObj === civData.wood) && (civData.reaping.owned)) { specialChance += 0.1; }
         if (Math.random() < specialChance) {
             var specialMaterial = civData[purchaseObj.specialMaterial];
             var specialQty = purchaseObj.increment * (1 + (9 * (civData.guilds.owned)));
@@ -477,6 +479,7 @@ function gameLoop() {
     doWoodcutters();
     doMiners();
     doBlacksmiths();
+    doApothecaries();
     doTanners();
     doClerics();
 
@@ -532,6 +535,7 @@ function ruinFun() {
     civData.skins.owned += 1000000;
     civData.ore.owned += 1000000;
     civData.leather.owned += 1000000;
+    civData.potions.owned += 1000000;
     civData.metal.owned += 1000000;
     civData.piety.owned += 1000000;
     civData.gold.owned += 10000;
