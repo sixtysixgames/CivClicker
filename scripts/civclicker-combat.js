@@ -23,7 +23,8 @@ function resetRaiding() {
 }
 
 function playerCombatMods() {
-    return (0.01 * ((civData.riddle.owned) + (civData.weaponry.owned) + (civData.shields.owned)));
+    return (0.01 * (civData.riddle.owned + civData.weaponry.owned + civData.shields.owned + civData.armour.owned
+            + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
 }
 
 /* Enemies */
@@ -167,7 +168,7 @@ function getCombatants(place, alignment) {
 
 // Some attackers get a damage mod against some defenders
 function getCasualtyMod(attacker, defender) {
-    // Cavalry take 50% more casualties vs infantry
+    // Cavalry take 50% more casualties vs infantry - 66g todo seems a bit high  
     if ((defender.combatType == combatTypes.cavalry) && (attacker.combatType == combatTypes.infantry)) { return 1.50; }
 
     return 1.0; // Otherwise no modifier
@@ -178,14 +179,21 @@ function doFight(attacker, defender) {
 
     // Defenses vary depending on whether the player is attacking or defending.
     var fortMod = (defender.alignment == alignmentType.player ?
-        (civData.fortification.owned * civData.fortification.efficiency)
-        : (civData.efort.owned * civData.efort.efficiency));
-    var palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
+                    (civData.fortification.owned * civData.fortification.efficiency)
+                    : (civData.efort.owned * civData.efort.efficiency));
+    //var palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
+    var defenceMod = 0;
+    if (defender.alignment == alignmentType.player) {
+        defenceMod += civData.rampart.owned ? civData.rampart.efficiency : 0;
+        defenceMod += civData.palisade.owned ? civData.palisade.efficiency : 0;
+        defenceMod += civData.battlement.owned ? civData.battlement.efficiency : 0;
+    }
 
     // Determine casualties on each side.  Round fractional casualties
     // probabilistically, and don't inflict more than 100% casualties.
     var attackerCas = Math.min(attacker.owned, rndRound(getCasualtyMod(defender, attacker) * defender.owned * defender.efficiency));
-    var defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - palisadeMod) * Math.max(1 - fortMod, 0)));
+    //var defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - palisadeMod) * Math.max(1 - fortMod, 0)));
+    var defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - defenceMod) * Math.max(1 - fortMod, 0)));
 
     attacker.owned -= attackerCas;
     defender.owned -= defenderCas;
