@@ -378,6 +378,7 @@ function resetTradeAmounts() {
     curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
     curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
     curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
+    curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
     curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
 }
 
@@ -402,6 +403,9 @@ function setInitTradeAmount() {
     }
     if (!isValid(curCiv.leather.tradeAmount)) {
         curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
+    }
+    if (!isValid(curCiv.potions.tradeAmount)) {
+        curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
     }
     if (!isValid(curCiv.metal.tradeAmount)) {
         curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
