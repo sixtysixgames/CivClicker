@@ -218,6 +218,7 @@ function updateResourceTotals() {
     ui.find("#maxherbs").innerHTML = prettify(civData.herbs.limit);
     ui.find("#maxore").innerHTML = prettify(civData.ore.limit);
     ui.find("#maxleather").innerHTML = prettify(civData.leather.limit);
+    ui.find("#maxpotions").innerHTML = prettify(civData.potions.limit);
     ui.find("#maxmetal").innerHTML = prettify(civData.metal.limit);
     ui.find("#maxpiety").innerHTML = prettify(civData.piety.limit);
 
