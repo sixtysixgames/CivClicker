@@ -25,9 +25,9 @@ var setup = {};
 var loopTimer = 0;
 
 // TODO: Update the version numbering internally
-var version = 24; // This is an ordinal used to trigger reloads. 
+var version = 30; // This is an ordinal used to trigger reloads. No it doesn't 
 //Always increment versionData if adding new element to civData
-var versionData = new VersionData(1, 4, 11, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 18, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
@@ -84,8 +84,7 @@ var curCiv = {
     deities: [{ name: "", domain: "", maxDev: 0 }]  // array of { name, domain, maxDev }
 
     //xxx We're still accessing many of the properties put here by civData
-    //elements without going through the civData accessors.  That should
-    //change.
+    //elements without going through the civData accessors.  That should change.
 };
 
 // These are not saved, but we need them up here for the asset data to init properly.
