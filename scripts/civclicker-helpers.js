@@ -340,7 +340,6 @@ function checkResourceLimits() {
 }
 
 function calculatePopulation() {
-
     population = {
         current: 0,
         living: 0,
