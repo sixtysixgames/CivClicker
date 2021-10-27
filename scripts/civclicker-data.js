@@ -13,7 +13,7 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                var barnBonus = ((civData.granaries.owned ? 2 : 1) * 200);
+                var barnBonus = (civData.granaries.owned ? 2 : 1) * 200;
                 return 200 + (civData.barn.owned * barnBonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -24,7 +24,10 @@ function getCivData() {
             specialMaterial: resourceType.herbs, verb: "cut", activity: "woodcutting", //I18N
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
-            get limit() { return 200 + (civData.woodstock.owned * 200); },
+            get limit() {
+                var bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                return 200 + (civData.woodstock.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -33,7 +36,10 @@ function getCivData() {
             specialMaterial: resourceType.ore, verb: "mine", activity: "mining", //I18N
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
-            get limit() { return 200 + (civData.stonestock.owned * 200); },
+            get limit() {
+                var bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                return 200 + (civData.stonestock.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -41,7 +47,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
-            get limit() { return 100 + (civData.barn.owned * 100); },
+            get limit() {
+                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                return 100 + (civData.barn.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -49,7 +58,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
-            get limit() { return 100 + (civData.woodstock.owned * 100); },
+            get limit() {
+                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                return 100 + (civData.woodstock.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -57,7 +69,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
-            get limit() { return 100 + (civData.stonestock.owned * 100); },
+            get limit() {
+                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                return 100 + (civData.stonestock.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -65,7 +80,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
-            get limit() { return 50 + (civData.tannery.owned * 50); },
+            get limit() {
+                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                return 50 + (civData.tannery.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -73,7 +91,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
-            get limit() { return 50 + (civData.apothecary.owned * 50); },
+            get limit() {
+                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                return 50 + (civData.apothecary.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -81,7 +102,10 @@ function getCivData() {
             subType: subTypes.special,
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
-            get limit() { return 50 + (civData.smithy.owned * 50); },
+            get limit() {
+                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                return 50 + (civData.smithy.owned * bonus);
+            },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
         new Resource({
@@ -111,6 +135,7 @@ function getCivData() {
         }),
         new Building({
             id: buildingType.hut, singular: "wooden hut", plural: "wooden huts",
+            prereqs: { carpentry: true },
             require: { wood: 20, skins: 1 },
             effectText: "+3 max pop."
         }),
@@ -131,7 +156,8 @@ function getCivData() {
             set effectText(value) { return this.require; }, // Only here for JSLint.
             update: function () {
                 // TODO: need better way to do this
-                document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
+                //document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
+                updateNote(this.id, this.effectText);
             }
         }),
         new Building({
@@ -148,44 +174,92 @@ function getCivData() {
         }),
         new Building({
             id: buildingType.barn, singular: "barn", plural: "barns",
+            prereqs: { carpentry: true },
             require: { wood: 100, stone: 10, skins: 5 },
             get effectText() {
                 var barnBonus = ((civData.granaries.owned ? 2 : 1) * 200);
-                return "+" + barnBonus + " food storage; +100 skin storage";
+                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + barnBonus + " food storage; +" + bonus2 + " skin storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
                 // TODO: need better way to do this
-                document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
+                //document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
+                // like this perhaps ?
+                updateNote(this.id, this.effectText);
             }
         }),
         new Building({
             id: buildingType.woodstock, singular: "wood stockpile", plural: "wood stockpiles",
+            prereqs: { carpentry: true },
             require: { wood: 100, stone: 10, skins: 5 },
-            effectText: "+200 wood storage; +100 herb storage"
+            //effectText: "+200 wood storage; +100 herb storage"
+            get effectText() {
+                var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
+                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + wbonus + " wood storage; +" + bonus2 + " herb storage";
+            },
+            set effectText(value) { return this.effectText; },
+            update: function () {
+                updateNote(this.id, this.effectText);
+            }
         }),
         new Building({
             id: buildingType.stonestock, singular: "stone stockpile", plural: "stone stockpiles",
+            prereqs: { carpentry: true },
             require: { wood: 100, stone: 10, skins: 5 },
-            effectText: "+200 stone storage; +100 ore storage"
+            //effectText: "+200 stone storage; +100 ore storage"
+            get effectText() {
+                var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
+                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + wbonus + " stone storage; +" + bonus2 + " ore storage";
+            },
+            set effectText(value) { return this.effectText; },
+            update: function () {
+                updateNote(this.id, this.effectText);
+            }
         }),
         new Building({
             id: buildingType.tannery, singular: "tannery", plural: "tanneries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, skins: 5 },
-            effectText: "allows 1 tanner; +50 leather storage"
+            //effectText: "allows 1 tanner; +50 leather storage"
+            get effectText() {
+                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
+                return "allows 1 tanner; +" + bonus2 + " leather storage";
+            },
+            set effectText(value) { return this.effectText; },
+            update: function () {
+                updateNote(this.id, this.effectText);
+            }
         }),
         new Building({
             id: buildingType.smithy, singular: "smithy", plural: "smithies",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, ore: 5 },
-            effectText: "allows 1 blacksmith; +50 metal storage"
+            //effectText: "allows 1 blacksmith; +50 metal storage"
+            get effectText() {
+                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
+                return "allows 1 blacksmith; +" + bonus2 + " metal storage";
+            },
+            set effectText(value) { return this.effectText; },
+            update: function () {
+                updateNote(this.id, this.effectText);
+            }
         }),
         new Building({
             id: buildingType.apothecary, singular: "apothecary", plural: "apothecaries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
-            effectText: "allows 1 healer; +50 potion storage"
+            //effectText: "allows 1 healer; +50 potion storage"
+            get effectText() {
+                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
+                return "allows 1 healer; +" + bonus2 + " potion storage";
+            },
+            set effectText(value) { return this.effectText; },
+            update: function () {
+                updateNote(this.id, this.effectText);
+            }
         }),
         new Building({
             id: buildingType.temple, singular: "temple", plural: "temples",
@@ -369,7 +443,13 @@ function getCivData() {
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
+            id: "carpentry", name: "Carpentry", subType: subTypes.upgrade,
+            require: { wood: 100 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
             id: "masonry", name: "Masonry", subType: subTypes.upgrade,
+            prereqs: { carpentry: true },
             require: { wood: 100, stone: 100 },
             effectText: "Unlock more buildings and upgrades"
         }),
@@ -390,21 +470,54 @@ function getCivData() {
             prereqs: { construction: true },
             require: { food: 200, wood: 500, stone: 500 },
             effectText: "Houses support +2 workers",
-            onGain: function () { updatePopulation(); } //due to population limits changing
+            onGain: function () {
+                updatePopulation();//due to population limits changing 
+            } 
         }),
         new Upgrade({
             id: "slums", name: "Slums", subType: subTypes.upgrade,
             prereqs: { architecture: true },
             require: { food: 500, wood: 1000, stone: 1000 },
             effectText: "Houses support +2 workers",
-            onGain: function () { updatePopulation(); } //due to population limits changing
+            onGain: function () {
+                updatePopulation();//due to population limits changing 
+            } 
         }),
         new Upgrade({
             id: "granaries", name: "Granaries", subType: subTypes.upgrade,
-            prereqs: { masonry: true },
+            prereqs: { construction: true },
             require: { wood: 1000, stone: 1000 },
             effectText: "Barns store double the amount of food",
-            onGain: function () { updateResourceTotals(); } //due to resource limits increasing
+            onGain: function () {
+                updateResourceTotals();//due to resource limits increasing 
+            } 
+        }),
+        new Upgrade({
+            id: "warehouses", name: "Warehouses", subType: subTypes.upgrade,
+            prereqs: { construction: true },
+            require: { wood: 1200, stone: 1200 },
+            effectText: "Stockpiles store double the amount of wood and stone",
+            onGain: function () {
+                updateResourceTotals();//due to resource limits increasing 
+            } 
+        }),
+        new Upgrade({
+            id: "storehouses", name: "Storehouses", subType: subTypes.upgrade,
+            prereqs: { construction: true },
+            require: { wood: 500, stone: 500, skins: 100, herbs: 100, ore: 100 },
+            effectText: "Store double the amount of skins, herbs and ore",
+            onGain: function () {
+                updateResourceTotals();//due to resource limits increasing 
+            } 
+        }),
+        new Upgrade({
+            id: "storerooms", name: "Storerooms", subType: subTypes.upgrade,
+            prereqs: { construction: true },
+            require: { wood: 250, stone: 250, leather: 50, potions: 50, metal: 50 },
+            effectText: "Store double the amount of leather, potions and metal",
+            onGain: function () {
+                updateResourceTotals();//due to resource limits increasing
+            } 
         }),
         new Upgrade({
             id: "palisade", name: "Palisade", subType: subTypes.upgrade,
@@ -825,6 +938,7 @@ function getCivData() {
             onWin: function () { doWolves(this); },
             killFatigue: (1 / 2), // Max fraction that leave after killing the last person
             killStop: (0.9), // Chance of an attacker leaving after killing a person
+            killMax: (1.0), // Max fraction that will kill
             species: speciesType.animal,
             effectText: "Eat your workers"
         }),
@@ -835,12 +949,15 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
-            lootFatigue: (1 / 8), // Max fraction that leave after cleaning out a resource. 8 lootable resources
-            lootStop: (0.9), // Chance of an attacker leaving after looting a resource
+            lootFatigue: (1 / 9), // Max fraction that leave after cleaning out a resource. 9 lootable resources
+            lootStop: (0.75), // Chance of an attacker leaving after looting a resource
+            lootMax: (0.75), // Max fraction that will loot
             sackFatigue: (1 / 16), // Max fraction that leave after destroying a building type. 16 sackable buildings
-            sackStop: (0.9), // Chance of an attacker leaving after sacking a building
+            sackStop: (0.75), // Chance of an attacker leaving after sacking a building
+            sackMax: (0.25), // Max fraction that will sack
             killFatigue: (1 / 7), // Max fraction that leave after killing the last person. 7 job types
-            killStop: (0.9), // Chance of an attacker leaving after killing a person
+            killStop: (0.75), // Chance of an attacker leaving after killing a person
+            killMax: (0.1), // Max fraction that will kill
             effectText: "Steal your resources"
         }),
         new Unit({
@@ -850,14 +967,18 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
-            lootFatigue: (1 / 16), // Max fraction that leave after cleaning out a resource
-            lootStop: (0.7), // Chance of an attacker leaving after looting a resource
+            lootFatigue: (1 / 18), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.5), // Chance of an attacker leaving after looting a resource
+            lootMax: (0.33), // Max fraction that will loot
             sackFatigue: (1 / 32), // Max fraction that leave after destroying a building type
-            sackStop: (0.7), // Chance of an attacker leaving after sacking a building
+            sackStop: (0.5), // Chance of an attacker leaving after sacking a building
+            sackMax: (0.5), // Max fraction that will sack
             killFatigue: (1 / 14), // Max fraction that leave after killing the last person
-            killStop: (0.7), // Chance of an attacker leaving after killing a person
+            killStop: (0.5), // Chance of an attacker leaving after killing a person
+            killMax: (0.5), // Max fraction that will kill
             conquerFatigue: (1 / 15), // Max fraction that leave after conquering the last land
-            conquerStop: (0.6), // Chance of an attacker leaving after conquering land
+            conquerStop: (0.5), // Chance of an attacker leaving after conquering land
+            conquerMax: (0.25), // Max fraction that will take land
             effectText: "Slaughter, plunder, and burn"
         }),
         new Unit({
@@ -867,14 +988,18 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
-            lootFatigue: (1 / 24), // Max fraction that leave after cleaning out a resource
-            lootStop: (0.5), // Chance of an attacker leaving after looting a resource
+            lootFatigue: (1 / 27), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.25), // Chance of an attacker leaving after looting a resource
+            lootMax: (0.25), // Max fraction that will loot
             sackFatigue: (1 / 48), // Max fraction that leave after destroying a building type
-            sackStop: (0.5), // Chance of an attacker leaving after sacking a building
+            sackStop: (0.25), // Chance of an attacker leaving after sacking a building
+            sackMax: (0.25), // Max fraction that will sack
             killFatigue: (1 / 21), // Max fraction that leave after killing the last person
-            killStop: (0.5), // Chance of an attacker leaving after killing a person
+            killStop: (0.25), // Chance of an attacker leaving after killing a person
+            killMax: (0.5), // Max fraction that will kill
             conquerFatigue: (1 / 30), // Max fraction that leave after conquering the last land
-            conquerStop: (0.5), // Chance of an attacker leaving after conquering land
+            conquerStop: (0.25), // Chance of an attacker leaving after conquering land
+            conquerMax: (0.75), // Max fraction that will take land
             effectText: "Conquer your lands"
         }),
         new Unit({
