@@ -421,6 +421,24 @@ button {
         font-family: 'Suez One', serif;
         color: #333;
         box-shadow: 0 0.1em 0.1em rgba(0,0,0,0.2);
+        z-index: 3;
+    }
+    .paneSelector .info {
+        display: none;
+        position: absolute;
+        font-size: 1.2em;
+        top: -0.5em;
+        right: -0.25em;
+        width: 1.2em;
+        height: 1.2em;
+        line-height: 1.5em;
+        text-align: center;
+        background: #99aaff;
+        border: solid 2px white;
+        border-radius: 1.5em;
+        font-family: 'Suez One', serif;
+        color: #333;
+        box-shadow: 0 0.1em 0.1em rgba(0,0,0,0.2);
         z-index: 2;
     }
 
@@ -935,35 +953,35 @@ ol.happinessRanks {
         padding: 0.1em 0.5em;
         background-color: rgba(0,0,0,0.05);
     }
-
+/*blissful*/
 .happy-1 li:nth-child(1) {
     background-color: #3ac;
     display: inline-block;
     opacity: 1;
     font-size: 1em;
 }
-
+/*happy*/
 .happy-2 li:nth-child(2) {
     background-color: #3a6;
     display: inline-block;
     opacity: 1;
     font-size: 1em;
 }
-
+/*content*/
 .happy-3 li:nth-child(3) {
     background-color: #6a3;
     display: inline-block;
     opacity: 1;
     font-size: 1em;
 }
-
+/*unhappy*/
 .happy-4 li:nth-child(4) {
     background-color: #aa3;
     display: inline-block;
     opacity: 1;
     font-size: 1em;
 }
-
+/*angry*/
 .happy-5 li:nth-child(5) {
     background-color: #c33;
     display: inline-block;
