@@ -147,7 +147,7 @@ function updatePurchaseRow(purchaseObj) {
         elt.disabled = ((purchaseQty > maxQty) || (purchaseQty < minQty));
     });
 
-    // Reveal the row if  prereqs are met
+    // Reveal the row if prereqs are met
     ui.show(elem, havePrereqs && !hideBoughtUpgrade);
 }
 
@@ -451,10 +451,20 @@ function updateUpgrades() {
     // Update all of the upgrades
     upgradeData.forEach(function (elem) {
         updatePurchaseRow(elem);  // Update the purchase row.
-
         // Show the already-purchased line if we've already bought it.
         ui.show(("#P" + elem.id), elem.owned);
     });
+
+    // show the alert on the upgrades tab if one is available
+    ui.show("#upgradesSelect .info", false);
+    for (var s = 0; s < upgradeData.length; s++) {
+        if (canPurchase(upgradeData[s]) && !upgradeData[s].owned) {
+            debug("canPurchase: " + upgradeData[s].id);
+            ui.show("#upgradesSelect .info", true);
+            break;
+        }
+    }
+    
 
     // Deity techs
     ui.show("#deityPane .notYet", (!hasDomain && !canSelectDomain));
