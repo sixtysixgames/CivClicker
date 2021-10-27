@@ -3,7 +3,6 @@
 
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
-    //
     var specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
     var millMod = 1;
     if (population.current > 0) {
@@ -29,6 +28,7 @@ function doFarmers() {
 }
 
 function doWoodcutters() {
+    var specialChance = civData.wood.specialChance + (0.1 * civData.reaping.owned);
     civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
     civData.wood.owned += civData.wood.net;
 
@@ -78,7 +78,19 @@ function doTanners() {
         civData.leather.owned += leatherEarned;
     }
 }
+function doApothecaries() {
+    if (civData.potions.owned < civData.potions.limit) {
+        // we don't want to use up herbs if we aren't making potions
+        var efficieny = civData.healer.efficiency * 5;// to bring productivity into line with blacksmiths and tanners
+        var herbsUsed = Math.min(civData.herbs.owned, (civData.healer.owned * efficieny * curCiv.morale.efficiency));
+        var potionsEarned = herbsUsed * getWonderBonus(civData.potions);
+        civData.herbs.net -= herbsUsed;
+        civData.herbs.owned -= herbsUsed;
 
+        civData.potions.net += potionsEarned;
+        civData.potions.owned += potionsEarned;
+    }
+}
 function doClerics() {
     var pietyEarned = (
         civData.cleric.owned
@@ -93,34 +105,29 @@ function doClerics() {
 
     civData.piety.net += pietyEarned;
     civData.piety.owned += pietyEarned;
-
-    //if (civData.piety.net < 0) civData.piety.net = 0;
-    //if (civData.piety.owned < 0) civData.piety.owned = 0;
 }
 
-
 function doHealers() {
-    if (civData.herbs.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without herbs
+    if (civData.potions.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without potions
     var job, numHealed = 0;
     var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
     // How much healing can we do?
-    // this doesn't need to be a global variable
     civData.healer.cureCount += (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
 
     var cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
     // We can't cure more sick people than there are
     civData.healer.cureCount = Math.min(civData.healer.cureCount, population.totalSick);
-    // We can't cure more sick people than there are herbs
-    civData.healer.cureCount = Math.min(civData.healer.cureCount, civData.herbs.owned);
+    // We can't cure more sick people than there are potions
+    civData.healer.cureCount = Math.min(civData.healer.cureCount, civData.potions.owned);
 
-    // Cure people until we run out of healing capacity or herbs
-    while (civData.healer.cureCount >= 1 && civData.herbs.owned >= 1) {
+    // Cure people until we run out of healing capacity or potions
+    while (civData.healer.cureCount >= 1 && civData.potions.owned >= 1) {
         job = getNextPatient();
         if (!job) {break;}
         healByJob(job);
         --civData.healer.cureCount;
-        --civData.herbs.owned;
-        --civData.herbs.net;
+        --civData.potions.owned;
+        --civData.potions.net;
         ++numHealed;
     }
     return numHealed;
