@@ -82,21 +82,10 @@ function buy(materialId) {
     if (civData.gold.owned < 1) { return; }
 
     var material = civData[materialId];
-
     var currentAmount = curCiv[materialId].tradeAmount;
 
     material.owned += currentAmount;
     --civData.gold.owned;
-
-    // lose 1% when we buy;  see trade() for increasing prices
-    //currentAmount -= Math.round(currentAmount * 0.01);
-    //curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, currentAmount);
-    //updateTradeButton(materialId, curCiv[materialId].tradeAmount);
-    //elem.innerHTML = civData[materialId].tradeAmount;
-    //}
-    //if (material == civData.food || material == civData.wood || material == civData.stone) { material.owned += 5000; }
-    //if (material == civData.skins || material == civData.herbs || material == civData.ore) { material.owned += 500; }
-    //if (material == civData.leather || material == civData.metal) { material.owned += 250; }
 
     updateResourceTotals();
 }
@@ -117,6 +106,7 @@ function updateTradeButtons() {
     updateTradeButton(resourceType.herbs, curCiv.herbs.tradeAmount);
     updateTradeButton(resourceType.ore, curCiv.ore.tradeAmount);
     updateTradeButton(resourceType.leather, curCiv.leather.tradeAmount);
+    updateTradeButton(resourceType.potions, curCiv.potions.tradeAmount);
     updateTradeButton(resourceType.metal, curCiv.metal.tradeAmount);
 }
 
