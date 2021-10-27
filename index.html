@@ -144,14 +144,14 @@
                                 <span class="number net" data-action="displayNet" data-target="herbs">0</span><span class="perSecond">/s</span>
                             </td>
                             <td>
-                                <img src="images/piety.png" class="icon icon-lg" alt="Piety" />
-                                <label>Piety:</label>
+                                <img src="images/potion.png" class="icon icon-lg" alt="Potions" />
+                                <label>Potions:</label>
                             </td>
                             <td class="number">
-                                <span class="number" data-action="display" data-target="piety">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxpiety">...</span>
+                                <span class="number" data-action="display" data-target="potions">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxpotions">...</span>
                             </td>
                             <td class="number">
-                                <span class="number net" data-action="displayNet" data-target="piety">0</span><span class="perSecond">/s</span>
+                                <span class="number net" data-action="displayNet" data-target="potions">0</span><span class="perSecond">/s</span>
                             </td>
                         </tr>
                         <tr>
@@ -186,11 +186,14 @@
                             </td>
                             <td>&nbsp;</td>
                             <td>
-                                <img src="images/carrion.png" class="icon icon-lg" alt="Corpses">
-                                <label>Corpses:</label>
+                                <img src="images/piety.png" class="icon icon-lg" alt="Piety" />
+                                <label>Piety:</label>
                             </td>
-                            <td colspan="2">
-                                <span class="number" data-action="display" data-target="corpses">0</span>&nbsp;/&nbsp;<span data-action="display" data-target="grave">...</span> Empty Graves
+                            <td class="number">
+                                <span class="number" data-action="display" data-target="piety">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxpiety">...</span>
+                            </td>
+                            <td class="number">
+                                <span class="number net" data-action="displayNet" data-target="piety">0</span><span class="perSecond">/s</span>
                             </td>
                         </tr>
                         <tr>
@@ -198,7 +201,7 @@
                                 <img src="images/smitten.png" class="icon icon-lg" alt="Happiness" />
                                 <label>Happiness:</label>
                             </td>
-                            <td colspan="5" id="morale">
+                            <td colspan="2" id="morale">
                                 <ol class="happinessRanks">
                                     <li>Blissful</li>
                                     <li>Happy</li>
@@ -206,6 +209,13 @@
                                     <li>Unhappy</li>
                                     <li>Angry</li>
                                 </ol>
+                            </td>
+                            <td>
+                                <img src="images/carrion.png" class="icon icon-lg" alt="Corpses">
+                                <label>Corpses:</label>
+                            </td>
+                            <td colspan="2">
+                                <span class="number" data-action="display" data-target="corpses">0</span>&nbsp;/&nbsp;<span data-action="display" data-target="grave">...</span> Empty Graves
                             </td>
                         </tr>
                     </tbody>
@@ -502,6 +512,7 @@
                         <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
                         <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
                         <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
+                        <button class="tradeResource" onmousedown="buy('potions')">Buy <span id="potionsCost">250</span> Potions</button><br />
                         <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
                     </div>
                 </div>
