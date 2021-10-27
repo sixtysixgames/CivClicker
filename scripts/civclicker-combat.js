@@ -293,8 +293,8 @@ function doSlaughter(attacker) {
 function doSlaughterMulti(attacker) {
     //var killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
 
-    // kill up to 25% of attacking force
-    var targets = 1 + Math.ceil(Math.random() * attacker.owned * 0.25);
+    // kill up to %age of attacking force
+    var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
     var kills = 0;
     for (var k = 1; k <= targets; k++) {
         //var target = getRandomHealthyWorker(); //Choose random worker
@@ -342,8 +342,8 @@ function doLoot(attacker) {
     var targetID = getRandomResource();
     var target = civData[targetID];
     if (isValid(target) && target.owned > 0) {
-        var stolenQty = Math.ceil((Math.random() * attacker.owned * 0.25)); //up to 25% of attackers steal.
-        stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items
+        var stolenQty = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
+        stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items.  TODO: global var
         // target.owned can be decimal.  we can't loot more than is available
         stolenQty = Math.min(stolenQty, Math.floor(target.owned));
         if (stolenQty > 0) {
@@ -394,7 +394,7 @@ function doSackMulti(attacker) {
     //Destroy buildings
 
     // sack up to 25% of attacking force
-    var targets = 1 + Math.ceil(Math.random() * attacker.owned * 0.25);
+    var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.sackMax);
     var sacks = 0;
     var lastTarget = "building";
     for (var s = 1; s <= targets; s++) {
@@ -435,7 +435,7 @@ function doConquer(attacker) {
     if (civData.freeLand.owned > 0) {
         // up to 25% of attacking force or land - this might need adjusting
         var targets = Math.min(attacker.owned, civData.freeLand.owned);
-        var land = Math.ceil(Math.random() * targets * 0.25);
+        var land = Math.ceil(Math.random() * targets * attacker.conquerMax);
         land = Math.min(civData.freeLand.owned, land);
         if (land > 0) {
             civData.freeLand.owned -= land;
