@@ -313,10 +313,10 @@ function doCorpses() {
     if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 }
 
-// sometime we have more tanners than we have tannerys, for example
+// sometime, for example, we have more tanners than we have tannerys
 // usually because of buildings being sacked i.e. destroyed
 // this is called in the main game loop
-// TODO: this could be improved.  maybe add id of worker to building type
+// 66g TODO: this could be improved.  maybe add id of worker to building type
 function dismissWorkers() {
     // we only lose a worker if an occupied building is destroyed
     var diff = 0;
@@ -364,4 +364,13 @@ function dismissWorkers() {
         civData.cavalry.owned -= diff;
         civData.unemployed.owned += diff;
     }
+}
+
+function farmerMods(efficiency_base) {
+    //+ civData.domestication.owned
+    return efficiency_base + (0.1 * (
+             + civData.farming.owned + civData.agriculture.owned
+            + civData.ploughshares.owned + civData.irrigation.owned
+            + civData.croprotation.owned + civData.selectivebreeding.owned + civData.fertilisers.owned
+            + civData.blessing.owned));
 }
