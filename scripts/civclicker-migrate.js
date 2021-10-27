@@ -495,6 +495,9 @@ function migrateGameData(loadVar, settingsVarReturn) {
         loadVar.curCiv.herbs.tradeAmount = civData.herbs.initTradeAmount;
         loadVar.curCiv.ore.tradeAmount = civData.ore.initTradeAmount;
         loadVar.curCiv.leather.tradeAmount = civData.leather.initTradeAmount;
+        //loadVar.curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
         loadVar.curCiv.metal.tradeAmount = civData.metal.initTradeAmount;
     }
+
+    //v1.4.10 - potions
 }
