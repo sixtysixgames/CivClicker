@@ -455,6 +455,10 @@ button {
         display: block;
     }
 
+    .selectPane .columns {
+        padding: 0;
+    }
+
     .selectPane:after /* clearfix */ {
         content: "";
         display: table;
@@ -523,6 +527,10 @@ button {
     font-weight: bold;
 }
 
+.sick {
+    color: green;
+}
+
 #customJobQuantity,
 #customBuildQuantity,
 #customPartyQuantity,
@@ -539,7 +547,7 @@ button {
 }
 
 .itemname {
-    padding-left: 0.3em;
+    padding-left: 2px;
     text-transform: capitalize;
 }
 
@@ -572,12 +580,15 @@ button {
 }
 
     #logTable td {
-        padding-right: 10px;
+        padding-right: 5px;
         vertical-align: top;
     }
 
+#syslogTable {
+    width: 100%;
+}
 #syslogTable td {
-    padding-right: 20px;
+    padding-right: 5px;
     vertical-align: top;
 }
 
@@ -896,7 +907,9 @@ button {
 .barbarian {
     background-color: #f63;
 }
-
+.invader {
+    background-color: #f60;
+}
 .esiege {
     background-color: #99f;
 }
@@ -941,7 +954,21 @@ button {
 
 #morale {
 }
-
+#morale1 {
+    display: none;
+}
+#morale2 {
+    display: none;
+}
+#morale3 {
+    display: none;
+}
+#morale4 {
+    display: none;
+}
+#morale5 {
+    display: none;
+}
 ol.happinessRanks {
     list-style: none;
     display: block;
@@ -1071,3 +1098,7 @@ footer {
     min-width: unset !important;
 }
 /*1050*/
+
+/*span {
+    background-color:aqua;
+}*/
