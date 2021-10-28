@@ -110,15 +110,26 @@ function getPurchaseCellText(purchaseObj, qty, inTable) {
 function getPurchaseRowText(purchaseObj) {
     // Make sure to update this if the number of columns changes.
     if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='17'/>&nbsp;</tr>"; }
+    var showSellButtons = true;
 
+    if (purchaseObj.type === civObjType.building) {
+        // we don't sell buildings, yet
+        showSellButtons = false;
+    }
     var objId = purchaseObj.id;
     var s = "<tr id='" + objId + "Row' class='purchaseRow' data-target='" + purchaseObj.id + "'>";
 
-    [-Infinity, "-custom", -100000, -10000, -1000, -100, -10, -1]
-        .forEach(function (elem) { s += getPurchaseCellText(purchaseObj, elem); });
-
-    var enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
-    s += "<td class='itemname" + enemyFlag + "'>" + purchaseObj.getQtyName(0) + ": </td>";
+    if (showSellButtons) {
+        [-Infinity, "-custom", -100000, -10000, -1000, -100, -10, -1]
+            .forEach(function (elem) {
+                s += getPurchaseCellText(purchaseObj, elem);
+            });
+    }
+    //var enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
+    var flag = "";
+    if (purchaseObj.alignment == alignmentType.enemy) {flag = " enemy";}
+    else if (purchaseObj.id == unitType.totalSick ) {flag = " sick";}
+    s += "<td class='itemname" + flag + "'>" + purchaseObj.getQtyName(0) + ": </td>";
 
     var action = (isValid(population[objId])) ? "display_pop" : "display"; //xxx Hack
     s += "<td class='number'><span data-action='" + action + "'>0</span></td>";
