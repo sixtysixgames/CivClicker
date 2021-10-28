@@ -457,15 +457,27 @@ function updateUpgrades() {
 
     // show the alert on the upgrades tab if one is available
     ui.show("#upgradesSelect .info", false);
+    ui.show("#deitySelect .info", false);
+    ui.show("#conquestSelect .info", false);
+    ui.show("#tradeSelect .info", false);
     for (var s = 0; s < upgradeData.length; s++) {
         if (canPurchase(upgradeData[s]) && !upgradeData[s].owned) {
-            debug("canPurchase: " + upgradeData[s].id);
-            ui.show("#upgradesSelect .info", true);
-            break;
+            if (upgradeData[s].subType === subTypes.upgrade) {
+                ui.show("#upgradesSelect .info", true);
+            }
+            if (upgradeData[s].subType === subTypes.deity || upgradeData[s].subType === subTypes.pantheon) {
+                ui.show("#deitySelect .info", true);
+            }
+            if (upgradeData[s].subType === subTypes.conquest) {
+                ui.show("#conquestSelect .info", true);
+            }
+            if (upgradeData[s].subType === subTypes.trade) {
+                ui.show("#tradeSelect .info", true);
+            }
+            //break;
         }
     }
     
-
     // Deity techs
     ui.show("#deityPane .notYet", (!hasDomain && !canSelectDomain));
     ui.find("#renameDeity").disabled = (!civData.worship.owned);
