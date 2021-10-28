@@ -347,7 +347,7 @@ function doSlaughterMulti(attacker) {
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
     //var target = lootable[Math.floor(Math.random() * lootable.length)];
-    var targetID = getRandomResource();
+    var targetID = getRandomLootableResource();
     var target = civData[targetID];
     if (isValid(target) && target.owned > 0) {
         var stolenQty = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
@@ -484,7 +484,7 @@ function doEsiege(siegeObj, targetObj) {
     if (!getCombatants(siegeObj.place, siegeObj.alignment).length &&
         getCombatants(targetObj.place, targetObj.alignment).length) {
         //the siege engines are undefended; maybe capture them.
-        if ((targetObj.alignment == alignmentType.player) && civData.mathematics.owned) { //Can we use them?
+        if ((targetObj.alignment == alignmentType.player) && civData.wheel.owned) { //Can we use them?
             gameLog("Captured " + prettify(siegeObj.owned) + " enemy siege engines.");
             civData.siege.owned += siegeObj.owned; //capture them
         }
