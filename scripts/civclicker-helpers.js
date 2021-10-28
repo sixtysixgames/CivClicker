@@ -212,8 +212,8 @@ function getRandomBuilding() {
     }
     return "";
 }
-//Selects a random sackable building based on its proportions in the current distribution.
-function getRandomResource() {
+//Selects a random lootable resource based on its proportions in the current distribution.
+function getRandomLootableResource() {
     var i;
     var total = 0;
     for (i = 0; i < lootable.length; ++i) {
@@ -229,6 +229,21 @@ function getRandomResource() {
         if (chance > num) { return lootable[i].id; }
     }
     return "";
+}
+function getRandomTradeableResource() {
+    var i;
+    var total = 0;
+    var tradeable = [];
+    for (i = 0; i < lootable.length; ++i) {
+        if (lootable[i].owned > 0) {
+            tradeable.push(lootable[i]);
+        }
+    }
+    if (tradeable.length == 0) { return ""; }
+
+    var selected = tradeable[Math.floor(Math.random() * tradeable.length)];
+    return selected;
+    
 }
 //xxx Eventually, we should have events like deaths affect morale (scaled by %age of total pop)
 function adjustMorale(delta) {
