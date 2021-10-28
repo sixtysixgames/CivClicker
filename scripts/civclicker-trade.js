@@ -15,30 +15,19 @@ function startTrader() {
     // Set timer length (12 sec + 5 sec/upgrade)
     curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
 
-    //then set material and requested amount
-    //var tradeItems = [ // Item and base amount
-    //    { materialId: "food", requested: 5000 },
-    //    { materialId: "wood", requested: 5000 },
-    //    { materialId: "stone", requested: 5000 },
-    //    { materialId: "skins", requested: 500 },
-    //    { materialId: "herbs", requested: 500 },
-    //    { materialId: "ore", requested: 500 },
-    //    { materialId: "leather", requested: 250 },
-    //    { materialId: "metal", requested: 250 }
-    //];
+    //var selected = lootable[Math.floor(Math.random() * lootable.length)];
+    // select a resource the player actually has some to trade
+    var selected = getRandomTradeableResource();
+    if (isValid(selected)) {
+        curCiv.trader.materialId = selected.id;
+        curCiv.trader.requested = selected.baseTradeAmount * (Math.ceil(Math.random() * 100)); // Up to 20x amount
+        // between 75% and 100% of resource limit
+        var limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25)
+        curCiv.trader.requested = Math.min(selected.limit, curCiv.trader.requested);
 
-    //// Randomly select and merge one of the above.
-    //var selected = tradeItems[Math.floor(Math.random() * tradeItems.length)];
-    //curCiv.trader.materialId = selected.materialId;
-    //curCiv.trader.requested = selected.requested * (Math.ceil(Math.random() * 100)); // Up to 20x amount
-
-    var selected = lootable[Math.floor(Math.random() * lootable.length)];
-    curCiv.trader.materialId = selected.id;
-    curCiv.trader.requested = selected.baseTradeAmount * (Math.ceil(Math.random() * 100)); // Up to 20x amount
-
-    curCiv.trader.userTraded = false; // has the user sold requested
-
-    updateTrader();
+        curCiv.trader.userTraded = false; // has the user sold requested
+        updateTrader();
+    }
 }
 
 function trade() {
@@ -57,11 +46,6 @@ function trade() {
     curCiv.trader.userTraded = true;
     ++civData.gold.owned;
     updateResourceTotals();
-
-    // gain 1% when we sell;  see buy() for decreasing prices
-    //curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount * 0.01);
-    //curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
-    //updateTradeButton(materialId, curCiv[materialId].tradeAmount);
 
     gameLog("Traded " + prettify(curCiv.trader.requested) + " " + material.getQtyName(curCiv.trader.requested));
 }
