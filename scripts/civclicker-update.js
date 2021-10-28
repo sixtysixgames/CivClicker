@@ -94,6 +94,7 @@ function updateAfterReset() {
 
 function updateTrader() {
     var isHere = isTraderHere();
+    debug("isHere=" + isHere);
     if (isHere) {
         ui.find("#tradeType").innerHTML = civData[curCiv.trader.materialId].getQtyName(curCiv.trader.requested);
         ui.find("#tradeRequested").innerHTML = prettify(curCiv.trader.requested);
@@ -636,6 +637,12 @@ function updateMorale() {
     else { happinessRank = 5; }
 
     elt.className = "happy-" + happinessRank;
+
+    ui.show("#morale1", happinessRank == 1);
+    ui.show("#morale2", happinessRank == 2);
+    ui.show("#morale3", happinessRank == 3);
+    ui.show("#morale4", happinessRank == 4);
+    ui.show("#morale5", happinessRank == 5);
 }
 
 function addWonderSelectText() {
@@ -657,7 +664,7 @@ function addWonderSelectText() {
 
 //updates the display of wonders and wonder building
 function updateWonder() {
-    var haveTech = (civData.architecture.owned && civData.civilservice.owned);
+    var haveTech = (civData.architecture.owned && civData.monotheism.owned);
     var isLimited = isWonderLimited();
     var lowItem = getWonderLowItem();
 
