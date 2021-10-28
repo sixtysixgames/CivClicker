@@ -206,12 +206,11 @@ function setPantheonUpgradeRowText(upgradeObj) {
 
 // Dynamically create the upgrade purchase buttons.
 function addUpgradeRows() {
-    ui.find("#upgradesPane").innerHTML +=
-        "<h3>Purchased Upgrades</h3>" + "<div id='purchasedUpgrades'></div>";
+    //ui.find("#pupgradesContainer").innerHTML += "";
 
     // Fill in any pre-existing stubs.
     upgradeData.forEach(function (elem) {
-        if (elem.subType == subTypes.upgrade) { return; } // Did these above.
+        if (elem.subType == subTypes.upgrade) { return; } // Did these in getUpgradeRowText.
         if (elem.subType == subTypes.pantheon) { setPantheonUpgradeRowText(elem); }
         else { // One of the 'atypical' upgrades not displayed in the main upgrade list.
             var stubElem = document.getElementById(elem.id + "Row");
