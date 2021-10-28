@@ -506,27 +506,41 @@ function migrateGameData(loadVar, settingsVarReturn) {
 
     //v1.4.11 - carpentry
     if (!isValid(loadVar.curCiv.carpentry) && isValid(loadVar.curCiv.masonry.owned)) {
-        loadVar.curCiv.carpentry = { owned: 1 };
+        loadVar.curCiv.carpentry = { owned: loadVar.curCiv.masonry.owned };
     }
 
     //v1.4.19 - engineering, rampart, battlement
     if (!isValid(loadVar.curCiv.engineering) && isValid(loadVar.curCiv.architecture.owned)) {
-        loadVar.curCiv.engineering = { owned: 1 };
+        loadVar.curCiv.engineering = { owned: loadVar.curCiv.architecture.owned };
     }
 
     //v1.4.20 - more upgrades
     if (!isValid(loadVar.curCiv.farming) && isValid(loadVar.curCiv.flensing.owned)) {
-        loadVar.curCiv.farming = { owned: 1 };
+        loadVar.curCiv.farming = { owned: loadVar.curCiv.flensing.owned };
     }
     if (!isValid(loadVar.curCiv.agriculture) && isValid(loadVar.curCiv.croprotation.owned)) {
-        loadVar.curCiv.agriculture = { owned: 1 };
+        loadVar.curCiv.agriculture = { owned: loadVar.curCiv.croprotation.owned };
     }
     if (!isValid(loadVar.curCiv.metalwork) && isValid(loadVar.curCiv.weaponry.owned)) {
-        loadVar.curCiv.metalwork = { owned: 1 };
+        loadVar.curCiv.metalwork = { owned: loadVar.curCiv.weaponry.owned };
     }
 
     //v1.4.21 - more upgrades
     if (!isValid(loadVar.curCiv.mining) && isValid(loadVar.curCiv.prospecting.owned)) {
-        loadVar.curCiv.mining = { owned: 1 };
+        loadVar.curCiv.mining = { owned: loadVar.curCiv.prospecting.owned };
+    }
+
+    // v1.4.22 - theism
+    if (!isValid(loadVar.curCiv.theism) && isValid(loadVar.curCiv.writing.owned)) {
+        loadVar.curCiv.theism = { owned: loadVar.curCiv.writing.owned };
+    }
+
+    // v1.4.23 - felling
+    if (!isValid(loadVar.curCiv.felling) && isValid(loadVar.curCiv.harvesting.owned)) {
+        loadVar.curCiv.felling = { owned: loadVar.curCiv.harvesting.owned };
+    }
+    // v1.4.24 - quarrying
+    if (!isValid(loadVar.curCiv.quarrying) && isValid(loadVar.curCiv.mining.owned)) {
+        loadVar.curCiv.quarrying = { owned: loadVar.curCiv.mining.owned };
     }
 }
