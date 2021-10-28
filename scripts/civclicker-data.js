@@ -82,7 +82,7 @@ function getCivData() {
             baseTradeAmount: 50, // the least on offer
             get limit() {
                 var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return 50 + (civData.tannery.owned * bonus);
+                return civData.tannery.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -93,7 +93,7 @@ function getCivData() {
             baseTradeAmount: 50, // the least on offer
             get limit() {
                 var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return 50 + (civData.apothecary.owned * bonus);
+                return civData.apothecary.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -104,7 +104,7 @@ function getCivData() {
             baseTradeAmount: 50, // the least on offer
             get limit() {
                 var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return 50 + (civData.smithy.owned * bonus);
+                return civData.smithy.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -112,11 +112,12 @@ function getCivData() {
             id: resourceType.piety, name: "piety",
             vulnerable: false, // Can't be stolen
             get limit() {
-                var bonus1 = ((civData.theism.owned ? 1 : 0) * 50);
-                var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
-                var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
-                var bonus = bonus1 + bonus2 + bonus3;
-                return 50 + (civData.temple.owned * 50) + (civData.temple.owned * bonus);
+                //var bonus1 = ((civData.theism.owned ? 2 : 1) * 10);
+                //var bonus2 = ((civData.polytheism.owned ? 2 : 1) * 25);
+                //var bonus3 = ((civData.monotheism.owned ? 2 : 1) * 50);
+                //var bonus = bonus1 + bonus2 + bonus3;
+                var bonus = getPietyBonus();
+                return (civData.temple.owned * 50) + (civData.temple.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
@@ -161,8 +162,6 @@ function getCivData() {
             },
             set effectText(value) { return this.require; }, // Only here for JSLint.
             update: function () {
-                // TODO: need better way to do this
-                //document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
                 updateNote(this.id, this.effectText);
             }
         }),
@@ -181,29 +180,25 @@ function getCivData() {
         new Building({
             id: buildingType.barn, singular: "barn", plural: "barns",
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 10, skins: 5 },
+            require: { wood: 100, stone: 10 },
             get effectText() {
-                var barnBonus = ((civData.granaries.owned ? 2 : 1) * 200);
-                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
-                return "+" + barnBonus + " food storage; +" + bonus2 + " skin storage";
+                var fbonus = ((civData.granaries.owned ? 2 : 1) * 200);
+                var sbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + fbonus + " food storage; +" + sbonus + " skin storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
-                // TODO: need better way to do this
-                //document.getElementById(this.id + "Note").innerHTML = ": " + this.effectText;
-                // like this perhaps ?
                 updateNote(this.id, this.effectText);
             }
         }),
         new Building({
             id: buildingType.woodstock, singular: "wood stockpile", plural: "wood stockpiles",
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 10, herbs: 5 },
-            //effectText: "+200 wood storage; +100 herb storage"
+            require: { wood: 100, stone: 10 },
             get effectText() {
                 var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
-                return "+" + wbonus + " wood storage; +" + bonus2 + " herb storage";
+                var hbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + wbonus + " wood storage; +" + hbonus + " herb storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -213,12 +208,11 @@ function getCivData() {
         new Building({
             id: buildingType.stonestock, singular: "stone stockpile", plural: "stone stockpiles",
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 10, ore: 5 },
-            //effectText: "+200 stone storage; +100 ore storage"
+            require: { wood: 100, stone: 10 },
             get effectText() {
-                var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                var bonus2 = ((civData.storehouses.owned ? 2 : 1) * 100);
-                return "+" + wbonus + " stone storage; +" + bonus2 + " ore storage";
+                var sbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
+                var obonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                return "+" + sbonus + " stone storage; +" + obonus + " ore storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -229,10 +223,9 @@ function getCivData() {
             id: buildingType.tannery, singular: "tannery", plural: "tanneries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, skins: 5 },
-            //effectText: "allows 1 tanner; +50 leather storage"
             get effectText() {
-                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
-                return "allows 1 tanner; +" + bonus2 + " leather storage";
+                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                return "allows 1 tanner; +" + bonus + " leather storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -243,10 +236,9 @@ function getCivData() {
             id: buildingType.smithy, singular: "smithy", plural: "smithies",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, ore: 5 },
-            //effectText: "allows 1 blacksmith; +50 metal storage"
             get effectText() {
-                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
-                return "allows 1 blacksmith; +" + bonus2 + " metal storage";
+                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                return "allows 1 blacksmith; +" + bonus + " metal storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -257,10 +249,9 @@ function getCivData() {
             id: buildingType.apothecary, singular: "apothecary", plural: "apothecaries",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
-            //effectText: "allows 1 healer; +50 potion storage"
             get effectText() {
-                var bonus2 = ((civData.storerooms.owned ? 2 : 1) * 50);
-                return "allows 1 healer; +" + bonus2 + " potion storage";
+                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                return "allows 1 healer; +" + bonus + " potion storage";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -273,10 +264,11 @@ function getCivData() {
             require: { wood: 30, stone: 120, herbs: 10 },
             //effectText: "allows 1 cleric; +50 piety storage",
             get effectText() {
-                var bonus1 = ((civData.theism.owned ? 1 : 0) * 50);
-                var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
-                var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
-                var bonus = 50 + bonus1 + bonus2 + bonus3;
+                //var bonus1 = ((civData.theism.owned ? 1 : 0) * 50);
+                //var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
+                //var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
+                //var bonus = 50 + bonus1 + bonus2 + bonus3;
+                var bonus = 50 + getPietyBonus();
                 return "allows 1 cleric; +" + bonus + " piety storage";
             },
             set effectText(value) { return this.effectText; },
@@ -374,19 +366,19 @@ function getCivData() {
         // Upgrades
         new Upgrade({
             id: "domestication", name: "Domestication", subType: subTypes.upgrade,
-            prereqs: { farmer: 1 },
+            //prereqs: { farmer: 1 },
             require: { food: 20 },
             effectText: "Unlock more upgrades"
         }),
         new Upgrade({
             id: "carpentry", name: "Carpentry", subType: subTypes.upgrade,
-            prereqs: { woodcutter: 1 },
+            //prereqs: { woodcutter: 1 },
             require: { wood: 20 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
             id: "quarrying", name: "Quarrying", subType: subTypes.upgrade,
-            prereqs: { miner: 1 },
+            //prereqs: { miner: 1 },
             require: { stone: 20 },
             effectText: "Unlock more buildings and upgrades"
         }),
@@ -659,7 +651,7 @@ function getCivData() {
             id: "wheel", name: "The Wheel", subType: subTypes.upgrade,
             prereqs: { masonry: true },
             require: { wood: 500, stone: 500 },
-            effectText: "Build mills. Create siege engines"
+            effectText: "Unlock more buildings"
         }),
 
         new Upgrade({
@@ -952,10 +944,6 @@ function getCivData() {
             efficiency_base: 0.2,
             get efficiency() {
                 return farmerMods(this.efficiency_base);
-                //return this.efficiency_base + (0.1 * (
-                //    + civData.domestication.owned + civData.ploughshares.owned + civData.irrigation.owned
-                //    + civData.croprotation.owned + civData.selectivebreeding.owned + civData.fertilisers.owned
-                //    + civData.blessing.owned));
             },
             set efficiency(value) { this.efficiency_base = value; },
             effectText: "Automatically harvest food"
@@ -964,7 +952,7 @@ function getCivData() {
             id: unitType.woodcutter, singular: "woodcutter", plural: "woodcutters",
             source: unitType.unemployed,
             //efficiency: 0.5,
-            efficiency_base: 0.45,
+            efficiency_base: 0.49,
             get efficiency() {
                 return woodcutterMods(this.efficiency_base);
             },
@@ -975,7 +963,7 @@ function getCivData() {
             id: unitType.miner, singular: "miner", plural: "miners",
             source: unitType.unemployed,
             //efficiency: 0.2,
-            efficiency_base: 0.15,
+            efficiency_base: 0.19,
             get efficiency() {
                 return minerMods(this.efficiency_base);
             },
@@ -1095,8 +1083,8 @@ function getCivData() {
             efficiency: 0.05,
             onWin: function () { doWolves(this); },
             killFatigue: (1 / 2), // Max fraction that leave after killing the last person
-            killStop: (0.9), // Chance of an attacker leaving after killing a person
-            killMax: (1.0), // Max fraction that will kill
+            killStop: (1.0), // Chance of an attacker leaving after killing a person
+            killMax: (0.9), // Max fraction that will kill
             species: speciesType.animal,
             effectText: "Eat your workers"
         }),
@@ -1271,7 +1259,7 @@ function getCivData() {
         new Achievement({
             id: "clowderAch", name: "Clowder",
             test: function () { return civData.cat.owned >= 100; },
-            effectText: "Own a hundred cats"
+            effectText: "Own one hundred cats"
         }),
         //other population
         //Plagued achievement requires sick people to outnumber healthy
@@ -1373,3 +1361,4 @@ function getCivData() {
 
     return civData;
 }
+// 210916 = 1368
