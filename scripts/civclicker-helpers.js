@@ -243,7 +243,7 @@ function getRandomTradeableResource() {
 
     var selected = tradeable[Math.floor(Math.random() * tradeable.length)];
     return selected;
-    
+
 }
 //xxx Eventually, we should have events like deaths affect morale (scaled by %age of total pop)
 function adjustMorale(delta) {
@@ -266,8 +266,6 @@ function adjustMorale(delta) {
             curCiv.morale.efficiency = min;
         }
         updateMorale(); //update to player
-
-        //debug("adjustMorale.delta: " + delta + ". curCiv.morale.efficiency: " + curCiv.morale.efficiency + ". fraction: " + fraction);
     }
 }
 
@@ -432,7 +430,7 @@ function pickStarveTarget() {
     //xxx Remove this hard-coded list.  Priority of least to most importance
     // todo: should probably be random job
     var jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
-        unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
+    unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
 
     for (modNum = 0; modNum < modList.length; ++modNum) {
         for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
@@ -444,4 +442,15 @@ function pickStarveTarget() {
     if (civData.soldierParty.owned > 0) { return civData.soldierParty; }
 
     return null;
+}
+
+function getPietyBonus() {
+    var bonus1 = ((civData.theism.owned ? 1 : 0) * 10);
+    var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 25);
+    var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
+
+    //var bonus1 = (civData.theism.owned ? 2 : 1) * 10;
+    //var bonus2 = (civData.polytheism.owned ? 2 : 1) * 25;
+    //var bonus3 = (civData.monotheism.owned ? 2 : 1) * 50;
+    return bonus1 + bonus2 + bonus3;
 }
