@@ -169,13 +169,13 @@ function getCivData() {
         new Building({
             id: buildingType.mansion, singular: "mansion", plural: "mansions",
             prereqs: { engineering: true },
-            require: { wood: 200, stone: 200, leather: 20, metal: 20 },
+            require: { wood: 500, stone: 500, leather: 100, metal: 100 },
             effectText: "+50 max pop."
         }),
         new Building({
             id: buildingType.palace, singular: "palace", plural: "palaces",
             prereqs: { architecture: true },
-            require: { wood: 1000, stone: 1000, leather: 100, metal: 100, gold: 10 },
+            require: { wood: 1000, stone: 1000, leather: 250, metal: 250, gold: 10 },
             effectText: "+150 max pop."
         }),
         new Building({
@@ -198,7 +198,7 @@ function getCivData() {
         new Building({
             id: buildingType.woodstock, singular: "wood stockpile", plural: "wood stockpiles",
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 10, skins: 5 },
+            require: { wood: 100, stone: 10, herbs: 5 },
             //effectText: "+200 wood storage; +100 herb storage"
             get effectText() {
                 var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
@@ -213,7 +213,7 @@ function getCivData() {
         new Building({
             id: buildingType.stonestock, singular: "stone stockpile", plural: "stone stockpiles",
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 10, skins: 5 },
+            require: { wood: 100, stone: 10, ore: 5 },
             //effectText: "+200 stone storage; +100 ore storage"
             get effectText() {
                 var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
@@ -306,7 +306,7 @@ function getCivData() {
         new Building({
             id: buildingType.graveyard, singular: "graveyard", plural: "graveyards",
             prereqs: { masonry: true },
-            require: { wood: 50, stone: 200, herbs: 10 },
+            require: { wood: 100, stone: 250 },
             vulnerable: false, // Graveyards can't be sacked
             effectText: "contains 100 graves",
             onGain: function (num) { if (num === undefined) { num = 1; } digGraves(num); }
@@ -437,13 +437,13 @@ function getCivData() {
         new Upgrade({
             id: "masonry", name: "Masonry", subType: subTypes.upgrade,
             prereqs: { carpentry: true },
-            require: { wood: 200, stone: 200 },
+            require: { wood: 250, stone: 250 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
             id: "metalwork", name: "Metalwork", subType: subTypes.upgrade,
             prereqs: { mining: true },
-            require: { wood: 200, stone: 200, ore: 50 },
+            require: { wood: 250, stone: 250, ore: 50 },
             effectText: "Unlock more buildings and upgrades"
         }),
         
@@ -476,7 +476,7 @@ function getCivData() {
         new Upgrade({
             id: "irrigation", name: "Irrigation", subType: subTypes.upgrade,
             prereqs: { domestication: true, masonry: true },
-            require: { wood: 500, stone: 200 },
+            require: { wood: 500, stone: 250 },
             effectText: "Increase farmer food output"
         }),
 
@@ -540,7 +540,7 @@ function getCivData() {
         new Upgrade({
             id: "tenements", name: "Tenements", subType: subTypes.upgrade,
             prereqs: { construction: true },
-            require: { food: 200, wood: 500, stone: 500 },
+            require: { food: 250, wood: 500, stone: 500 },
             effectText: "Houses support +2 workers",
             onGain: function () {
                 updatePopulation();//due to population limits changing 
@@ -602,7 +602,7 @@ function getCivData() {
             id: "palisade", name: "Palisades", subType: subTypes.upgrade,
             efficiency: 0.01, // Subtracted from attacker efficiency.
             prereqs: { engineering: true },
-            require: { wood: 2000, stone: 1000 },
+            require: { wood: 2500, stone: 1000 },
             effectText: "Enemies do less damage"
         }),
         new Upgrade({
@@ -633,19 +633,19 @@ function getCivData() {
         new Upgrade({
             id: "advweaponry", name: "Advanced Weaponry", subType: subTypes.upgrade,
             prereqs: { weaponry: true, engineering: true, soldier: 100 },
-            require: { wood: 2000, metal: 2000, leather: 1000 },
+            require: { wood: 2500, metal: 2500, leather: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advshields", name: "Advanced Shields", subType: subTypes.upgrade,
             prereqs: { shields: true, engineering: true, soldier: 100 },
-            require: { wood: 2000, leather: 2000, metal: 1000 },
+            require: { wood: 2500, leather: 2500, metal: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advarmour", name: "Advanced Armour", subType: subTypes.upgrade,
             prereqs: { armour: true, engineering: true, soldier: 100 },
-            require: { leather: 2000, metal: 2000 },
+            require: { leather: 2500, metal: 2500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
@@ -684,39 +684,39 @@ function getCivData() {
         new Upgrade({
             id: "writing", name: "Writing", subType: subTypes.upgrade,
             prereqs: { theism: true },
-            require: { skins: 1000, piety: 2000 },
+            require: { skins: 1000, piety: 2500 },
             effectText: "Increase cleric piety generation. Unlock more upgrades"
         }),
         new Upgrade({
             id: "mathematics", name: "Mathematics", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { metal: 2000, piety: 2000 },
+            require: { metal: 2500, piety: 2500 },
             effectText: "Increase metal production"
         }),
         new Upgrade({
             id: "astronomy", name: "Astronomy", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { leather: 2000, piety: 2000 },
+            require: { leather: 2500, piety: 2500 },
             effectText: "Increase leather efficiency"
         }),
         new Upgrade({
             id: "medicine", name: "Medicine", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { potions: 2000, piety: 2000 },
+            require: { potions: 2500, piety: 2500 },
             effectText: "Increase potion production"
         }),
 
         new Upgrade({
             id: "administration", name: "Administration", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { stone: 2000, skins: 2000 },
+            require: { stone: 2500, skins: 2500 },
             effectText: "Increase land gained from raiding"
         }),
         
         new Upgrade({
             id: "codeoflaws", name: "Code of Laws", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { stone: 2000, skins: 2000 },
+            require: { stone: 2500, skins: 2500 },
             effectText: "Reduce unhappiness caused by overcrowding"
         }),
         
@@ -741,13 +741,13 @@ function getCivData() {
         new Upgrade({
             id: "feudalism", name: "Feudalism", subType: subTypes.upgrade,
             prereqs: { guilds: true },
-            require: { piety: 20000 },
+            require: { piety: 25000 },
             effectText: "Further increase basic resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
             id: "serfs", name: "Serfs", subType: subTypes.upgrade,
             prereqs: { guilds: true },
-            require: { piety: 20000 },
+            require: { piety: 25000 },
             effectText: "Idle workers increase resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
@@ -858,19 +858,19 @@ function getCivData() {
         }),
         new Upgrade({
             id: "currency", name: "Currency", subType: subTypes.trade,
-            require: { food: 1000, wood: 1000, stone: 1000, gold: 10 },
+            require: { gold: 10 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         new Upgrade({
             id: "commerce", name: "Commerce", subType: subTypes.trade,
             prereqs: { currency: true },
-            require: { food: 2000, wood: 2000, stone: 2000, skins: 1000, herbs: 1000, ore: 1000, gold: 50 },
+            require: { gold: 50 },
             effectText: "Traders arrive more frequently, stay longer"
         }),
         new Upgrade({
             id: "cornexchange", name: "Corn Exchange", subType: subTypes.trade,
             prereqs: { commerce: true },
-            require: { food: 5000, wood: 5000, stone: 5000, skins: 2000, herbs: 2000, ore: 2000, leather: 1000, potions: 1000, metal: 1000, gold: 100 },
+            require: { gold: 100 },
             effectText: "Traders set the cost of resources"
         }),
         // Prayers
@@ -1194,7 +1194,7 @@ function getCivData() {
             id: unitType.siege, singular: "siege engine", plural: "siege engines",
             efficiency: 0.1, // 10% chance to hit
             prereqs: { standard: true, wheel: true },
-            require: { wood: 200, leather: 50, metal: 50 },
+            require: { wood: 250, leather: 50, metal: 50 },
             species: speciesType.mechanical,
             place: placeType.party,
             salable: false,
