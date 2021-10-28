@@ -237,7 +237,7 @@
                     <div id="upgradesSelect" class="paneSelector" data-target="upgradesPane" onclick="paneSelect(this)">
                         Upgrades
                         <div class="alert">!</div>
-                        <div class="info">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="deitySelect" class="paneSelector" data-target="deityPane" onclick="paneSelect(this)">
                         Deity
@@ -318,24 +318,37 @@
                 </div>
 
                 <div id="upgradesPane" class="selectPane">
-                    <div id="wondersContainer">
-                        <h3>Wonders</h3>
-                        <span id="startWonderLine"><button id="startWonder" onmousedown="startWonder()">Start Building Wonder</button></span>
-                        <div id="wonderInProgress">
-                            <span class="wonderTitle">Progress on <span id="wonderNameP">Wonder</span> - <span id="progressNumber">0</span>%</span> - <button id="renameWonder" onmousedown="renameWonder()">Rename</button>
-                            <div id="progressContainer"><div id="progressBar"></div></div>
-                            <div id="lowResources">Limited<span id="limited"> by low resources</span></div>
-                            <div id="speedWonderGroup">
-                                <br /><button id="speedWonder" onmousedown="speedWonder()">Speed Wonder</button>
-                                <span id="speedWonderCost" class="cost">100 gold</span><span class="note">: Increase wonder progress</span>
+                    <div class="columns">
+                        <div class="column left">
+                            <table id="upgrades"></table>
+                            <div id="pupgradesContainer">
+                                <h3>Purchased Upgrades</h3>
+                                <div id='purchasedUpgrades'>
+                                    <!-- populated by JavaScript -->
+                                </div>
+                                
                             </div>
                         </div>
-                        <div id="wonderCompleted">
-                            <div class="wonderTitle"><span id="wonderNameC">Wonder</span> Completed! Choose Bonus:</div>
+                        <div class="column right">
+                            <div id="wondersContainer">
+                                <h3>Wonders</h3>
+                                <span id="startWonderLine"><button id="startWonder" onmousedown="startWonder()">Start Building Wonder</button></span>
+                                <div id="wonderInProgress">
+                                    <span class="wonderTitle">Progress on <span id="wonderNameP">Wonder</span> - <span id="progressNumber">0</span>%</span> - <button id="renameWonder" onmousedown="renameWonder()">Rename</button>
+                                    <div id="progressContainer"><div id="progressBar"></div></div>
+                                    <div id="lowResources">Limited<span id="limited"> by low resources</span></div>
+                                    <div id="speedWonderGroup">
+                                        <br /><button id="speedWonder" onmousedown="speedWonder()">Speed Wonder</button>
+                                        <span id="speedWonderCost" class="cost">100 gold</span><span class="note">: Increase wonder progress</span>
+                                    </div>
+                                </div>
+                                <div id="wonderCompleted">
+                                    <div class="wonderTitle"><span id="wonderNameC">Wonder</span> Completed! Choose Bonus:</div>
+                                </div>
+                                <table id="pastWonders"><tr><td></td></tr></table>
+                            </div>
                         </div>
-                        <table id="pastWonders"><tr><td></td></tr></table>
                     </div>
-                    <table id="upgrades"></table>
                 </div>
 
                 <div id="deityPane" class="selectPane">
@@ -487,35 +500,41 @@
                 </div>
 
                 <div id="tradePane" class="selectPane">
-                    <div class="notYet">
-                        You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
-                    </div>
-                    <div id="tradeContainer">
-                        Trader offers 1 gold for <span id="tradeRequested">...</span> <span id="tradeType">...</span>
-                        for the next <span id="traderTimer">...</span>.
-                        <br />
-                        <button id="tradeButton" onmousedown="trade()">Trade</button>
-                    </div>
-                    <div id="noTrader">
-                        No trader visiting
-                    </div>
-                    <span id="tradeRow">
-                        <!-- populated by javascript -->
-                    </span>
-                    <div id="tradeUpgradeContainer">
-                        <span id="currencyRow"></span>
-                        <span id="commerceRow"></span>
-                        <span id="cornexchangeRow"></span>
-                        <h4>Buy Resources (1 gold)</h4>
-                        <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
-                        <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
-                        <button class="tradeResource" onmousedown="buy('stone')">Buy <span id="stoneCost">5000</span> Stone</button><br />
-                        <button class="tradeResource" onmousedown="buy('skins')">Buy <span id="skinsCost">500</span> Skins</button><br />
-                        <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
-                        <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
-                        <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
-                        <button class="tradeResource" onmousedown="buy('potions')">Buy <span id="potionsCost">250</span> Potions</button><br />
-                        <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
+                    <div class="columns">
+                        <div class="column left width25">
+                            <div id="tradeUpgradeContainer">
+                                <span id="currencyRow"></span>
+                                <span id="commerceRow"></span>
+                                <span id="cornexchangeRow"></span>
+                                <h4>Buy Resources (1 gold)</h4>
+                                <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
+                                <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
+                                <button class="tradeResource" onmousedown="buy('stone')">Buy <span id="stoneCost">5000</span> Stone</button><br />
+                                <button class="tradeResource" onmousedown="buy('skins')">Buy <span id="skinsCost">500</span> Skins</button><br />
+                                <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
+                                <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
+                                <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
+                                <button class="tradeResource" onmousedown="buy('potions')">Buy <span id="potionsCost">250</span> Potions</button><br />
+                                <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
+                            </div>
+                        </div>
+                        <div class="column right">
+                            <div class="notYet">
+                                You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
+                            </div>
+                            <div id="tradeContainer">
+                                Trader offers 1 gold for <span id="tradeRequested">...</span> <span id="tradeType">...</span>
+                                for the next <span id="traderTimer">...</span>.
+                                <br />
+                                <button id="tradeButton" onmousedown="trade()">Trade</button>
+                            </div>
+                            <div id="noTrader">
+                                No trader visiting
+                            </div>
+                            <span id="tradeRow">
+                                <!-- populated by javascript -->
+                            </span>
+                        </div>
                     </div>
                 </div>
 
