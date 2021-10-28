@@ -546,7 +546,7 @@ function addAchievementRows() {
     var s = '';
     achData.forEach(function (elem) {
         s += (
-            '<div class="achievement" title="' + elem.getQtyName() + '">'
+            '<div class="achievement" title="' + elem.getQtyName() + ": " + elem.effectText + '">'
             + '<div class="unlockedAch" id="' + elem.id + '">' + elem.getQtyName() + '</div>'
             + '</div>'
         );
