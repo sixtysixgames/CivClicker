@@ -88,7 +88,6 @@ function doLabourers() {
         //then set wonder.stage so things will be updated appropriately
         ++curCiv.curWonder.stage;
     } else { //we're still building
-
         prod = getWonderProduction();
 
         //remove resources
@@ -97,6 +96,8 @@ function doLabourers() {
             resource.net -= prod;
         });
 
+        // labourers use prods more efficiently with mods
+        prod += getLabourerMods();
         //increase progress
         curCiv.curWonder.progress += prod / (1000000 * getWonderCostMultiplier());
     }
@@ -129,5 +130,14 @@ function isWonderLimited() {
         return false;
     }
     return (prod < civData.labourer.owned);
+}
 
+function getLabourerMods() {
+    var mod = 0;
+    mod += civData.civilservice.owned ? 0.0001 : 0;
+    mod += civData.guilds.owned ? 0.0002 : 0;
+    mod += civData.feudalism.owned ? 0.0005 : 0;
+    mod += civData.serfs.owned ? 0.0005 : 0;
+    mod += civData.nationalism.owned ? 0.001 : 0;
+    return mod;
 }
