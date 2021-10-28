@@ -94,7 +94,6 @@ function updateAfterReset() {
 
 function updateTrader() {
     var isHere = isTraderHere();
-    debug("isHere=" + isHere);
     if (isHere) {
         ui.find("#tradeType").innerHTML = civData[curCiv.trader.materialId].getQtyName(curCiv.trader.requested);
         ui.find("#tradeRequested").innerHTML = prettify(curCiv.trader.requested);
@@ -239,6 +238,8 @@ function updateResourceTotals() {
 
     // Cheaters don't get names.
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
+    
+    ui.show("#resourcesSelect .info", curCiv.resourceClicks == 22);// neverclick is on
 }
 
 //Update page with numbers
