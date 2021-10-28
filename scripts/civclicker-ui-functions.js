@@ -213,7 +213,6 @@ function onToggleWorksafe(control) {
     return setWorksafe(control.checked);
 }
 
-
 // Generate two HTML <span> texts to display an item's cost and effect note.
 function getCostNote(civObj) {
     // Only add a ":" if both items are present.
@@ -225,13 +224,13 @@ function getCostNote(civObj) {
         + "<span id='" + civObj.id + "Note' class='note'>" + separator + civObj.effectText + "</span>";
 }
 
-
 // TODO: we should probably pass the relevant table to a single function
 // even better would be to use a div with a scrollbars so that no messages are lost
 function gameLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
     var d = new Date();
+    // todo: output some sort of in-game date based on how long played
     var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
 
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
@@ -239,7 +238,7 @@ function gameLog(message) {
         logRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
-        var i = 20; // Number of lines of log to keep.
+        var i = 30; // Number of lines of log to keep. See the logTable in index.html
         while (--i > 1) { ui.find("#log" + i).innerHTML = ui.find("#log" + (i - 1)).innerHTML; }
         //Since ids need to be unique, log1 strips the ids from the log0 elements when copying the contents.
         ui.find("#log1").innerHTML = (
