@@ -116,7 +116,7 @@ function getCivData() {
                 var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
                 var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
                 var bonus = bonus1 + bonus2 + bonus3;
-                return 50 + (civData.temple.owned * bonus);
+                return 50 + (civData.temple.owned * 50) + (civData.temple.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
@@ -276,7 +276,7 @@ function getCivData() {
                 var bonus1 = ((civData.theism.owned ? 1 : 0) * 50);
                 var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
                 var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
-                var bonus = bonus1 + bonus2 + bonus3;
+                var bonus = 50 + bonus1 + bonus2 + bonus3;
                 return "allows 1 cleric; +" + bonus + " piety storage";
             },
             set effectText(value) { return this.effectText; },
@@ -325,7 +325,7 @@ function getCivData() {
         }),
         new Building({
             id: buildingType.fortification, singular: "fortification", plural: "fortifications", efficiency: 0.01,
-            prereqs: { architecture: true },
+            prereqs: { engineering: true },
             //xxx This is testing a new technique that allows a function for the cost items.
             // Eventually, this will take a qty parameter
             get require() {
@@ -374,26 +374,59 @@ function getCivData() {
         // Upgrades
         new Upgrade({
             id: "domestication", name: "Domestication", subType: subTypes.upgrade,
+            prereqs: { farmer: 1 },
             require: { food: 20 },
             effectText: "Unlock more upgrades"
         }),
         new Upgrade({
             id: "carpentry", name: "Carpentry", subType: subTypes.upgrade,
+            prereqs: { woodcutter: 1 },
             require: { wood: 20 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
-            id: "mining", name: "Mining", subType: subTypes.upgrade,
+            id: "quarrying", name: "Quarrying", subType: subTypes.upgrade,
+            prereqs: { miner: 1 },
             require: { stone: 20 },
-            effectText: "Unlock more upgrades"
+            effectText: "Unlock more buildings and upgrades"
         }),
-
+        new Upgrade({
+            id: "skinning", name: "Skinning", subType: subTypes.upgrade,
+            prereqs: { domestication: true },
+            require: { skins: 10 },
+            effectText: "Farmers can collect skins"
+        }),
+        new Upgrade({
+            id: "harvesting", name: "Harvesting", subType: subTypes.upgrade,
+            prereqs: { carpentry: true },
+            require: { herbs: 10 },
+            effectText: "Woodcutters can collect herbs"
+        }),
+        new Upgrade({
+            id: "prospecting", name: "Prospecting", subType: subTypes.upgrade,
+            prereqs: { quarrying: true },
+            require: { ore: 10 },
+            effectText: "Miners can collect ore"
+        }),
         new Upgrade({
             id: "farming", name: "Farming", subType: subTypes.upgrade,
             prereqs: { domestication: true },
             require: { skins: 100, herbs: 100 },
             effectText: "Increase farmer food output.  Unlock more upgrades"
         }),
+        new Upgrade({
+            id: "felling", name: "Felling", subType: subTypes.upgrade,
+            prereqs: { carpentry: true },
+            require: { herbs: 100, ore: 100 },
+            effectText: "Increase woodcutter wood output. Unlock more upgrades"
+        }),
+        new Upgrade({
+            id: "mining", name: "Mining", subType: subTypes.upgrade,
+            prereqs: { quarrying: true },
+            require: { ore: 100, skins: 100 },
+            effectText: "Increase miner stone output. Unlock more upgrades"
+        }),
+        
         new Upgrade({
             id: "agriculture", name: "Agriculture", subType: subTypes.upgrade,
             prereqs: { farming: true },
@@ -404,17 +437,16 @@ function getCivData() {
         new Upgrade({
             id: "masonry", name: "Masonry", subType: subTypes.upgrade,
             prereqs: { carpentry: true },
-            require: { wood: 100, stone: 100 },
+            require: { wood: 200, stone: 200 },
             effectText: "Unlock more buildings and upgrades"
         }),
         new Upgrade({
             id: "metalwork", name: "Metalwork", subType: subTypes.upgrade,
             prereqs: { mining: true },
-            require: { wood: 100, stone: 100, ore: 100 },
+            require: { wood: 200, stone: 200, ore: 50 },
             effectText: "Unlock more buildings and upgrades"
         }),
         
-
         new Upgrade({
             id: "construction", name: "Construction", subType: subTypes.upgrade,
             prereqs: { masonry: true },
@@ -433,18 +465,8 @@ function getCivData() {
             require: { wood: 10000, stone: 10000 },
             effectText: "Unlock more buildings and upgrades"
         }),
-        new Upgrade({
-            id: "skinning", name: "Skinning", subType: subTypes.upgrade,
-            prereqs: { domestication: true },
-            require: { skins: 10 },
-            effectText: "Farmers can collect skins"
-        }),
-        new Upgrade({
-            id: "harvesting", name: "Harvesting", subType: subTypes.upgrade,
-            prereqs: { domestication: true },
-            require: { herbs: 10 },
-            effectText: "Woodcutters can collect herbs"
-        }),
+        
+
         new Upgrade({
             id: "ploughshares", name: "Ploughshares", subType: subTypes.upgrade,
             prereqs: { domestication: true, metalwork: true },
@@ -457,19 +479,26 @@ function getCivData() {
             require: { wood: 500, stone: 200 },
             effectText: "Increase farmer food output"
         }),
+
         new Upgrade({
             id: "butchering", name: "Butchering", subType: subTypes.upgrade,
-            prereqs: { domestication: true, skinning: true },
+            prereqs: { tannery: 1 },
             require: { leather: 40 },
             effectText: "More farmers collect more skins"
         }),
         new Upgrade({
             id: "gardening", name: "Gardening", subType: subTypes.upgrade,
-            prereqs: { domestication: true, harvesting: true },
-            require: { herbs: 40 },
+            prereqs: { apothecary: 1 },
+            require: { potions: 40 },
             effectText: "More woodcutters collect more herbs"
         }),
-        
+        new Upgrade({
+            id: "extraction", name: "Extraction", subType: subTypes.upgrade,
+            prereqs: { prospecting: true, smithy: 1 },
+            require: { metal: 40 },
+            effectText: "More miners collect more ore"
+        }),
+
         new Upgrade({
             id: "flensing", name: "Flensing", subType: subTypes.upgrade,
             prereqs: { farming: true },
@@ -482,48 +511,32 @@ function getCivData() {
             require: { potions: 500, wood: 500 },
             effectText: "Collect herbs more frequently"
         }),
-        
-        
-        new Upgrade({
-            id: "croprotation", name: "Crop Rotation", subType: subTypes.upgrade,
-            prereqs: { agriculture: true },
-            require: { herbs: 5000, piety: 1000 },
-            effectText: "Increase farmer food output"
-        }),
-        new Upgrade({
-            id: "selectivebreeding", name: "Selective Breeding", subType: subTypes.upgrade,
-            prereqs: { agriculture: true },
-            require: { skins: 5000, herbs: 1000 },
-            effectText: "Increase farmer food output"
-        }),
-        new Upgrade({
-            id: "fertilisers", name: "Fertilisers", subType: subTypes.upgrade,
-            prereqs: { agriculture: true },
-            require: { ore: 5000, herbs: 1000 },
-            effectText: "Increase farmer food output"
-        }),
-
-
-        new Upgrade({
-            id: "prospecting", name: "Prospecting", subType: subTypes.upgrade,
-            prereqs: { mining: true },
-            require: { ore: 10 },
-            effectText: "Miners can collect ore"
-        }),
-        new Upgrade({
-            id: "extraction", name: "Extraction", subType: subTypes.upgrade,
-            prereqs: { prospecting: true },
-            require: { stone: 50, ore: 20 },
-            effectText: "More miners collect more ore"
-        }),
         new Upgrade({
             id: "macerating", name: "Macerating", subType: subTypes.upgrade,
             prereqs: { extraction: true },
             require: { metal: 500, stone: 500 },
             effectText: "Collect ore more frequently"
         }),
-
         
+        new Upgrade({
+            id: "croprotation", name: "Crop Rotation", subType: subTypes.upgrade,
+            prereqs: { agriculture: true },
+            require: { herbs: 5000, piety: 5000 },
+            effectText: "Increase farmer food output"
+        }),
+        new Upgrade({
+            id: "selectivebreeding", name: "Selective Breeding", subType: subTypes.upgrade,
+            prereqs: { agriculture: true },
+            require: { skins: 5000, herbs: 5000 },
+            effectText: "Increase farmer food output"
+        }),
+        new Upgrade({
+            id: "fertilisers", name: "Fertilisers", subType: subTypes.upgrade,
+            prereqs: { agriculture: true },
+            require: { ore: 5000, herbs: 5000 },
+            effectText: "Increase farmer food output"
+        }),
+
         new Upgrade({
             id: "tenements", name: "Tenements", subType: subTypes.upgrade,
             prereqs: { construction: true },
@@ -545,7 +558,7 @@ function getCivData() {
         new Upgrade({
             id: "granaries", name: "Granaries", subType: subTypes.upgrade,
             prereqs: { construction: true },
-            require: { wood: 1000, stone: 1000 },
+            require: { wood: 1200, stone: 1200 },
             effectText: "Barns store double the amount of food",
             onGain: function () {
                 updateResourceTotals();//due to resource limits increasing 
@@ -563,7 +576,7 @@ function getCivData() {
         new Upgrade({
             id: "storehouses", name: "Storehouses", subType: subTypes.upgrade,
             prereqs: { construction: true },
-            require: { wood: 500, stone: 500, skins: 100, herbs: 100, ore: 100 },
+            require: { skins: 600, herbs: 600, ore: 600 },
             effectText: "Store double the amount of skins, herbs and ore",
             onGain: function () {
                 updateResourceTotals();//due to resource limits increasing 
@@ -572,7 +585,7 @@ function getCivData() {
         new Upgrade({
             id: "storerooms", name: "Storerooms", subType: subTypes.upgrade,
             prereqs: { construction: true },
-            require: { wood: 250, stone: 250, leather: 50, potions: 50, metal: 50 },
+            require: { leather: 300, potions: 300, metal: 300 },
             effectText: "Store double the amount of leather, potions and metal",
             onGain: function () {
                 updateResourceTotals();//due to resource limits increasing
@@ -601,37 +614,37 @@ function getCivData() {
         }),
         new Upgrade({
             id: "weaponry", name: "Basic Weaponry", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, soldier: 1 },
             require: { wood: 500, metal: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "shields", name: "Basic Shields", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, soldier: 1 },
             require: { wood: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "armour", name: "Basic Armour", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, soldier: 1 },
             require: { metal: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advweaponry", name: "Advanced Weaponry", subType: subTypes.upgrade,
-            prereqs: { weaponry: true, engineering: true },
+            prereqs: { weaponry: true, engineering: true, soldier: 100 },
             require: { wood: 2000, metal: 2000, leather: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advshields", name: "Advanced Shields", subType: subTypes.upgrade,
-            prereqs: { shields: true, engineering: true },
+            prereqs: { shields: true, engineering: true, soldier: 100 },
             require: { wood: 2000, leather: 2000, metal: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advarmour", name: "Advanced Armour", subType: subTypes.upgrade,
-            prereqs: { armour: true, engineering: true },
+            prereqs: { armour: true, engineering: true, soldier: 100 },
             require: { leather: 2000, metal: 2000 },
             effectText: "Improve soldiers"
         }),
@@ -651,7 +664,7 @@ function getCivData() {
 
         new Upgrade({
             id: "theism", name: "Theism", subType: subTypes.upgrade,
-            prereqs: { carpentry: true },
+            prereqs: { cleric: 1 },
             require: { skins: 100, piety: 100 },
             effectText: "Increase cleric piety generation. Increase piety storage"
         }),
@@ -664,84 +677,84 @@ function getCivData() {
         new Upgrade({
             id: "monotheism", name: "Monotheism", subType: subTypes.upgrade,
             prereqs: { polytheism: true },
-            require: { skins: 2000, piety: 5000  },
+            require: { skins: 2500, piety: 5000  },
             effectText: "Increase cleric piety generation. Increase piety storage"
         }),
 
         new Upgrade({
             id: "writing", name: "Writing", subType: subTypes.upgrade,
             prereqs: { theism: true },
-            require: { skins: 500, piety: 100 },
+            require: { skins: 1000, piety: 2000 },
             effectText: "Increase cleric piety generation. Unlock more upgrades"
         }),
         new Upgrade({
             id: "mathematics", name: "Mathematics", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { metal: 1000, piety: 1000 },
-            effectText: "Increase miner efficiency"
+            require: { metal: 2000, piety: 2000 },
+            effectText: "Increase metal production"
         }),
         new Upgrade({
             id: "astronomy", name: "Astronomy", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { leather: 1000, piety: 1000 },
-            effectText: "Increase woodcutter efficiency"
+            require: { leather: 2000, piety: 2000 },
+            effectText: "Increase leather efficiency"
         }),
         new Upgrade({
             id: "medicine", name: "Medicine", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { potions: 1000, piety: 1000 },
+            require: { potions: 2000, piety: 2000 },
             effectText: "Increase potion production"
         }),
 
         new Upgrade({
             id: "administration", name: "Administration", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { stone: 1000, skins: 1000 },
+            require: { stone: 2000, skins: 2000 },
             effectText: "Increase land gained from raiding"
         }),
         
         new Upgrade({
             id: "codeoflaws", name: "Code of Laws", subType: subTypes.upgrade,
             prereqs: { writing: true },
-            require: { stone: 1000, skins: 1000 },
+            require: { stone: 2000, skins: 2000 },
             effectText: "Reduce unhappiness caused by overcrowding"
         }),
         
         new Upgrade({
             id: "aesthetics", name: "Aesthetics", subType: subTypes.upgrade,
             prereqs: { polytheism: true },
-            require: { piety: 2000 },
+            require: { piety: 4000 },
             effectText: "Building temples increases morale"
         }),
         new Upgrade({
             id: "civilservice", name: "Civil Service", subType: subTypes.upgrade,
             prereqs: { codeoflaws: true },
-            require: { piety: 2000 },
-            effectText: "Increase basic resources from clicking"
+            require: { piety: 5000 },
+            effectText: "Increase basic resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
             id: "guilds", name: "Guilds", subType: subTypes.upgrade,
             prereqs: { astronomy: true, mathematics: true, medicine: true },
-            require: { piety: 5000 },
-            effectText: "Increase special resources from clicking"
+            require: { piety: 10000 },
+            effectText: "Increase special resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
             id: "feudalism", name: "Feudalism", subType: subTypes.upgrade,
             prereqs: { guilds: true },
-            require: { piety: 5000 },
-            effectText: "Further increase basic resources from clicking"
+            require: { piety: 20000 },
+            effectText: "Further increase basic resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
             id: "serfs", name: "Serfs", subType: subTypes.upgrade,
             prereqs: { guilds: true },
-            require: { piety: 10000 },
-            effectText: "Idle workers increase resources from clicking"
+            require: { piety: 20000 },
+            effectText: "Idle workers increase resources from clicking.  Increase labourer efficiency"
         }),
         new Upgrade({
             id: "nationalism", name: "Nationalism", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
-            require: { piety: 20000 },
-            effectText: "Soldiers increase basic resources from clicking"
+            require: { piety: 50000 },
+            effectText: "Soldiers increase basic resources from clicking.  Increase labourer efficiency"
         }),
 
         new Upgrade({
@@ -951,7 +964,7 @@ function getCivData() {
             id: unitType.woodcutter, singular: "woodcutter", plural: "woodcutters",
             source: unitType.unemployed,
             //efficiency: 0.5,
-            efficiency_base: 0.5,
+            efficiency_base: 0.45,
             get efficiency() {
                 return woodcutterMods(this.efficiency_base);
             },
@@ -962,7 +975,7 @@ function getCivData() {
             id: unitType.miner, singular: "miner", plural: "miners",
             source: unitType.unemployed,
             //efficiency: 0.2,
-            efficiency_base: 0.2,
+            efficiency_base: 0.15,
             get efficiency() {
                 return minerMods(this.efficiency_base);
             },
@@ -972,7 +985,7 @@ function getCivData() {
         new Unit({
             id: unitType.tanner, singular: "tanner", plural: "tanners",
             source: unitType.unemployed,
-            efficiency: 0.5,
+            efficiency: 0.44,
             prereqs: { tannery: 1 },
             require: { skins: 2 },
             get limit() { return civData.tannery.owned; },
@@ -982,7 +995,7 @@ function getCivData() {
         new Unit({
             id: unitType.blacksmith, singular: "blacksmith", plural: "blacksmiths",
             source: unitType.unemployed,
-            efficiency: 0.5,
+            efficiency: 0.43,
             prereqs: { smithy: 1 },
             require: { ore: 2 },
             get limit() { return civData.smithy.owned; },
@@ -992,13 +1005,13 @@ function getCivData() {
         new Unit({
             id: unitType.healer, singular: "healer", plural: "healers",
             source: unitType.unemployed,
-            efficiency: 0.1,
+            efficiency: 0.42,
             prereqs: { apothecary: 1 },
             require: { herbs: 2 },
             init: function (fullInit) { Unit.prototype.init.call(this, fullInit); this.cureCount = 0; },
             get limit() { return civData.apothecary.owned; },
             set limit(value) { return this.limit; }, // Only here for JSLint.
-            get cureCount() { return this.data.cureCount; }, // Carryover fractional healing
+            get cureCount() { return this.data.cureCount; }, // Carry over fractional healing
             set cureCount(value) { this.data.cureCount = value; }, // Only here for JSLint.
             effectText: "Make potions from herbs. Cure sick workers"
         }),
