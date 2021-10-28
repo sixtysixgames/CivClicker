@@ -287,8 +287,7 @@ function renameRuler(newName) {
 function renameDeity(newName) {
     var i = false;
     while (!newName) {
-        // Default to ruler's name.  Hey, despots tend to have big egos.
-        newName = prompt("Whom do your people worship?", (newName || curCiv.deities[0].name || curCiv.rulerName));
+        newName = prompt("Whom do your people worship?", (newName || curCiv.deities[0].name || "Deity"));
         if ((newName === null) && (curCiv.deities[0].name)) { return; } // Cancelled
 
         // If haveDeity returns a number > 0, the name is used by a legacy deity.
