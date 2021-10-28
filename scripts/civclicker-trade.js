@@ -24,7 +24,10 @@ function startTrader() {
         // between 75% and 100% of resource limit
         var limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25)
         curCiv.trader.requested = Math.min(selected.limit, curCiv.trader.requested);
-
+        // and finally, we don't want less than the initial amount
+        if (curCiv.trader.requested < selected.initTradeAmount) {
+            curCiv.trader.requested = selected.initTradeAmount
+        }
         curCiv.trader.userTraded = false; // has the user sold requested
         updateTrader();
     }
@@ -120,25 +123,8 @@ function tickTraders() {
 
 function updateTradeAmount() {
     var materialId = curCiv.trader.materialId;
-    // randomly set new trade amount
-    //curCiv[materialId].tradeAmount = Math.round(Math.random() * civData[materialId].baseTradeAmount) * 10;
 
-    // if user trades then price goes down, else price randomly goes up or down
-    // the logic runs something like:
-    // if the user sells something then they probably don't need it, so there's no demand, so cost goes down, amount goes up
-    // if the user doesn't sell something, they probably need it, so have to pay more, so cost goes up, so amount goes down
-    //if (curCiv.trader.userTraded) {
-    //    curCiv[materialId].tradeAmount += Math.round(curCiv[materialId].tradeAmount / 10);
-    //}
-    //else {
-    //    if (Math.random() < 0.5) {
-    //        curCiv[materialId].tradeAmount -= Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
-    //    }
-    //    else {
-    //        curCiv[materialId].tradeAmount += Math.round(Math.random() * curCiv[materialId].tradeAmount / 10);
-    //    }
-    //}
-    // far too complicated. simply change to 10% whatever was requested
+    // simply change to 10% whatever was requested
     curCiv[materialId].tradeAmount = Math.floor(curCiv.trader.requested / 10);
     // don't offer less than base amount
     curCiv[materialId].tradeAmount = Math.max(civData[materialId].baseTradeAmount, curCiv[materialId].tradeAmount);
