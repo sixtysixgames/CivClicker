@@ -8,8 +8,7 @@ function VersionData(major, minor, sub, mod) {
 }
 VersionData.prototype.toNumber = function () { return this.major * 1000 + this.minor + this.sub / 1000; };
 VersionData.prototype.toString = function () {
-    return String(this.major) + "."
-        + String(this.minor) + "." + String(this.sub) + String(this.mod);
+    return String(this.major) + "." + String(this.minor) + "." + String(this.sub) + String(this.mod);
 };
 
 // TODO: Create a mechanism to automate the creation of a class hierarchy,
@@ -19,8 +18,9 @@ function CivObj(props, asProto) {
     //xxx Should these just be taken off the prototype's property names?
     var names = asProto ? null : [
         "id", "name", "subType", "owned", "prereqs", "require", "salable", "vulnerable", "effectText"
-        , "prestige", "initOwned", "init", "reset", "limit", "hasVariableCost", "tradeAmount", "baseTradeAmount", "initTradeAmount"
+        , "prestige", "initOwned", "init", "reset", "limit", "hasVariableCost", "tradeAmount"
     ];
+    //, "baseTradeAmount", "initTradeAmount" - consts in civData - don't need to save them
     Object.call(this, props);
     copyProps(this, props, names, true);
     return this;
@@ -157,7 +157,7 @@ function Unit(props) // props is an object containing the desired properties.
     copyProps(this, props, null, true);
     // Occasional Properties: singular, plural, subType, prereqs, require, effectText, alignment,
     // source, efficiency_base, efficiency, onWin, 
-    // lootFatigue, lootStop, sackFatigue, sackStop, killFatigue, killStop, 
+    // lootFatigue, lootStop, sackFatigue, sackStop, killFatigue, killStop, conquerFatigue, conquerStop
     // species, place, ill
     return this;
 }
@@ -207,31 +207,14 @@ Unit.prototype = new CivObj({
     //xxx Right now, ill numbers are being stored as a separate structure inside curCiv.
     // It would probably be better to make it an actual 'ill' property of the Unit.
     // That will require migration code.
-    get illObj() {
-        return curCiv[this.id + "Ill"];
-    },
-    set illObj(value) {
-        curCiv[this.id + "Ill"] = value;
-    },
-    get ill() {
-        return isValid(this.illObj) ? this.illObj.owned : undefined;
-    },
-    set ill(value) {
-        if (isValid(this.illObj)) { this.illObj.owned = value; }
-    },
-    get partyObj() {
-        return civData[this.id + "Party"];
-    },
-    set partyObj(value) {
-        return this.partyObj;
-    }, // Only here for JSLint.
-    get party() {
-        return isValid(this.partyObj) ? this.partyObj.owned : undefined;
-    },
-    set party(value) {
-        if (isValid(this.partyObj)) {
-            this.partyObj.owned = value;
-        }
+    get illObj() { return curCiv[this.id + "Ill"]; },
+    set illObj(value) { curCiv[this.id + "Ill"] = value; },
+    get ill() { return isValid(this.illObj) ? this.illObj.owned : undefined; },
+    set ill(value) { if (isValid(this.illObj)) { this.illObj.owned = value; } },
+    get partyObj() { return civData[this.id + "Party"]; },
+    set partyObj(value) { return this.partyObj; }, // Only here for JSLint.
+    get party() { return isValid(this.partyObj) ? this.partyObj.owned : undefined; },
+    set party(value) { if (isValid(this.partyObj)) { this.partyObj.owned = value; }
     },
     // Is this unit just some other sort of unit in a different place (but in the same limit pool)?
     isDest: function () {
@@ -240,17 +223,13 @@ Unit.prototype = new CivObj({
     get limit() {
         return (this.isDest()) ? civData[this.source].limit : Object.getOwnPropertyDescriptor(CivObj.prototype, "limit").get.call(this);
     },
-    set limit(value) {
-        return this.limit;
-    }, // Only here for JSLint.
+    set limit(value) { return this.limit; }, // Only here for JSLint.
 
     // The total quantity of this unit, regardless of status or place.
     get total() {
         return (this.isDest()) ? civData[this.source].total : (this.owned + (this.ill || 0) + (this.party || 0));
     },
-    set total(value) {
-        return this.total;
-    } // Only here for JSLint.
+    set total(value) { return this.total; } // Only here for JSLint.
 }, true);
 
 function Achievement(props) // props is an object containing the desired properties.
