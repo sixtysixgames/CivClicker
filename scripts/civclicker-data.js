@@ -361,6 +361,62 @@ function getCivData() {
             effectText: "Unlock more upgrades"
         }),
         new Upgrade({
+            id: "carpentry", name: "Carpentry", subType: subTypes.upgrade,
+            require: { wood: 10 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
+            id: "mining", name: "Mining", subType: subTypes.upgrade,
+            require: { stone: 10 },
+            effectText: "Unlock more upgrades"
+        }),
+
+        new Upgrade({
+            id: "farming", name: "Farming", subType: subTypes.upgrade,
+            prereqs: { domestication: true },
+            require: { skins: 100, herbs: 100 },
+            effectText: "Increase farmer food output.  Unlock more upgrades"
+        }),
+        new Upgrade({
+            id: "agriculture", name: "Agriculture", subType: subTypes.upgrade,
+            prereqs: { farming: true },
+            require: { leather: 1000, metal: 1000 },
+            effectText: "Increase farmer food output.  Unlock more upgrades"
+        }),
+        
+        new Upgrade({
+            id: "masonry", name: "Masonry", subType: subTypes.upgrade,
+            prereqs: { carpentry: true },
+            require: { wood: 100, stone: 100 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
+            id: "metalwork", name: "Metalwork", subType: subTypes.upgrade,
+            prereqs: { mining: true },
+            require: { wood: 100, stone: 100, ore: 100 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        
+
+        new Upgrade({
+            id: "construction", name: "Construction", subType: subTypes.upgrade,
+            prereqs: { masonry: true },
+            require: { wood: 1000, stone: 1000 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
+            id: "engineering", name: "Engineering", subType: subTypes.upgrade,
+            prereqs: { construction: true },
+            require: { wood: 5000, stone: 5000 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
+            id: "architecture", name: "Architecture", subType: subTypes.upgrade,
+            prereqs: { engineering: true },
+            require: { wood: 10000, stone: 10000 },
+            effectText: "Unlock more buildings and upgrades"
+        }),
+        new Upgrade({
             id: "skinning", name: "Skinning", subType: subTypes.upgrade,
             prereqs: { domestication: true },
             require: { skins: 10 },
@@ -396,31 +452,21 @@ function getCivData() {
             require: { herbs: 40 },
             effectText: "More woodcutters collect more herbs"
         }),
-        new Upgrade({
-            id: "farming", name: "Farming", subType: subTypes.upgrade,
-            prereqs: { domestication: true },
-            require: { skins: 100, herbs: 100 },
-            effectText: "Increase farmer food output.  Unlock more upgrades"
-        }),
+        
         new Upgrade({
             id: "flensing", name: "Flensing", subType: subTypes.upgrade,
             prereqs: { farming: true },
-            require: { metal: 1000 },
+            require: { leather: 500, food: 500 },
             effectText: "Collect skins more frequently"
         }),
         new Upgrade({
             id: "reaping", name: "Reaping", subType: subTypes.upgrade,
             prereqs: { farming: true },
-            require: { metal: 500, wood: 500 },
+            require: { potions: 500, wood: 500 },
             effectText: "Collect herbs more frequently"
         }),
         
-        new Upgrade({
-            id: "agriculture", name: "Agriculture", subType: subTypes.upgrade,
-            prereqs: { farming: true },
-            require: { leather: 1000, metal: 1000 },
-            effectText: "Increase farmer food output.  Unlock more upgrades"
-        }),
+        
         new Upgrade({
             id: "croprotation", name: "Crop Rotation", subType: subTypes.upgrade,
             prereqs: { agriculture: true },
@@ -440,11 +486,7 @@ function getCivData() {
             effectText: "Increase farmer food output"
         }),
 
-        new Upgrade({
-            id: "mining", name: "Mining", subType: subTypes.upgrade,
-            require: { stone: 10 },
-            effectText: "Unlock more upgrades"
-        }),
+
         new Upgrade({
             id: "prospecting", name: "Prospecting", subType: subTypes.upgrade,
             prereqs: { mining: true },
@@ -460,45 +502,11 @@ function getCivData() {
         new Upgrade({
             id: "macerating", name: "Macerating", subType: subTypes.upgrade,
             prereqs: { extraction: true },
-            require: { leather: 500, stone: 500 },
+            require: { metal: 500, stone: 500 },
             effectText: "Collect ore more frequently"
         }),
 
-        new Upgrade({
-            id: "carpentry", name: "Carpentry", subType: subTypes.upgrade,
-            require: { wood: 10 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
-        new Upgrade({
-            id: "masonry", name: "Masonry", subType: subTypes.upgrade,
-            prereqs: { carpentry: true },
-            require: { wood: 100, stone: 100 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
-        new Upgrade({
-            id: "metalwork", name: "Metalwork", subType: subTypes.upgrade,
-            prereqs: { masonry: true },
-            require: { wood: 100, stone: 100, ore: 100 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
-        new Upgrade({
-            id: "construction", name: "Construction", subType: subTypes.upgrade,
-            prereqs: { masonry: true },
-            require: { wood: 1000, stone: 1000 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
-        new Upgrade({
-            id: "engineering", name: "Engineering", subType: subTypes.upgrade,
-            prereqs: { construction: true },
-            require: { wood: 5000, stone: 5000 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
-        new Upgrade({
-            id: "architecture", name: "Architecture", subType: subTypes.upgrade,
-            prereqs: { engineering: true },
-            require: { wood: 10000, stone: 10000 },
-            effectText: "Unlock more buildings and upgrades"
-        }),
+        
         new Upgrade({
             id: "tenements", name: "Tenements", subType: subTypes.upgrade,
             prereqs: { construction: true },
@@ -594,19 +602,19 @@ function getCivData() {
         }),
         new Upgrade({
             id: "advweaponry", name: "Advanced Weaponry", subType: subTypes.upgrade,
-            prereqs: { weaponry: true },
+            prereqs: { weaponry: true, engineering: true },
             require: { wood: 2000, metal: 2000, leather: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advshields", name: "Advanced Shields", subType: subTypes.upgrade,
-            prereqs: { shields: true },
+            prereqs: { shields: true, engineering: true },
             require: { wood: 2000, leather: 2000, metal: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advarmour", name: "Advanced Armour", subType: subTypes.upgrade,
-            prereqs: { armour: true },
+            prereqs: { armour: true, engineering: true },
             require: { leather: 2000, metal: 2000 },
             effectText: "Improve soldiers"
         }),
@@ -1146,97 +1154,115 @@ function getCivData() {
         //conquest
         new Achievement({
             id: "raiderAch", name: "Raider",
-            test: function () { return curCiv.raid.victory; }
+            test: function () { return curCiv.raid.victory; },
+            effectText: "Succesfully conquer an enemy"
         }),
         //xxx Technically this also gives credit for capturing a siege engine.
         new Achievement({
             id: "engineerAch", name: "Engi&shy;neer",
-            test: function () { return civData.siege.owned > 0; }
+            test: function () { return civData.siege.owned > 0; },
+            effectText: "Buy or capture a siege engine"
         }),
         // If we beat the largest possible opponent, grant bonus achievement.
         new Achievement({
             id: "dominationAch", name: "Domi&shy;nation",
-            test: function () { return curCiv.raid.victory && (curCiv.raid.last == civSizes[civSizes.length - 1].id); }
+            test: function () { return curCiv.raid.victory && (curCiv.raid.last == civSizes[civSizes.length - 1].id); },
+            effectText: "Succesfully conquer all enemies"
         }),
         //Morale
         new Achievement({
             id: "hatedAch", name: "Hated",
-            test: function () { return curCiv.morale.efficiency <= 0.5; }
+            test: function () { return curCiv.morale.efficiency <= 0.5; },
+            effectText: "Make your population angry"
         }),
         new Achievement({
             id: "lovedAch", name: "Loved",
-            test: function () { return curCiv.morale.efficiency >= 1.5; }
+            test: function () { return curCiv.morale.efficiency >= 1.5; },
+            effectText: "Make your population blissful"
         }),
         //cats
         new Achievement({
             id: "catAch", name: "Cat!",
-            test: function () { return civData.cat.owned >= 1; }
+            test: function () { return civData.cat.owned >= 1; },
+            effectText: "Own a cat"
         }),
         new Achievement({
             id: "glaringAch", name: "Glaring",
-            test: function () { return civData.cat.owned >= 10; }
+            test: function () { return civData.cat.owned >= 10; },
+            effectText: "Own ten cats"
         }),
         new Achievement({
             id: "clowderAch", name: "Clowder",
-            test: function () { return civData.cat.owned >= 100; }
+            test: function () { return civData.cat.owned >= 100; },
+            effectText: "Own a hundred cats"
         }),
         //other population
         //Plagued achievement requires sick people to outnumber healthy
         new Achievement({
             id: "plaguedAch", name: "Plagued",
-            test: function () { return population.totalSick > population.healthy; }
+            test: function () { return population.totalSick > population.healthy; },
+            effectText: "Your sick civilians outnumber the healthy"
         }),
         new Achievement({
             id: "ghostTownAch", name: "Ghost Town",
-            test: function () { return (population.living === 0 && population.limit >= 1000); }
+            test: function () { return (population.living === 0 && population.limit >= 1000); },
+            effectText: "Your population of at least 1,000 all died"
         }),
         //deities
         //xxx TODO: Should make this loop through the domains
         new Achievement({
             id: "battleAch", name: "Battle",
-            test: function () { return getCurDeityDomain() == deityDomains.battle; }
+            test: function () { return getCurDeityDomain() == deityDomains.battle; },
+            effectText: "Worship a deity of Battle"
         }),
         new Achievement({
             id: "fieldsAch", name: "Fields",
-            test: function () { return getCurDeityDomain() == deityDomains.fields; }
+            test: function () { return getCurDeityDomain() == deityDomains.fields; },
+            effectText: "Worship a deity of the Fields"
         }),
         new Achievement({
             id: "underworldAch", name: "Under&shy;world",
-            test: function () { return getCurDeityDomain() == deityDomains.underworld; }
+            test: function () { return getCurDeityDomain() == deityDomains.underworld; },
+            effectText: "Worship a deity of the Underworld"
         }),
         new Achievement({
             id: "catsAch", name: "Cats",
-            test: function () { return getCurDeityDomain() == deityDomains.cats; }
+            test: function () { return getCurDeityDomain() == deityDomains.cats; },
+            effectText: "Worship a deity of Cats"
         }),
         //xxx It might be better if this checked for all domains in the Pantheon at once (no iconoclasming old ones away).
         new Achievement({
             id: "fullHouseAch", name: "Full House",
-            test: function () { return civData.battleAch.owned && civData.fieldsAch.owned && civData.underworldAch.owned && civData.catsAch.owned; }
+            test: function () { return civData.battleAch.owned && civData.fieldsAch.owned && civData.underworldAch.owned && civData.catsAch.owned; },
+            effectText: "Worship all deities"
         }),
         //wonders
         new Achievement({
             id: "wonderAch", name: "Wonder",
-            test: function () { return curCiv.curWonder.stage === 3; }
+            test: function () { return curCiv.curWonder.stage === 3; },
+            effectText: "Build a Wonder"
         }),
         new Achievement({
             id: "sevenAch", name: "Seven!",
-            test: function () { return curCiv.wonders.length >= 7; }
+            test: function () { return curCiv.wonders.length >= 7; },
+            effectText: "Build seven Wonders"
         }),
         //trading
         new Achievement({
             id: "merchantAch", name: "Merch&shy;ant",
-            test: function () { return civData.gold.owned > 0; }
+            test: function () { return civData.gold.owned > 0; },
+            effectText: "Sell to a trader"
         }),
         new Achievement({
             id: "rushedAch", name: "Rushed",
-            test: function () { return curCiv.curWonder.rushed; }
+            test: function () { return curCiv.curWonder.rushed; },
+            effectText: "Spend gold to speed the building of a Wonder"
         }),
         //other
         new Achievement({
             id: "neverclickAch", name: "Never&shy;click",
-            test: function () {
-                return curCiv.curWonder.stage === 3 && curCiv.resourceClicks <= 22;
-            }
+            test: function () {return curCiv.curWonder.stage === 3 && curCiv.resourceClicks <= 22;},
+            effectText: "Build a Wonder with only 22 resource clicks"
         })
     ];
 
@@ -1247,7 +1273,12 @@ function getCivData() {
         };
         // Add the civ size based achievements to the front of the data, so that they come first.
         for (i = civSizes.length - 1; i > 0; --i) {
-            civData.unshift(new Achievement({ id: civSizes[i].id + "Ach", name: civSizes[i].name, test: testCivSizeAch }));
+            civData.unshift(new Achievement({
+                id: civSizes[i].id + "Ach",
+                name: civSizes[i].name,
+                test: testCivSizeAch,
+                effectText: "Reach a population size of " + prettify(civSizes[i].min_pop)
+            }));
         }
         //xxx TODO: Add deity domain based achievements here too.
     }
