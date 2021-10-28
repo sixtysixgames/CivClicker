@@ -229,6 +229,7 @@
                     <div id="populationSelect" class="paneSelector selected" data-target="populationPane" onclick="paneSelect(this)">
                         Population
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="buildingsSelect" class="paneSelector" data-target="buildingsPane" onclick="paneSelect(this)">
                         Buildings
@@ -242,26 +243,32 @@
                     <div id="deitySelect" class="paneSelector" data-target="deityPane" onclick="paneSelect(this)">
                         Deity
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="conquestSelect" class="paneSelector" data-target="conquestPane" onclick="paneSelect(this)">
                         Conquest
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="tradeSelect" class="paneSelector" data-target="tradePane" onclick="paneSelect(this)">
                         Trade
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="resourcesSelect" class="paneSelector" data-target="resourcesPane" onclick="paneSelect(this)">
                         Resources
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="achievementsSelect" class="paneSelector" data-target="achievementsPane" onclick="paneSelect(this)">
                         Achievements
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                     <div id="settingsSelect" class="paneSelector" data-target="settingsPane" onclick="paneSelect(this)">
                         Settings
                         <div class="alert">!</div>
+                        <div class="info">i</div>
                     </div>
                 </div>
 
@@ -500,6 +507,9 @@
                 </div>
 
                 <div id="tradePane" class="selectPane">
+                    <div class="notYet">
+                        You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
+                    </div>
                     <div class="columns">
                         <div class="column left width25">
                             <div id="tradeUpgradeContainer">
@@ -519,9 +529,6 @@
                             </div>
                         </div>
                         <div class="column right">
-                            <div class="notYet">
-                                You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
-                            </div>
                             <div id="tradeContainer">
                                 Trader offers 1 gold for <span id="tradeRequested">...</span> <span id="tradeType">...</span>
                                 for the next <span id="traderTimer">...</span>.
