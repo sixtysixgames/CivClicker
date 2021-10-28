@@ -198,7 +198,12 @@
                         </tr>
                         <tr>
                             <td>
-                                <img src="images/smitten.png" class="icon icon-lg" alt="Happiness" />
+                                <img src="images/morale1-blissful.png" class="icon icon-lg" alt="Happiness" id="morale1" />
+                                <img src="images/morale2-happy.png" class="icon icon-lg" alt="Happiness" id="morale2" />
+                                <img src="images/morale3-content.png" class="icon icon-lg" alt="Happiness" id="morale3" />
+                                <img src="images/morale4-unhappy.png" class="icon icon-lg" alt="Happiness" id="morale4" />
+                                <img src="images/morale5-angry.png" class="icon icon-lg" alt="Happiness" id="morale5" />
+                                <!--<img src="images/smitten.png" class="icon icon-lg" alt="Happiness" />-->
                                 <label>Happiness:</label>
                             </td>
                             <td colspan="2" id="morale">
@@ -333,7 +338,7 @@
                                 <div id='purchasedUpgrades'>
                                     <!-- populated by JavaScript -->
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="column right">
@@ -511,24 +516,7 @@
                         You do not yet own a trading post. <span class="tip">Try trading with a trader when they (randomly) appear.</span>
                     </div>
                     <div class="columns">
-                        <div class="column left width25">
-                            <div id="tradeUpgradeContainer">
-                                <span id="currencyRow"></span>
-                                <span id="commerceRow"></span>
-                                <span id="cornexchangeRow"></span>
-                                <h4>Buy Resources (1 gold)</h4>
-                                <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
-                                <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
-                                <button class="tradeResource" onmousedown="buy('stone')">Buy <span id="stoneCost">5000</span> Stone</button><br />
-                                <button class="tradeResource" onmousedown="buy('skins')">Buy <span id="skinsCost">500</span> Skins</button><br />
-                                <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
-                                <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
-                                <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
-                                <button class="tradeResource" onmousedown="buy('potions')">Buy <span id="potionsCost">250</span> Potions</button><br />
-                                <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
-                            </div>
-                        </div>
-                        <div class="column right">
+                        <div class="column left width33">
                             <div id="tradeContainer">
                                 Trader offers 1 gold for <span id="tradeRequested">...</span> <span id="tradeType">...</span>
                                 for the next <span id="traderTimer">...</span>.
@@ -541,6 +529,24 @@
                             <span id="tradeRow">
                                 <!-- populated by javascript -->
                             </span>
+                        </div>
+                        <div class="column right width60">
+                            <div id="tradeUpgradeContainer">
+                                <span id="currencyRow"></span>
+                                <span id="commerceRow"></span>
+                                <span id="cornexchangeRow"></span>
+
+                                <h4>Buy Resources (1 gold)</h4>
+                                <button class="tradeResource" onmousedown="buy('food')">Buy <span id="foodCost">5000</span> Food</button><br />
+                                <button class="tradeResource" onmousedown="buy('wood')">Buy <span id="woodCost">5000</span> Wood</button><br />
+                                <button class="tradeResource" onmousedown="buy('stone')">Buy <span id="stoneCost">5000</span> Stone</button><br />
+                                <button class="tradeResource" onmousedown="buy('skins')">Buy <span id="skinsCost">500</span> Skins</button><br />
+                                <button class="tradeResource" onmousedown="buy('herbs')">Buy <span id="herbsCost">500</span> Herbs</button><br />
+                                <button class="tradeResource" onmousedown="buy('ore')">Buy <span id="oreCost">500</span> Ore</button><br />
+                                <button class="tradeResource" onmousedown="buy('leather')">Buy <span id="leatherCost">250</span> Leather</button><br />
+                                <button class="tradeResource" onmousedown="buy('potions')">Buy <span id="potionsCost">250</span> Potions</button><br />
+                                <button class="tradeResource" onmousedown="buy('metal')">Buy <span id="metalCost">250</span> Metal</button><br />
+                            </div>
                         </div>
                     </div>
                 </div>
