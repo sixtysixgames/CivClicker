@@ -25,9 +25,9 @@ var setup = {};
 var loopTimer = 0;
 
 // TODO: Update the version numbering internally
-var version = 31; // This is an ordinal used to trigger reloads. 66g No it doesn't 
+var version = 33; // This is an ordinal used to trigger reloads. 66g No it doesn't 
 //66g Always increment versionData if adding/modifying element to civData
-var versionData = new VersionData(1, 4, 21, "alpha"); // this is not accurate.  
+var versionData = new VersionData(1, 4, 24, "alpha"); // this is not accurate.  
 
 var saveTag = "civ";
 var saveTag2 = saveTag + "2"; // For old saves.
