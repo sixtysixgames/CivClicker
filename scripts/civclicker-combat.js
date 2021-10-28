@@ -235,7 +235,7 @@ function doBandits(attacker) {
     // bandits mainly loot
     var r = Math.random();
     if (r < 0.1) { doSlaughter(attacker); }
-    else if (r < 0.2) { doSack(attacker); }
+    else if (r < 0.2) { doSack(attacker); } 
     else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
@@ -581,29 +581,23 @@ function doMobs() {
 
     // we don't want mobs attacking tiny populations
     //population.current > 1 &&
-    if (curCiv.attackCounter > (60 * 5)) { //Minimum 5 minutes
-        var rnum = population.current * Math.random();
-
+    var limit = (60 * 5) + Math.floor(60 * 5 * Math.random()); //Minimum 5 minutes, max 10
+    if (curCiv.attackCounter > limit) {
         // attempt at forcing attacks more frequently the larger the civ
-        // 50 because that is max pop of a thorp
+        // 10 because that is max pop of a thorp
+        var rnum = population.current * Math.random();
+        var rnum2 = (population.current * Math.random()) / 10;
+        
         //if (600 * Math.random() < 1) {
-        if (rnum < population.current / 50) {
+        //debug(rnum + "<" + rnum2);
+        if (rnum < rnum2) {
             curCiv.attackCounter = 0;
-            //Choose which kind of mob will attack
-            //mobType = mobTypeIds.wolf; // Default to wolves
-            //if (population.current >= 10000) {
-            //    choose = Math.random();
-            //    if (choose > 0.5) { mobType = "barbarian"; }
-            //    else if (choose > 0.2) { mobType = "bandit"; }
-            //} else if (population.current >= 1000) {
-            //    if (Math.random() > 0.5) { mobType = "bandit"; }
-            //}
 
             // we don't want wolves/bandits attacking large settlements/nations
             // or barbarians/invaders attacking small ones
             if (population.current < civSizes.thorp.min_pop) {
                 // mostly wolves
-                if (Math.random() < 0.95) {
+                if (Math.random() < 0.99) {
                     mobType = mobTypeIds.wolf;
                 }
                 else {
