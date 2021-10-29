@@ -15,7 +15,7 @@ function setDefaultSettings() {
 
 // Game infrastructure functions
 function handleStorageError(err) {
-    var msg;
+    let msg;
     if ((err instanceof DOMException) && (err.code == DOMException.SECURITY_ERR)) { msg = "Browser security settings blocked access to local storage."; }
     else { msg = "Cannot access localStorage - browser may not support localStorage, or storage may be corrupt"; }
     console.error(err.toString());
@@ -25,10 +25,10 @@ function handleStorageError(err) {
 // Load in saved data
 function load(loadType) {
     //define load variables
-    var loadVar = {},
+    let loadVar = {},
         loadVar2 = {},
         settingsVar = {};
-    var saveVersion = new VersionData(1, 0, 0, "legacy");
+    let saveVersion = new VersionData(1, 0, 0, "legacy");
 
     if (loadType === "cookie") {
         //check for cookies
@@ -50,9 +50,9 @@ function load(loadType) {
 
     if (loadType === "localStorage") {
         //check for local storage
-        var string1;
-        var string2;
-        var settingsString;
+        let string1;
+        let string2;
+        let settingsString;
         try {
             settingsString = localStorage.getItem(saveSettingsTag);
             string1 = localStorage.getItem(saveTag);
@@ -95,7 +95,7 @@ function load(loadType) {
     saveVersion = mergeObj(saveVersion, loadVar.versionData);
     if (saveVersion.toNumber() > versionData.toNumber()) {
         // Refuse to load saved games from future versions.
-        var alertStr = "Cannot load; saved game version " + saveVersion + " is newer than game version " + versionData;
+        let alertStr = "Cannot load; saved game version " + saveVersion + " is newer than game version " + versionData;
         console.log(alertStr);
         sysLog(alertStr);
         alert(alertStr);
@@ -103,7 +103,7 @@ function load(loadType) {
     }
     if (saveVersion.toNumber() < versionData.toNumber()) {
         // Migrate saved game data from older versions.
-        var settingsVarReturn = { val: {} };
+        let settingsVarReturn = { val: {} };
         migrateGameData(loadVar, settingsVarReturn);
         settingsVar = settingsVarReturn.val;
 
@@ -113,9 +113,9 @@ function load(loadType) {
         curCiv = loadVar.curCiv; // No need to merge if the versions match; this is quicker.
     }
 
-    var lsgv = "Loaded save game version " + saveVersion.major + "." + saveVersion.minor + "." + saveVersion.sub + "(" + saveVersion.mod + ") via";
+    let lsgv = "Loaded save game version " + saveVersion.major + "." + saveVersion.minor + "." + saveVersion.sub + "(" + saveVersion.mod + ") via ";
     console.log(lsgv, loadType);
-    sysLog(lsgv);
+    sysLog(lsgv + loadType);
 
     if (isValid(settingsVar)) { settings = mergeObj(settings, settingsVar); }
 
@@ -150,12 +150,12 @@ function load(loadType) {
 
 function importByInput(elt) {
     //take the import string, decompress and parse it
-    var compressed = elt.value;
-    var decompressed = LZString.decompressFromBase64(compressed);
-    var revived = JSON.parse(decompressed);
+    let compressed = elt.value;
+    let decompressed = LZString.decompressFromBase64(compressed);
+    let revived = JSON.parse(decompressed);
     //set variables to load from
-    var loadVar = revived[0];
-    var loadVar2;
+    let loadVar = revived[0];
+    let loadVar2;
     if (isValid(revived[1])) {
         loadVar2 = revived[1];
         // If there's a second string (old save game format), merge it in.
@@ -177,19 +177,19 @@ function importByInput(elt) {
 // Create objects and populate them with the variables, these will be stored in HTML5 localStorage.
 // Cookie-based saves are no longer supported.
 function save(savetype) {
-    var xmlhttp;
+    let xmlhttp;
 
-    var saveVar = {
+    let saveVar = {
         versionData: versionData, // Version information header
         curCiv: curCiv // Game data
     };
 
-    var settingsVar = settings; // UI Settings are saved separately.
+    let settingsVar = settings; // UI Settings are saved separately.
 
     // Handle export
     if (savetype == saveTypes.export) {
-        var savestring = "[" + JSON.stringify(saveVar) + "]";
-        var compressed = LZString.compressToBase64(savestring);
+        let savestring = "[" + JSON.stringify(saveVar) + "]";
+        let compressed = LZString.compressToBase64(savestring);
         console.log("Compressed save from " + savestring.length + " to " + compressed.length + " characters");
         ui.find("#impexpField").value = compressed;
         sysLog("Exported game to text");
@@ -285,7 +285,7 @@ function renameRuler(newName) {
 // is moved to the first slot, overwriting the current entry, and the
 // player's domain is automatically assigned to match (for free).
 function renameDeity(newName) {
-    var i = false;
+    let i = false;
     while (!newName) {
         newName = prompt("Whom do your people worship?", (newName || curCiv.deities[0].name || "Deity"));
         if ((newName === null) && (curCiv.deities[0].name)) { return; } // Cancelled
@@ -317,7 +317,7 @@ function renameDeity(newName) {
 function reset() {
     console.log("Reset");
     //Resets the game, keeping some values but resetting most back to their initial values.
-    var msg = "Really reset? You will keep past deities and wonders (and cats)"; //Check player really wanted to do that.
+    let msg = "Really reset? You will keep past deities and wonders (and cats)"; //Check player really wanted to do that.
     if (!confirm(msg)) { return false; } // declined
 
     // Let each data subpoint re-init.
