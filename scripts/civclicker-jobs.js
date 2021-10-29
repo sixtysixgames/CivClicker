@@ -58,6 +58,7 @@ function doMiners() {
 }
 
 function doBlacksmiths() {
+    if (civData.blacksmith.owned  <= 0) { return; }
     // we don't want to use up ore if we aren't making metal
     if (civData.metal.owned < civData.metal.limit) {
         var efficiency = civData.blacksmith.efficiency + (0.1 * civData.blacksmith.efficiency * civData.mathematics.owned);
@@ -73,6 +74,7 @@ function doBlacksmiths() {
 }
 
 function doTanners() {
+    if (civData.tanner.owned  <= 0) { return; }
      // we don't want to use up skins if we aren't making leather
     if (civData.leather.owned < civData.leather.limit) {
         var efficiency = civData.tanner.efficiency + (0.1 * civData.tanner.efficiency * civData.astronomy.owned);
@@ -87,6 +89,7 @@ function doTanners() {
     }
 }
 function doApothecaries() {
+    if (civData.healer.owned  <= 0) { return; }
     // we don't want to use up herbs if we aren't making potions
     if (civData.potions.owned < civData.potions.limit) {
         var efficiency = civData.healer.efficiency + (0.1 * civData.healer.efficiency * civData.medicine.owned);
@@ -101,6 +104,7 @@ function doApothecaries() {
     }
 }
 function doClerics() {
+
     var pietyEarned = (
         civData.cleric.owned
         * (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
@@ -117,7 +121,8 @@ function doClerics() {
 }
 
 function doHealers() {
-    if (civData.potions.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without potions
+    if (civData.healer.owned <= 0 || civData.potions.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without potions
+
     var job, numHealed = 0;
     var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
     // How much healing can we do?
@@ -141,54 +146,117 @@ function doHealers() {
     }
     return numHealed;
 }
-//function doHealers() {
-//    if (civData.herbs.owned <= 0) { return 0;} // we can't heal without herbs
-//    var job, numHealed = 0;
-//    var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
-//    // How much healing can we do?
-//    // this doesn't need to be a global variable
-//    var cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
-
-//    // We can't cure more sick people than there are
-//    civData.healer.cureCount = Math.min(cureCount, population.totalSick);
-
-//    // Cure people until we run out of healing capacity or herbs
-//    while (cureCount >= 1 && civData.herbs.owned >= 1) {
-//        job = getNextPatient();
-//        if (!job) {break;}
-//        healByJob(job);
-//        --cureCount;
-//        --civData.herbs.owned;
-//        --civData.herbs.net;
-//        ++numHealed;
+//https://www.bbc.co.uk/bitesize/guides/z7r7hyc/revision/3
+/*
+ * An estimated 30% to 60% of the population of Europe died from the plague. This is often referred to as the 'mortality rate'.
+ * victims of bubonic plague itself had a 50% chance of death.
+ * */
+//function doPlague() {
+//    if (population.totalSick <= 0) {
+//        return false;
 //    }
-//    return numHealed;
+//    //var jobInfected = getRandomPatient();
+//    //var unitInfected = civData[jobInfected];
+//    //if (unitInfected.ill <= 0 || unitInfected.owned <= 0) {
+//    //    return false;
+//    //}
+
+//    var deathRoll = (100 * Math.random());
+
+//    // try 45 90 splits and 50/50 chance of death/survival
+//    if (deathRoll <= 1) { // 1% chance that up to 1% ill people dies
+//        var victims = Math.floor(population.totalSick / 100 * Math.random());
+
+//        if (victims <= 0) { return false; }
+//        var died = 0;
+//        var lastVictim = "citizen";
+//        for (var d = 1; d <= victims; d++) {
+//            var jobInfected = getRandomPatient();
+
+//            if (isValid(jobInfected)) {
+//                var unitInfected = civData[jobInfected];
+
+//                if (unitInfected.ill > 0 && unitInfected.owned > 0) {
+//                    killUnit(unitInfected);
+//                    lastVictim = unitInfected.singular;
+//                    died++;
+//                }
+//            }
+//        }
+
+//        if (died == 1) {
+//            gameLog("A sick " + lastVictim + " died of the plague.");
+//        }
+//        else if (died > 1) {
+//            gameLog(prettify(died) + " sick citizens died of the plague.");
+//        }
+//        calculatePopulation();
+//        return true;
+//    }
+//    else if (deathRoll <= 2) {
+//        // some sick victims recover naturally
+//        var survivors = Math.floor(population.totalSick / 100 * Math.random());
+//        if (survivors <= 0) { return false; }
+//        var survived = 0;
+//        var lastJob = "citizen";
+//        for (var s = 1; s <= survivors; s++) {
+//            var job = getRandomPatient();
+
+//            if (isValid(job)) {
+//                healByJob(job);
+//                lastJob = civData[job].singular;
+//                survived++;
+//            }
+//        }
+//        if (survived == 1) {
+//            gameLog("A sick " + lastJob + " recovered from the plague.");
+//        }
+//        else if (survived > 1) {
+//            gameLog(prettify(survived) + " sick citizens recovered from the plague.");
+//        }
+//        calculatePopulation();
+//        return true;
+//    } else if (deathRoll > 99) { // 1% chance that it spreads 
+//        // Infect up to 0.1% of the healthy population.
+//        //* (1 + civData.feast.owned)
+//        // needs to be same odds as catching plague in doCorpses
+//        var infected = Math.floor(population.healthy / 100 * Math.random()) + 1;
+//        if (infected <= 0) { return false; }
+//        var num = spreadPlague(infected);
+//        if (num == 1) {
+//            gameLog("The plague spreads to a new citizen.");
+//        }
+//        else {
+//            gameLog("The plague spreads to " + prettify(num) + " new citizens.");
+//        }
+//        return true;
+//    }
+//    return false;
 //}
+
+// lets try to simplify
 function doPlague() {
     if (population.totalSick <= 0) {
         return false;
     }
-    //var jobInfected = getRandomPatient();
-    //var unitInfected = civData[jobInfected];
-    //if (unitInfected.ill <= 0 || unitInfected.owned <= 0) {
-    //    return false;
-    //}
 
-    var deathRoll = (100 * Math.random());
+    //var deathRoll = (100 * Math.random());
+    // there are 4 possibilities: die, survive, spread, nothing - therefore
+    var chance = 0.1;
 
-    if (deathRoll <= 1) { // 1% chance that up to 1% ill people dies
-        var victims = Math.floor(population.totalSick / 100 * Math.random());
+    if (Math.random() < chance) { 
+        var victims = Math.ceil(population.totalSick / 2 * Math.random());
 
         if (victims <= 0) { return false; }
         var died = 0;
         var lastVictim = "citizen";
         for (var d = 1; d <= victims; d++) {
             var jobInfected = getRandomPatient();
-            //if (!isValid(jobInfected) || !jobInfected) { continue; }
+
             if (isValid(jobInfected)) {
                 var unitInfected = civData[jobInfected];
 
-                if (unitInfected.ill > 0 && unitInfected.owned > 0) {
+                if (isValid(unitInfected) && unitInfected.ill > 0 && unitInfected.owned > 0) {
                     killUnit(unitInfected);
                     lastVictim = unitInfected.singular;
                     died++;
@@ -205,16 +273,16 @@ function doPlague() {
         calculatePopulation();
         return true;
     }
-    else if (deathRoll <= 2) {
+    else if (Math.random() < chance) {
         // some sick victims recover naturally
-        var survivors = Math.floor(population.totalSick / 100 * Math.random());
+        var survivors = Math.ceil(population.totalSick / 2 * Math.random());
         if (survivors <= 0) { return false; }
         var survived = 0;
         var lastJob = "citizen";
         for (var s = 1; s <= survivors; s++) {
             var job = getRandomPatient();
 
-            if (isValid(job)) {
+            if (isValid(job) && isValid(civData[job])) {
                 healByJob(job);
                 lastJob = civData[job].singular;
                 survived++;
@@ -228,10 +296,12 @@ function doPlague() {
         }
         calculatePopulation();
         return true;
-    } else if (deathRoll > 99) { // 1% chance that it spreads 
-        // Infect up to 0.1% of the healthy population.
-        var infected = Math.floor(population.healthy / 100 * Math.random()) + 1;
-
+    } else if (Math.random() < chance) {  
+        // plague spreads
+        // needs to be same odds as catching plague in doCorpses civData.corpses.owned
+        //var infected = Math.floor(population.healthy / 2 * Math.random()) + 1;
+        var infected = Math.ceil(population.totalSick / 2 * (1 + civData.feast.owned) * Math.random());
+        if (infected <= 0) { return false; }
         var num = spreadPlague(infected);
         if (num == 1) {
             gameLog("The plague spreads to a new citizen.");
@@ -247,12 +317,17 @@ function doPlague() {
 function doGraveyards() {
     var i;
 
-    if (civData.corpses.owned > 0 && curCiv.grave.owned > 0) {
+    if (civData.corpses.owned > 0 && curCiv.grave.owned > 0 && civData.piety.owned > 0) {
         //Clerics will bury corpses if there are graves to fill and corpses lying around
         for (i = 0; i < civData.cleric.owned; i++) {
-            if (civData.corpses.owned > 0 && curCiv.grave.owned > 0) {
+            if (civData.corpses.owned > 0 && curCiv.grave.owned > 0 && civData.piety.owned > 0) {
                 civData.corpses.owned -= 1;
                 curCiv.grave.owned -= 1;
+
+                // it costs to bury
+                //var pietyEarned = -civData.cleric.efficiency; 
+                civData.piety.net -= 1;
+                civData.piety.owned -= 1;
             }
             else {
                 // if criteria not met, no point continuing
@@ -263,9 +338,13 @@ function doGraveyards() {
     }
 }
 
+//https://www.bbc.co.uk/bitesize/guides/z7r7hyc/revision/3
+/*
+ * An estimated 30% to 60% of the population of Europe died from the plague. This is often referred to as the 'mortality rate'.
+ * victims of bubonic plague itself had a 50% chance of death.
+ * other research show 50% chance of dying/surviving/catching plague
+ * */
 function doCorpses() {
-    var sickChance;
-    var infected;
     // Nothing happens if there are no corpses
     if (civData.corpses.owned <= 0) { return; }
 
@@ -279,9 +358,10 @@ function doCorpses() {
     //if (sickChance >= 1) { return; }
 
     // more corpses should mean more chance of disease
-    sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
+    var sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
     // increase percentage to reduce frequency
-    var test = population.healthy * 0.33 * Math.random();
+    //var test = population.healthy * 0.5 * Math.random();
+    var test = population.healthy * (1 + civData.feast.owned) * Math.random();
 
     // if corpses owned is greater than upto %age of population, then chance of sickness spreading
     if (sickChance < test) { return; }
@@ -289,7 +369,7 @@ function doCorpses() {
     // Infect up to 1% of the healthy population.
     // if there are sick already, then see doPlague()
     if (population.healthy > 0 && population.totalSick == 0) {
-        infected = Math.floor(population.healthy / 100 * Math.random());
+        var infected = Math.floor(population.healthy / 100 * Math.random());
         if (infected <= 0) { return; }
 
         infected = spreadPlague(infected);
@@ -331,28 +411,28 @@ function dismissWorkers() {
     var diff = 0;
     var total = 0;
 
-    total = totalByJob(unitType.tanner);
+    total = getTotalByJob(unitType.tanner);
     if (total > 0 && total > civData.tannery.owned) {
         diff = total - civData.tannery.owned;
         civData.tanner.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob(unitType.blacksmith);
+    total = getTotalByJob(unitType.blacksmith);
     if (total > 0 && total > civData.smithy.owned) {
         diff = total - civData.smithy.owned;
         civData.blacksmith.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob(unitType.healer);
+    total = getTotalByJob(unitType.healer);
     if (total > 0 && total > civData.apothecary.owned) {
         diff = total - civData.apothecary.owned;
         civData.healer.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob(unitType.cleric);
+    total = getTotalByJob(unitType.cleric);
     if (total > 0 && total > civData.temple.owned) {
         diff = total - civData.temple.owned;
         civData.cleric.owned -= diff;
@@ -360,14 +440,14 @@ function dismissWorkers() {
     }
 
     // these buildings have 10 units
-    total = totalByJob(unitType.soldier);
+    total = getTotalByJob(unitType.soldier);
     if (total > 0 && total > civData.barracks.owned * 10) {
         diff = total - (civData.barracks.owned * 10);
         civData.soldier.owned -= diff;
         civData.unemployed.owned += diff;
     }
 
-    total = totalByJob(unitType.cavalry);
+    total = getTotalByJob(unitType.cavalry);
     if (total > 0 && total > civData.stable.owned * 10) {
         diff = total - (civData.stable.owned * 10);
         civData.cavalry.owned -= diff;
