@@ -934,6 +934,13 @@ button {
     background-color: #cc4;
 }
 
+.attacker {
+    background-color: green;
+}
+.defender {
+    background-color: red;
+}
+
 .bar span {
     display: none;
     position: relative;
@@ -952,6 +959,9 @@ button {
     display: block;
 }
 
+.fightBar {
+    display: none;
+}
 #morale {
 }
 #morale1 {
