@@ -19,7 +19,6 @@ function createUIComponents() {
 
 var UIComponents = createUIComponents();
 
-
 // Pass this the item definition object.
 // Or pass nothing, to create a blank row.
 //function getResourceRowText(purchaseObj) {
