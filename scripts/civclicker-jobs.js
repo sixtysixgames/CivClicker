@@ -3,7 +3,7 @@
 
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
-    var millMod = 1;
+    let millMod = 1;
     if (population.current > 0) {
         millMod = population.living / population.current;
     }
@@ -19,39 +19,39 @@ function doFarmers() {
     civData.food.owned += civData.food.net;
 
     if (civData.skinning.owned && civData.farmer.owned > 0) { //and sometimes get skins
-        var specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
-        var skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
-        var skinsEarned = rndRound(skinsChance);
+        let specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
+        let skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
+        let skinsEarned = rndRound(skinsChance);
         civData.skins.net += skinsEarned;
         civData.skins.owned += skinsEarned;
     }
 }
 
 function doWoodcutters() {
-    var efficiency = civData.woodcutter.efficiency + (0.1 * civData.woodcutter.efficiency * civData.felling.owned);
+    let efficiency = civData.woodcutter.efficiency + (0.1 * civData.woodcutter.efficiency * civData.felling.owned);
     //civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
     civData.wood.net = civData.woodcutter.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
     civData.wood.owned += civData.wood.net;
 
     if (civData.harvesting.owned && civData.woodcutter.owned > 0) { //and sometimes get herbs
-        var specialChance = civData.wood.specialChance + (0.1 * civData.reaping.owned);
-        var herbsChance = specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
-        var herbsEarned = rndRound(herbsChance);
+        let specialChance = civData.wood.specialChance + (0.1 * civData.reaping.owned);
+        let herbsChance = specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
+        let herbsEarned = rndRound(herbsChance);
         civData.herbs.net += herbsEarned;
         civData.herbs.owned += herbsEarned;
     }
 }
 
 function doMiners() {
-    var efficiency = civData.miner.efficiency + (0.1 * civData.miner.efficiency * civData.mining.owned);
+    let efficiency = civData.miner.efficiency + (0.1 * civData.miner.efficiency * civData.mining.owned);
     //civData.stone.net = civData.miner.owned * (civData.miner.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
     civData.stone.net = civData.miner.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
     civData.stone.owned += civData.stone.net;
 
     if (civData.prospecting.owned && civData.miner.owned > 0) { //and sometimes get ore
-        var specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
-        var oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
-        var oreEarned = rndRound(oreChance);
+        let specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
+        let oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
+        let oreEarned = rndRound(oreChance);
         civData.ore.net += oreEarned;
         civData.ore.owned += oreEarned;
     }
@@ -61,10 +61,10 @@ function doBlacksmiths() {
     if (civData.blacksmith.owned  <= 0) { return; }
     // we don't want to use up ore if we aren't making metal
     if (civData.metal.owned < civData.metal.limit) {
-        var efficiency = civData.blacksmith.efficiency + (0.1 * civData.blacksmith.efficiency * civData.mathematics.owned);
-        var oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * efficiency * curCiv.morale.efficiency));
+        let efficiency = civData.blacksmith.efficiency + (0.1 * civData.blacksmith.efficiency * civData.mathematics.owned);
+        let oreUsed = Math.min(civData.ore.owned, (civData.blacksmith.owned * efficiency * curCiv.morale.efficiency));
         oreUsed = Math.min(oreUsed, civData.metal.limit - civData.metal.owned); // can't make more than we can store
-        var metalEarned = oreUsed * getWonderBonus(civData.metal);
+        let metalEarned = oreUsed * getWonderBonus(civData.metal);
         civData.ore.net -= oreUsed;
         civData.ore.owned -= oreUsed;
 
@@ -77,10 +77,10 @@ function doTanners() {
     if (civData.tanner.owned  <= 0) { return; }
      // we don't want to use up skins if we aren't making leather
     if (civData.leather.owned < civData.leather.limit) {
-        var efficiency = civData.tanner.efficiency + (0.1 * civData.tanner.efficiency * civData.astronomy.owned);
-        var skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * efficiency * curCiv.morale.efficiency));
+        let efficiency = civData.tanner.efficiency + (0.1 * civData.tanner.efficiency * civData.astronomy.owned);
+        let skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * efficiency * curCiv.morale.efficiency));
         skinsUsed = Math.min(skinsUsed, civData.leather.limit - civData.leather.owned); // can't make more than we can store
-        var leatherEarned = skinsUsed * getWonderBonus(civData.leather);
+        let leatherEarned = skinsUsed * getWonderBonus(civData.leather);
         civData.skins.net -= skinsUsed;
         civData.skins.owned -= skinsUsed;
 
@@ -92,10 +92,10 @@ function doApothecaries() {
     if (civData.healer.owned  <= 0) { return; }
     // we don't want to use up herbs if we aren't making potions
     if (civData.potions.owned < civData.potions.limit) {
-        var efficiency = civData.healer.efficiency + (0.1 * civData.healer.efficiency * civData.medicine.owned);
-        var herbsUsed = Math.min(civData.herbs.owned, (civData.healer.owned * efficiency * curCiv.morale.efficiency));
+        let efficiency = civData.healer.efficiency + (0.1 * civData.healer.efficiency * civData.medicine.owned);
+        let herbsUsed = Math.min(civData.herbs.owned, (civData.healer.owned * efficiency * curCiv.morale.efficiency));
         herbsUsed = Math.min(herbsUsed, civData.potions.limit - civData.potions.owned); // can't make more than we can store
-        var potionsEarned = herbsUsed * getWonderBonus(civData.potions);
+        let potionsEarned = herbsUsed * getWonderBonus(civData.potions);
         civData.herbs.net -= herbsUsed;
         civData.herbs.owned -= herbsUsed;
 
@@ -105,16 +105,21 @@ function doApothecaries() {
 }
 function doClerics() {
 
-    var pietyEarned = (
-        civData.cleric.owned
-        * (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
-        * (1 + ((civData.secrets.owned)
-            * (1 - 100 / (civData.graveyard.owned + 100))))
-        * curCiv.morale.efficiency
-        * getWonderBonus(civData.piety)
-    );
+    //var pietyEarned = (
+    //    civData.cleric.owned
+    //    * (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
+    //    * (1 + ((civData.secrets.owned)
+    //        * (1 - 100 / (civData.graveyard.owned + 100))))
+    //    * curCiv.morale.efficiency
+    //    * getWonderBonus(civData.piety)
+    //);
+    //// lose piety for having temples but no clerics
+    //if (civData.cleric.owned == 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -civData.cleric.efficiency; }
+
+    let bonus = getPietyEarnedBonus();
+    let pietyEarned = civData.cleric.owned * bonus;
     // lose piety for having temples but no clerics
-    if (civData.cleric.owned == 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -civData.cleric.efficiency; }
+    if (civData.cleric.owned == 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -bonus; }
 
     civData.piety.net += pietyEarned;
     civData.piety.owned += pietyEarned;
@@ -123,12 +128,12 @@ function doClerics() {
 function doHealers() {
     if (civData.healer.owned <= 0 || civData.potions.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without potions
 
-    var job, numHealed = 0;
-    var numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
+    let job, numHealed = 0;
+    let numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
     // How much healing can we do?
     civData.healer.cureCount += (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
 
-    var cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
+    let cureCount = (numHealers * civData.healer.efficiency * curCiv.morale.efficiency);
     // We can't cure more sick people than there are
     civData.healer.cureCount = Math.min(civData.healer.cureCount, population.totalSick);
     // We can't cure more sick people than there are potions
@@ -242,19 +247,19 @@ function doPlague() {
 
     //var deathRoll = (100 * Math.random());
     // there are 4 possibilities: die, survive, spread, nothing - therefore
-    var chance = 0.025;
+    let chance = 0.025;
 
     if (Math.random() < chance) { 
-        var victims = Math.ceil(population.totalSick / 2 * Math.random());
+        let victims = Math.ceil(population.totalSick / 2 * Math.random());
 
         if (victims <= 0) { return false; }
-        var died = 0;
-        var lastVictim = "citizen";
-        for (var d = 1; d <= victims; d++) {
-            var jobInfected = getRandomPatient();
+        let died = 0;
+        let lastVictim = "citizen";
+        for (let d = 1; d <= victims; d++) {
+            let jobInfected = getRandomPatient();
 
             if (isValid(jobInfected)) {
-                var unitInfected = civData[jobInfected];
+                let unitInfected = civData[jobInfected];
 
                 if (isValid(unitInfected) && unitInfected.ill > 0 && unitInfected.owned > 0) {
                     killUnit(unitInfected);
@@ -275,12 +280,12 @@ function doPlague() {
     }
     else if (Math.random() < chance) {
         // some sick victims recover naturally
-        var survivors = Math.ceil(population.totalSick / 2 * Math.random());
+        let survivors = Math.ceil(population.totalSick / 2 * Math.random());
         if (survivors <= 0) { return false; }
-        var survived = 0;
-        var lastJob = "citizen";
-        for (var s = 1; s <= survivors; s++) {
-            var job = getRandomPatient();
+        let survived = 0;
+        let lastJob = "citizen";
+        for (let s = 1; s <= survivors; s++) {
+            let job = getRandomPatient();
 
             if (isValid(job) && isValid(civData[job])) {
                 healByJob(job);
@@ -300,9 +305,9 @@ function doPlague() {
         // plague spreads
         // needs to be same odds as catching plague in doCorpses civData.corpses.owned
         //var infected = Math.floor(population.healthy / 2 * Math.random()) + 1;
-        var infected = Math.ceil(population.totalSick / 2 * (1 + civData.feast.owned) * Math.random());
+        let infected = Math.ceil(population.totalSick / 2 * (1 + civData.feast.owned) * Math.random());
         if (infected <= 0) { return false; }
-        var num = spreadPlague(infected);
+        let num = spreadPlague(infected);
         if (num == 1) {
             gameLog("The plague spreads to a new citizen.");
         }
@@ -315,19 +320,21 @@ function doPlague() {
 }
 
 function doGraveyards() {
-    var i;
+    //var i;
 
     if (civData.corpses.owned > 0 && curCiv.grave.owned > 0 && civData.piety.owned > 0) {
         //Clerics will bury corpses if there are graves to fill and corpses lying around
-        for (i = 0; i < civData.cleric.owned; i++) {
+        for (let i = 0; i < civData.cleric.owned; i++) {
             if (civData.corpses.owned > 0 && curCiv.grave.owned > 0 && civData.piety.owned > 0) {
                 civData.corpses.owned -= 1;
                 curCiv.grave.owned -= 1;
 
                 // it costs to bury
                 //var pietyEarned = -civData.cleric.efficiency; 
-                civData.piety.net -= 1;
-                civData.piety.owned -= 1;
+                if (civData.piety.owned > 0) {
+                    civData.piety.net -= getPietyEarnedBonus();
+                    civData.piety.owned -= getPietyEarnedBonus();
+                }
             }
             else {
                 // if criteria not met, no point continuing
@@ -358,10 +365,10 @@ function doCorpses() {
     //if (sickChance >= 1) { return; }
 
     // more corpses should mean more chance of disease
-    var sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
+    let sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
     // increase percentage to reduce frequency
     //var test = population.healthy * 0.5 * Math.random();
-    var test = population.healthy * (1 + civData.feast.owned) * Math.random();
+    let test = population.healthy * (1 + civData.feast.owned) * Math.random();
 
     // if corpses owned is greater than upto %age of population, then chance of sickness spreading
     if (sickChance < test) { return; }
@@ -369,7 +376,7 @@ function doCorpses() {
     // Infect up to 1% of the healthy population.
     // if there are sick already, then see doPlague()
     if (population.healthy > 0 && population.totalSick == 0) {
-        var infected = Math.floor(population.healthy / 100 * Math.random());
+        let infected = Math.floor(population.healthy / 100 * Math.random());
         if (infected <= 0) { return; }
 
         infected = spreadPlague(infected);
@@ -387,10 +394,10 @@ function doCorpses() {
     // Corpses have a slight chance of decaying (at least there is a bright side)
     if (Math.random() < 1 / 100) {
         //civData.corpses.owned -= 1;
-        var gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
+        let gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
-        var corpse = " corpse" + ((gone > 1) ? "s" : "");
-        var action = " rotted away";
+        let corpse = " corpse" + ((gone > 1) ? "s" : "");
+        let action = " rotted away";
         if (Math.random() < 0.33) {
             action = " eaten by vermin";
         } else if (Math.random() < 0.66) {
@@ -408,8 +415,8 @@ function doCorpses() {
 // 66g TODO: this could be improved.  maybe add id of worker to building type
 function dismissWorkers() {
     // we only lose a worker if an occupied building is destroyed
-    var diff = 0;
-    var total = 0;
+    let diff = 0;
+    let total = 0;
 
     total = getTotalByJob(unitType.tanner);
     if (total > 0 && total > civData.tannery.owned) {
