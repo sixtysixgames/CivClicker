@@ -285,7 +285,7 @@ function healByJob(job, num) {
 }
 
 // include sick and healthy
-function totalByJob(job) {
+function getTotalByJob(job) {
     if (!isValid(job) || !job) { return 0; }
 
     var num = civData[job].ill + civData[job].owned;
@@ -348,6 +348,9 @@ function checkResourceLimits() {
     resourceData.forEach(function (resource) {
         if (resource.owned > resource.limit) {
             resource.owned = resource.limit;
+        }
+        if (resource.owned < 0) {
+            resource.owned = 0;
         }
     });
 }
@@ -419,7 +422,6 @@ function calculatePopulation() {
 
     // somehow managed to get 0.5 corpse, let's just round down any bits of a body left over
     civData.corpses.owned = Math.floor(civData.corpses.owned);
-
 }
 // Picks the next worker to starve.  Kills the sick first, then the healthy.
 // Deployed military starve last.
