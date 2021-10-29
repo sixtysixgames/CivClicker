@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 function getCivType() {
-    var civType = civSizes.getCivSize(population.living).name;
+    let civType = civSizes.getCivSize(population.living).name;
     if (population.living === 0 && population.limit >= 1000) {
         civType = "Ghost Town";
     }
@@ -18,9 +18,9 @@ function getReqText(costObj, qty) {
     costObj = valOf(costObj, qty); // valOf evals it if it's a function
     if (!isValid(costObj)) { return ""; }
 
-    var i, num;
-    var text = "";
-    for (i in costObj) {
+    let num;
+    let text = "";
+    for (let i in costObj) {
         // If the cost is a function, eval it with qty as a param.  Otherwise
         // just multiply by qty.
         num = (typeof costObj[i] == "function") ? (costObj[i](qty)) : (costObj[i] * qty);
@@ -36,8 +36,8 @@ function getReqText(costObj, qty) {
 // Undefined prereqs are assumed to mean the item is unpurchasable
 function meetsPrereqs(prereqObj) {
     if (!isValid(prereqObj)) { return false; }
-    var i;
-    for (i in prereqObj) {
+    //let i;
+    for (let i in prereqObj) {
         //xxx HACK:  Ugly special checks for non-upgrade pre-reqs.
         // This should be simplified/eliminated once the resource
         // system is unified.
@@ -65,8 +65,8 @@ function canAfford(costObj, qty) {
     if (!isValid(costObj)) { return 0; }
     if (qty === undefined) { qty = Infinity; } // default to as many as we can
     if (qty === false) { qty = -1; } // Selling back a boolean item.
-    var i;
-    for (i in costObj) {
+
+    for (let i in costObj) {
         if (costObj[i] === 0) { continue; }
 
         //xxx We don't handle nonlinear costs here yet.
@@ -94,8 +94,8 @@ function payFor(costObj, qty) {
     qty = Math.min(qty, canAfford(costObj));
     if (qty === 0) { return 0; }
 
-    var i, num;
-    for (i in costObj) {
+    let num;
+    for (let i in costObj) {
         // If the cost is a function, eval it with qty as a param.  Otherwise
         // just multiply by qty.
         num = (typeof costObj[i] == "function") ? (costObj[i](qty)) : (costObj[i] * qty);
@@ -136,19 +136,86 @@ function canPurchase(purchaseObj, qty) {
     // if source limit has changed ie barracks destroyed, we need to check limit of source
     if (purchaseObj.isDest && purchaseObj.isDest() && qty < 0) {
         // we can't relocate back more than the limit
-        //debug(purchaseObj.id + " dest qty = " + qty);
-        //debug(purchaseObj.id + " dest qty = " + qty + " - limit=" + civData[purchaseObj.source].limit + " - owned=" + civData[purchaseObj.source].owned);
         qty = Math.max(qty, civData[purchaseObj.source].owned - civData[purchaseObj.source].limit);
-        //debug(" dest qty = " + qty);
     }
 
     // See if we can afford them; return fewer if we can't afford them all
     return Math.min(qty, canAfford(purchaseObj.require));
 }
 
+// Buys or sells a unit, building, or upgrade.
+// Pass a positive number to buy, a negative number to sell.
+// If it can't add/remove as many as requested, does as many as it can.
+// Pass Infinity/-Infinity as the num to get the max possible.
+// Pass "custom" or "-custom" to use the custom increment.
+// Returns the actual number bought or sold (negative if fired).
+function doPurchase(objId, num) {
+    let purchaseObj = civData[objId];
+    if (!purchaseObj) {
+        console.log("Unknown purchase: " + objId);
+        sysLog("Unknown purchase: " + objId);
+        return 0;
+    }
+    if (num === undefined) { num = 1; }
+    if (abs(num) == "custom") { num = sgn(num) * getCustomNumber(purchaseObj); }
+
+    num = canPurchase(purchaseObj, num);  // How many can we actually get?
+
+    // Pay for them
+    num = payFor(purchaseObj.require, num);
+    if (abs(num) < 1) {
+        gameLog("Could not build, insufficient resources."); // I18N
+        return 0;
+    }
+
+    //Then increment the total number of that building
+    // Do the actual purchase; coerce to the proper type if needed
+    purchaseObj.owned = matchType(purchaseObj.owned + num, purchaseObj.initOwned);
+    if (purchaseObj.source) { civData[purchaseObj.source].owned -= num; }
+
+    // Post-purchase triggers
+    if (isValid(purchaseObj.onGain)) { purchaseObj.onGain(num); } // Take effect
+
+    //Increase devotion if the purchase provides it.
+    if (isValid(purchaseObj.devotion)) {
+        civData.devotion.owned += purchaseObj.devotion * num;
+        // If we've exceeded this deity's prior max, raise it too.
+        if (curCiv.deities[0].maxDev < civData.devotion.owned) {
+            curCiv.deities[0].maxDev = civData.devotion.owned;
+            makeDeitiesTables();
+        }
+    }
+
+    // If building, then you use up free land
+    if (purchaseObj.type == civObjType.building) {
+        civData.freeLand.owned -= num;
+        // check for overcrowding
+        if (civData.freeLand.owned < 0) {
+            gameLog("You are suffering from overcrowding.");  // I18N
+            adjustMorale(Math.max(num, -civData.freeLand.owned) * -0.0025 * (civData.codeoflaws.owned ? 0.5 : 1.0));
+        }
+
+        // v1.4 managed to get 0.5 land, round down
+        civData.freeLand.owned = Math.floor(civData.freeLand.owned);
+    }
+
+    updateRequirements(purchaseObj); //Increases buildings' costs
+    updateResourceTotals(); //Update page with lower resource values and higher building total
+    updatePopulation(); //Updates the army display
+    updateResourceRows(); //Update resource display
+    updateBuildingButtons(); //Update the buttons themselves
+    updateJobButtons(); //Update page with individual worker numbers, since limits might have changed.
+    updatePartyButtons();
+    updateUpgrades(); //Update which upgrades are available to the player
+    updateDevotion(); //might be necessary if building was an altar
+    updateTargets(); // might enable/disable raiding
+
+    return num;
+}
+
 function getLandTotals() {
     //Update land values
-    var ret = { lands: 0, buildings: 0, free: 0, sackableTotal: 0 };
+    let ret = { lands: 0, buildings: 0, free: 0, sackableTotal: 0 };
     buildingData.forEach(function (elem) {
         if (elem.subType == subTypes.land) { ret.free += elem.owned; }
         else { ret.buildings += elem.owned; }
@@ -190,20 +257,20 @@ function calcZombieCost(num) {
 //xxx Take a parameter for how many people to pick.
 //xxx Make this able to return multiples by returning a cost structure.
 function getRandomHealthyWorker() {
-    var num = Math.random() * population.healthy;
-    var chance = 0;
-    var i;
-    for (i = 0; i < killable.length; ++i) {
+    let num = Math.random() * population.healthy;
+    let chance = 0;
+
+    for (let i = 0; i < killable.length; ++i) {
         chance += civData[killable[i].id].owned;
         if (chance > num) { return killable[i].id; }
     }
     return "";
 }
 function getRandomWorker() {
-    var num = Math.random() * population.living;
-    var chance = 0;
-    var i;
-    for (i = 0; i < killable.length; ++i) {
+    let num = Math.random() * population.living;
+    let chance = 0;
+
+    for (let i = 0; i < killable.length; ++i) {
         chance += civData[killable[i].id].owned;
         if (chance > num) { return killable[i].id; }
     }
@@ -211,11 +278,11 @@ function getRandomWorker() {
 }
 //Selects a random sackable building based on its proportions in the current distribution.
 function getRandomBuilding() {
-    var landTotals = getLandTotals();
-    var num = Math.random() * landTotals.sackableTotal;
-    var chance = 0;
-    var i;
-    for (i = 0; i < sackable.length; ++i) {
+    let landTotals = getLandTotals();
+    let num = Math.random() * landTotals.sackableTotal;
+    let chance = 0;
+
+    for (let i = 0; i < sackable.length; ++i) {
         chance += civData[sackable[i].id].owned;
         if (chance > num) { return sackable[i].id; }
     }
@@ -223,16 +290,15 @@ function getRandomBuilding() {
 }
 //Selects a random lootable resource based on its proportions in the current distribution.
 function getRandomLootableResource() {
-    var i;
-    var total = 0;
-    for (i = 0; i < lootable.length; ++i) {
+    let total = 0;
+    for (let i = 0; i < lootable.length; ++i) {
         //total += civData[lootable[i].id].owned;
         total += lootable[i].owned;
     }
-    var num = Math.random() * total;
-    var chance = 0;
+    let num = Math.random() * total;
+    let chance = 0;
 
-    for (i = 0; i < lootable.length; ++i) {
+    for (let i = 0; i < lootable.length; ++i) {
         //chance += civData[lootable[i].id].owned;
         chance += lootable[i].owned;
         if (chance > num) { return lootable[i].id; }
@@ -240,17 +306,16 @@ function getRandomLootableResource() {
     return "";
 }
 function getRandomTradeableResource() {
-    var i;
-    var total = 0;
-    var tradeable = [];
-    for (i = 0; i < lootable.length; ++i) {
+    let total = 0;
+    let tradeable = [];
+    for (let i = 0; i < lootable.length; ++i) {
         if (lootable[i].owned > 0) {
             tradeable.push(lootable[i]);
         }
     }
     if (tradeable.length == 0) { return ""; }
 
-    var selected = tradeable[Math.floor(Math.random() * tradeable.length)];
+    let selected = tradeable[Math.floor(Math.random() * tradeable.length)];
     return selected;
 
 }
@@ -263,9 +328,9 @@ function adjustMorale(delta) {
     }
     if (population.current > 0) { //dividing by zero is bad for hive
         //calculates zombie proportion (zombies do not become happy or sad)
-        var fraction = population.living / population.current;
-        var max = 1 + (0.5 * fraction);
-        var min = 1 - (0.5 * fraction);
+        let fraction = population.living / population.current;
+        let max = 1 + (0.5 * fraction);
+        let min = 1 - (0.5 * fraction);
         //alters morale
         curCiv.morale.efficiency += delta * fraction;
         //Then check limits (50 is median, limits are max 0 or 100, but moderated by fraction of zombies)
@@ -296,19 +361,17 @@ function healByJob(job, num) {
 // include sick and healthy
 function getTotalByJob(job) {
     if (!isValid(job) || !job) { return 0; }
-
-    var num = civData[job].ill + civData[job].owned;
+    let num = civData[job].ill + civData[job].owned;
     return num;
 }
 
 //Selects random workers, transfers them to their Ill variants
 function spreadPlague(sickNum) {
-    var actualNum = 0;
-    var i;
+    let actualNum = 0;
 
     calculatePopulation();
     // Apply in 1-worker groups to spread it out.
-    for (i = 0; i < sickNum; i++) {
+    for (let i = 0; i < sickNum; i++) {
         actualNum += -healByJob(getRandomHealthyWorker(), -1);
     }
 
@@ -317,17 +380,16 @@ function spreadPlague(sickNum) {
 
 // Select a sick worker type to cure, with certain priorities
 function getNextPatient() {
-    var i;
-    for (i = 0; i < PATIENT_LIST.length; ++i) {
+    for (let i = 0; i < PATIENT_LIST.length; ++i) {
         if (civData[PATIENT_LIST[i]].ill > 0) { return PATIENT_LIST[i]; }
     }
     return "";
 }
 
 function getRandomPatient(n) {
-    var i = Math.floor(Math.random() * PATIENT_LIST.length);
+    let i = Math.floor(Math.random() * PATIENT_LIST.length);
     n = n || 1; // counter to stop infinite loop
-    var stop = Math.max(PATIENT_LIST.length, population.totalSick);
+    let stop = Math.max(PATIENT_LIST.length, population.totalSick);
     if (n > stop) {
         return false;
     }
@@ -436,11 +498,11 @@ function calculatePopulation() {
 // Deployed military starve last.
 // Return the job ID of the selected target.
 //function pickStarveTarget() {
-//    var modNum, jobNum;
-//    var modList = ["ill", "owned"]; // The sick starve first
+//    let modNum, jobNum;
+//    let modList = ["ill", "owned"]; // The sick starve first
 //    //xxx Remove this hard-coded list.  Priority of least to most importance
 //    // todo: should probably be random job
-//    var jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
+//    let jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
 //    unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
 
 //    for (modNum = 0; modNum < modList.length; ++modNum) {
@@ -455,25 +517,185 @@ function calculatePopulation() {
 //    return null;
 //}
 function pickStarveTarget() {
-
-    var id = getRandomPatient();
-    //debug(id);
+    let id = getRandomPatient();
     if (isValid(id) && id) { return civData[id];}
 
     id = getRandomWorker();
-    //debug(id);
     if (isValid(id) && id) { return civData[id]; }
 
     return null;
 }
 
-function getPietyBonus() {
-    var bonus1 = ((civData.theism.owned ? 1 : 0) * 10);
-    var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 25);
-    var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
+function getPietyLimitBonus() {
+    let bonus1 = ((civData.theism.owned ? 1 : 0) * 10);
+    let bonus2 = ((civData.polytheism.owned ? 1 : 0) * 25);
+    let bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
 
-    //var bonus1 = (civData.theism.owned ? 2 : 1) * 10;
-    //var bonus2 = (civData.polytheism.owned ? 2 : 1) * 25;
-    //var bonus3 = (civData.monotheism.owned ? 2 : 1) * 50;
     return bonus1 + bonus2 + bonus3;
+}
+function getPietyEarnedBonus() {
+    let pietyEarned = 
+         (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
+        * (1 + ((civData.secrets.owned)
+            * (1 - 100 / (civData.graveyard.owned + 100))))
+        * curCiv.morale.efficiency
+        * getWonderBonus(civData.piety);
+
+    return pietyEarned;
+}
+
+// Creates or destroys workers
+function spawn(num) {
+    let newJobId = unitType.unemployed;
+    let bums = civData.unemployed;
+    if (num == "custom") { num = getCustomNumber(bums); }
+    if (num == "-custom") { num = -getCustomNumber(bums); }
+
+    // Find the most workers we can spawn
+    num = Math.max(num, -bums.owned);  // Cap firing by # in that job.
+    num = Math.min(num, logSearchFn(calcWorkerCost, civData.food.owned));
+
+    // Apply population limit, and only allow whole workers.
+    num = Math.min(num, (population.limit - population.living));
+
+    // Update numbers and resource levels
+    civData.food.owned -= calcWorkerCost(num);
+
+    // New workers enter as a job that has been selected, but we only destroy idle ones.
+    newJobId = ui.find("#newSpawnJobSelection").value;
+    if (num >= 0 && typeof civData[newJobId] === "object") {
+        civData[newJobId].owned += num;
+    } else {
+        bums.owned += num;
+    }
+    calculatePopulation(); //Run through the population->job update cycle
+
+    //This is intentionally independent of the number of workers spawned
+    if (Math.random() * 100 < 1 + (civData.lure.owned)) { spawnCat(); }
+
+    updateResourceTotals(); //update with new resource number
+    updatePopulation();
+
+    return num;
+}
+
+// Culls workers when they starve.
+function starve(num) {
+    let targetObj;
+    let starveCount = 0;
+    if (num === undefined) { num = 1; }
+    num = Math.min(num, population.living);
+
+    for (let i = 0; i < num; ++i) {
+        starveCount += killUnit(pickStarveTarget());
+    }
+    return starveCount;
+}
+
+function doStarve() {
+    let corpsesEaten, numberStarve;
+    if (civData.food.owned < 0 && civData.waste.owned) // Workers eat corpses if needed
+    {
+        corpsesEaten = Math.min(civData.corpses.owned, -civData.food.owned);
+        civData.corpses.owned -= corpsesEaten;
+        civData.food.owned += corpsesEaten;
+    }
+
+    if (civData.food.owned < 0) { // starve if there's not enough food.
+        //xxx This is very kind.  Only 0.1% deaths no matter how big the shortage?
+        //numberStarve = starve(Math.ceil(population.living / 1000));
+        //Only 1.0% deaths no matter how big the shortage? a larger number will reduce the population quicker
+        numberStarve = starve(Math.ceil(Math.random() * population.living / 100));
+        if (numberStarve == 1) {
+            gameLog("A citizen starved to death");
+        } else if (numberStarve > 1) {
+            gameLog(prettify(numberStarve) + " citizens starved to death");
+        }
+        //adjustMorale(-0.0025); adjusted in kill
+        civData.food.owned = 0;
+    }
+}
+
+function doHomeless() {
+    // 50% chance
+    if (population.living > population.limit && Math.random() < 0.5) {
+        // we have homeless, let some die of exposure
+        let numHomeless = population.living - population.limit;
+        // kill off up to 20% of homeless
+        let numDie = starve(Math.ceil(Math.random() * numHomeless / 5));
+        if (numDie == 1) {
+            gameLog("A homeless citizen died of exposure");
+        } else if (numDie > 1) {
+            gameLog(prettify(numDie) + " homeless citizens died of exposure");
+        }
+    }
+}
+
+function killUnit(unit) {
+    if (!unit) { return 0; }
+    //let killed = 0;
+    if (unit.ill) { unit.ill -= 1; }
+    else { unit.owned -= 1; }
+
+    civData.corpses.owned += 1; //Increments corpse number
+    //Workers dying may trigger Book of the Dead
+    if (civData.book.owned) { civData.piety.owned += 10; }
+
+    if (population.living > 50) {
+        // the greater the population, the less the drop in morale
+        adjustMorale(-0.0025 / population.living);
+    }
+
+    calculatePopulation();
+    return 1;
+}
+
+function digGraves(num) {
+    //Creates new unfilled graves.
+    curCiv.grave.owned += 100 * num;
+    updatePopulation(); //Update page with grave numbers
+}
+
+//This function is called every time a player clicks on a primary resource button
+function increment(objId) {
+    let purchaseObj = civData[objId];
+    let numArmy = 0;
+
+    if (!purchaseObj) {
+        console.log("Unknown purchase: " + objId);
+        sysLog("Unknown purchase: " + objId);
+        return;
+    }
+
+    unitData.forEach(function (elem) {
+        if ((elem.alignment == alignmentType.player) && (elem.species == speciesType.human)
+            && (elem.combatType) && (elem.place == placeType.home)) {
+            numArmy += elem.owned;
+        }
+    }); // Nationalism adds military units.
+
+    purchaseObj.owned += purchaseObj.increment
+        + (purchaseObj.increment * 9 * (civData.civilservice.owned))
+        + (purchaseObj.increment * 40 * (civData.feudalism.owned))
+        + ((civData.serfs.owned) * Math.floor(Math.log(civData.unemployed.owned * 10 + 1)))
+        + ((civData.nationalism.owned) * Math.floor(Math.log(numArmy * 10 + 1)));
+
+    //Handles random collection of special resources.
+    let specialChance = purchaseObj.specialChance;
+    if (specialChance && purchaseObj.specialMaterial && civData[purchaseObj.specialMaterial]) {
+        if ((purchaseObj === civData.food) && (civData.flensing.owned)) { specialChance += 0.1; }
+        if ((purchaseObj === civData.stone) && (civData.macerating.owned)) { specialChance += 0.1; }
+        if ((purchaseObj === civData.wood) && (civData.reaping.owned)) { specialChance += 0.1; }
+        if (Math.random() < specialChance) {
+            let specialMaterial = civData[purchaseObj.specialMaterial];
+            let specialQty = purchaseObj.increment * (1 + (9 * (civData.guilds.owned)));
+            specialMaterial.owned += specialQty;
+            gameLog("Found " + specialMaterial.getQtyName(specialQty) + " while " + purchaseObj.activity); // I18N
+        }
+    }
+    //Checks to see that resources are not exceeding their limits
+    if (purchaseObj.owned > purchaseObj.limit) { purchaseObj.owned = purchaseObj.limit; }
+
+    ui.find("#clicks").innerHTML = prettify(Math.round(++curCiv.resourceClicks));
+    updateResourceTotals(); //Update the page with totals
 }
