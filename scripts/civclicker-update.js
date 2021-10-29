@@ -640,6 +640,7 @@ function updateMorale() {
     //first check there's someone to be happy or unhappy, not including zombies
     if (population.living < 1) {
         elt.className = "";
+        updateMoraleIcon(0);
         return;
     }
 
@@ -650,12 +651,14 @@ function updateMorale() {
     else { happinessRank = 5; }
 
     elt.className = "happy-" + happinessRank;
-
-    ui.show("#morale1", happinessRank == 1);
-    ui.show("#morale2", happinessRank == 2);
-    ui.show("#morale3", happinessRank == 3);
-    ui.show("#morale4", happinessRank == 4);
-    ui.show("#morale5", happinessRank == 5);
+    updateMoraleIcon(happinessRank);
+}
+function updateMoraleIcon(morale) {
+    ui.show("#morale1", morale == 1);
+    ui.show("#morale2", morale == 2);
+    ui.show("#morale3", morale == 3);
+    ui.show("#morale4", morale == 4);
+    ui.show("#morale5", morale == 5);
 }
 
 function addWonderSelectText() {
