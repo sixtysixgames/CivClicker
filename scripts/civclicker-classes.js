@@ -16,7 +16,7 @@ VersionData.prototype.toString = function () {
 function CivObj(props, asProto) {
     if (!(this instanceof CivObj)) { return new CivObj(props); } // Prevent accidental namespace pollution
     //xxx Should these just be taken off the prototype's property names?
-    var names = asProto ? null : [
+    let names = asProto ? null : [
         "id", "name", "subType", "owned", "prereqs", "require", "salable", "vulnerable", "effectText"
         , "prestige", "initOwned", "init", "reset", "limit", "hasVariableCost", "tradeAmount"
     ];
@@ -60,10 +60,10 @@ CivObj.prototype = {
     // 'require' has a variable cost.  Which is currently true, but might not
     // always be.
     hasVariableCost: function () {
-        var i;
+        let i;
         // If our requirements have a getter, assume variable.
         //xxx This won't work if it inherits a variable desc.
-        var requireDesc = Object.getOwnPropertyDescriptor(this, "require");
+        let requireDesc = Object.getOwnPropertyDescriptor(this, "require");
         if (!requireDesc) { return false; } // Unpurchaseable
         if (requireDesc.get !== undefined) { return true; }
         // If our requirements contain a function, assume variable.
