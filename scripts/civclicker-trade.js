@@ -15,14 +15,14 @@ function startTrader() {
     // Set timer length (12 sec + 5 sec/upgrade)
     curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
 
-    //var selected = lootable[Math.floor(Math.random() * lootable.length)];
+    //let selected = lootable[Math.floor(Math.random() * lootable.length)];
     // select a resource the player actually has some to trade
-    var selected = getRandomTradeableResource();
+    let selected = getRandomTradeableResource();
     if (isValid(selected)) {
         curCiv.trader.materialId = selected.id;
         curCiv.trader.requested = selected.baseTradeAmount * (Math.ceil(Math.random() * 100)); // Up to 20x amount
         // between 75% and 100% of resource limit
-        var limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25)
+        let limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25)
         curCiv.trader.requested = Math.min(selected.limit, curCiv.trader.requested);
         // and finally, we don't want less than the initial amount
         if (curCiv.trader.requested < selected.initTradeAmount) {
@@ -34,7 +34,7 @@ function startTrader() {
 }
 
 function trade() {
-    var materialId = curCiv.trader.materialId;
+    let materialId = curCiv.trader.materialId;
     if (!checkTradeAmounts(materialId)) { return; }
     //check we have enough of the right type of resources to trade
     if (!curCiv.trader.materialId || (curCiv.trader.materialId.owned < curCiv.trader.requested)) {
@@ -43,7 +43,7 @@ function trade() {
     }
 
     //subtract resources, add gold
-    var material = civData[curCiv.trader.materialId];
+    let material = civData[curCiv.trader.materialId];
 
     material.owned -= curCiv.trader.requested;
     curCiv.trader.userTraded = true;
@@ -58,7 +58,7 @@ function isTraderHere() {
 }
 
 function checkTradeAmounts(materialId) {
-    var ret = true;
+    let ret = true;
     if (!isValid(curCiv[materialId].tradeAmount)) { sysLog("Missing curCiv tradeAmount for " + materialId); ret = false; }
     if (!isValid(civData[materialId].baseTradeAmount)) { sysLog("Missing civData baseTradeAmount for " + materialId); ret = false; }
     return ret;
@@ -68,8 +68,8 @@ function buy(materialId) {
     if (!checkTradeAmounts(materialId)) { return; }
     if (civData.gold.owned < 1) { return; }
 
-    var material = civData[materialId];
-    var currentAmount = curCiv[materialId].tradeAmount;
+    let material = civData[materialId];
+    let currentAmount = curCiv[materialId].tradeAmount;
 
     material.owned += currentAmount;
     --civData.gold.owned;
@@ -78,8 +78,8 @@ function buy(materialId) {
 }
 
 function updateTradeButton(materialId, cost) {
-    var materialCostID = "#" + materialId + "Cost";
-    var elem = ui.find(materialCostID);
+    let materialCostID = "#" + materialId + "Cost";
+    let elem = ui.find(materialCostID);
     if (!elem) { console.warn("Missing UI element for " + materialCostID); return; }
 
     elem.innerHTML = prettify(cost);
@@ -98,8 +98,8 @@ function updateTradeButtons() {
 }
 
 function tickTraders() {
-    var delayMult = 60 * (3 - ((civData.currency.owned) + (civData.commerce.owned)));
-    var check;
+    let delayMult = 60 * (3 - ((civData.currency.owned) + (civData.commerce.owned)));
+    let check;
     //traders occasionally show up
     if (population.current > 0) {
         ++curCiv.trader.counter;
@@ -122,7 +122,7 @@ function tickTraders() {
 }
 
 function updateTradeAmount() {
-    var materialId = curCiv.trader.materialId;
+    let materialId = curCiv.trader.materialId;
 
     // simply change to 10% whatever was requested
     curCiv[materialId].tradeAmount = Math.floor(curCiv.trader.requested / 10);
