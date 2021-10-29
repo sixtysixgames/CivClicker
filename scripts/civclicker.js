@@ -406,14 +406,14 @@ function doStarve() {
     if (civData.food.owned < 0) { // starve if there's not enough food.
         //xxx This is very kind.  Only 0.1% deaths no matter how big the shortage?
         //numberStarve = starve(Math.ceil(population.living / 1000));
-        //Only 1.0% deaths no matter how big the shortage?
+        //Only 1.0% deaths no matter how big the shortage? a larger number will reduce the population quicker
         numberStarve = starve(Math.ceil(Math.random() * population.living / 100));
         if (numberStarve == 1) {
             gameLog("A citizen starved to death");
         } else if (numberStarve > 1) {
             gameLog(prettify(numberStarve) + " citizens starved to death");
         }
-        adjustMorale(-0.0025);
+        //adjustMorale(-0.0025); adjusted in kill
         civData.food.owned = 0;
     }
 }
@@ -422,8 +422,8 @@ function doHomeless() {
     if (population.living > population.limit) {
         // we have homeless, let some die of exposure
         var numHomeless = population.living - population.limit;
-        // kill off up to 1% of homeless
-        var numDie = starve(Math.ceil(Math.random() * numHomeless / 100));
+        // kill off up to 20% of homeless
+        var numDie = starve(Math.ceil(Math.random() * numHomeless / 5));
         if (numDie == 1) {
             gameLog("A homeless citizen died of exposure");
         } else if (numDie > 1) {
