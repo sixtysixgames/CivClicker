@@ -32,9 +32,12 @@ function spawnMob(mobObj, num) {
     var num_sge = 0, msg = "";
 
     if (num === undefined) { // By default, base numbers on current population
-        var max_mob = (population.current / 50); // is this 2% too small? 
+        var max_mob = (population.limit / 50); // is this 2% too small? 
         //No! According to research a standing army was about 1% of total population
+        // However, the enemy force should not be based on player population.  See invade
         num = Math.ceil(max_mob * Math.random());
+        // invaders require a larger army
+        if (mobObj.id === unitType.invader) { num *= 4; }
     }
 
     if (num === 0) { return num; }  // Nobody came
@@ -75,10 +78,10 @@ function invade(ecivtype) {
     //curCiv.raid.plunderLoot = { 
     //	freeLand: Math.round(baseLoot * (1 + (civData.administration.owned))) 
     //};
-    // land between 75 and 95%
+    // land between 25 and 50% because it can be doubled with administration
     var baseLand = baseLoot * (1 + (civData.administration.owned));
     curCiv.raid.plunderLoot = {
-        freeLand: Math.floor((baseLand * 0.75) + Math.floor(Math.random() * (baseLand * 0.2)))
+        freeLand: Math.floor((baseLand * 0.25) + Math.floor(Math.random() * (baseLand * 0.25)))
     };
     lootable.forEach(function (elem) { curCiv.raid.plunderLoot[elem.id] = Math.round(baseLoot * Math.random()); });
 
@@ -300,8 +303,6 @@ function doSlaughter(attacker) {
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
 function doSlaughterMulti(attacker) {
-    //var killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
-
     // kill up to %age of attacking force
     var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
     var kills = 0;
@@ -337,8 +338,9 @@ function doSlaughterMulti(attacker) {
         }
     }
     if (kills > 0) {
-        var killVerb = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens slaughtered by ";
-        gameLog(prettify(kills) + killVerb + attacker.getQtyName(2)); // always use plural attacker
+        var killVerb = Math.random() < 0.5 ? "captured" : "slaughtered";
+        var killNote = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens " + killVerb + " by ";
+        gameLog(prettify(kills) + killNote + attacker.getQtyName(2)); // always use plural attacker
         calculatePopulation();
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
@@ -513,11 +515,11 @@ function doSiege(siegeObj, targetObj) {
         ++hits; // hit
         if (--targetObj.owned <= 0) { break; }
     }
-
     return hits;
 }
 
 //Handling raids
+//starts when player clicks button on Conquest page. see invade
 function doRaid(place, attackAlignment, defendAlignment) {
     if (!curCiv.raid.raiding) {
         ui.show("#fightBar", false);
@@ -581,18 +583,19 @@ function doMobs() {
     //Checks when mobs will attack
     //xxx Perhaps this should go after the mobs attack, so we give 1 turn's warning?
     var mobType, choose;
-    if (population.current > 0) { // No attacks if deserted.
+    //var civLimit = population.current; 
+    var civLimit = population.limit; // attacks can still happen if there are buildings to destroy
+    if (civLimit > 0) { // No attacks if nothing.
         ++curCiv.attackCounter;
     }
 
     // we don't want mobs attacking tiny populations
-    //population.current > 1 &&
     var limit = (60 * 5) + Math.floor(60 * 5 * Math.random()); //Minimum 5 minutes, max 10
     if (curCiv.attackCounter > limit) {
         // attempt at forcing attacks more frequently the larger the civ
         // 10 because that is max pop of a thorp
-        var rnum = population.current * Math.random();
-        var rnum2 = (population.current * Math.random()) / 10;
+        var rnum = civLimit * Math.random();
+        var rnum2 = (civLimit * Math.random()) / 10;
         
         //if (600 * Math.random() < 1) {
         //debug(rnum + "<" + rnum2);
@@ -601,7 +604,7 @@ function doMobs() {
 
             // we don't want wolves/bandits attacking large settlements/nations
             // or barbarians/invaders attacking small ones
-            if (population.current < civSizes.thorp.min_pop) {
+            if (civLimit < civSizes.thorp.min_pop) {
                 // mostly wolves
                 if (Math.random() < 0.99) {
                     mobType = mobTypeIds.wolf;
@@ -610,7 +613,7 @@ function doMobs() {
                     mobType = mobTypeIds.bandit;
                 }
             }
-            else if (population.current >= civSizes.thorp.min_pop && population.current < civSizes.village.min_pop) {
+            else if (civLimit >= civSizes.thorp.min_pop && civLimit < civSizes.village.min_pop) {
                 // mostly wolves
                 if (Math.random() < 0.75) {
                     mobType = mobTypeIds.wolf;
@@ -619,7 +622,7 @@ function doMobs() {
                     mobType = mobTypeIds.bandit;
                 }
             }
-            else if (population.current >= civSizes.village.min_pop && population.current < civSizes.town.min_pop) {
+            else if (civLimit >= civSizes.village.min_pop && civLimit < civSizes.town.min_pop) {
                 // wolf or bandit
                 if (Math.random() < 0.5) {
                     mobType = mobTypeIds.wolf;
@@ -628,7 +631,7 @@ function doMobs() {
                     mobType = mobTypeIds.bandit;
                 }
             }
-            else if (population.current >= civSizes.town.min_pop && population.current < civSizes.smallCity.min_pop) {
+            else if (civLimit >= civSizes.town.min_pop && civLimit < civSizes.smallCity.min_pop) {
                 // mostly bandits
                 if (Math.random() < 0.75) {
                     mobType = mobTypeIds.bandit;
@@ -637,7 +640,7 @@ function doMobs() {
                     mobType = mobTypeIds.barbarian;
                 }
             }
-            else if (population.current >= civSizes.smallCity.min_pop && population.current < civSizes.largeCity.min_pop) {
+            else if (civLimit >= civSizes.smallCity.min_pop && civLimit < civSizes.largeCity.min_pop) {
                 // bandits or barbarians
                 if (Math.random() < 0.5) {
                     mobType = mobTypeIds.bandit;
@@ -646,7 +649,7 @@ function doMobs() {
                     mobType = mobTypeIds.barbarian;
                 }
             }
-            else if (population.current >= civSizes.largeCity.min_pop && population.current < civSizes.smallNation.min_pop) {
+            else if (civLimit >= civSizes.largeCity.min_pop && civLimit < civSizes.smallNation.min_pop) {
                 // mostly barbarians
                 if (Math.random() < 0.75) {
                     mobType = mobTypeIds.barbarian;
@@ -655,7 +658,7 @@ function doMobs() {
                     mobType = mobTypeIds.invader;
                 }
             }
-            else if (population.current >= civSizes.smallNation.min_pop && population.current < civSizes.largeNation.min_pop) {
+            else if (civLimit >= civSizes.smallNation.min_pop && civLimit < civSizes.largeNation.min_pop) {
                 // barbarians or invaders
                 if (Math.random() < 0.5) {
                     mobType = mobTypeIds.barbarian;
@@ -664,7 +667,7 @@ function doMobs() {
                     mobType = mobTypeIds.invader;
                 }
             }
-            else if (population.current >= civSizes.largeNation.min_pop) {
+            else if (civLimit >= civSizes.largeNation.min_pop) {
                 // mainly invaders 
                 if (Math.random() < 0.25) {
                     mobType = mobTypeIds.barbarian;
