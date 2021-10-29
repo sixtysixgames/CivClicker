@@ -29,10 +29,10 @@ function playerCombatMods() {
 
 /* Enemies */
 function spawnMob(mobObj, num) {
-    var num_sge = 0, msg = "";
+    let num_sge = 0, msg = "";
 
     if (num === undefined) { // By default, base numbers on current population
-        var max_mob = (population.limit / 50); // is this 2% too small? 
+        let max_mob = (population.limit / 50); // is this 2% too small? 
         //No! According to research a standing army was about 1% of total population
         // However, the enemy force should not be based on player population.  See invade
         num = Math.ceil(max_mob * Math.random());
@@ -71,7 +71,7 @@ function invade(ecivtype) {
     civData.efort.owned += Math.floor(Math.random() * (curCiv.raid.epop / 5000));
 
     // Glory redoubles rewards (doubled here because doubled already above)
-    var baseLoot = curCiv.raid.epop / (1 + (civData.glory.timer <= 0));
+    let baseLoot = curCiv.raid.epop / (1 + (civData.glory.timer <= 0));
 
     // Set rewards of land and other random plunder.
     //xxx Maybe these should be partially proportionate to the actual number of defenders?
@@ -79,7 +79,7 @@ function invade(ecivtype) {
     //	freeLand: Math.round(baseLoot * (1 + (civData.administration.owned))) 
     //};
     // land between 25 and 50% because it can be doubled with administration
-    var baseLand = baseLoot * (1 + (civData.administration.owned));
+    let baseLand = baseLoot * (1 + (civData.administration.owned));
     curCiv.raid.plunderLoot = {
         freeLand: Math.floor((baseLand * 0.25) + Math.floor(Math.random() * (baseLand * 0.25)))
     };
@@ -92,8 +92,7 @@ function invade(ecivtype) {
 function onInvade(control) { return invade(dataset(control, "target")); }
 
 function onInvadeMult(control) {
-    var times = dataset(control, "value");
-    //console.log('inv mult', times)
+    let times = dataset(control, "value");
 
     curCiv.raid.invadeciv = dataset(control, "target");
     switch (times.toString()) {
@@ -121,8 +120,8 @@ function breakInvadeLoop() {
 }
 
 function plunder() {
-    var plunderMsg = "";
-    var raidNewsElt = ui.find("#raidNews");
+    let plunderMsg = "";
+    let raidNewsElt = ui.find("#raidNews");
 
     // If we fought our largest eligible foe, but not the largest possible, raise the limit.
     if ((curCiv.raid.targetMax != civSizes[civSizes.length - 1].id) && curCiv.raid.last == curCiv.raid.targetMax) {
@@ -138,9 +137,9 @@ function plunder() {
     // Collect loot
     //payFor(curCiv.raid.plunderLoot, -1);  // We pay for -1 of these to receive them. 
     // Why?  If land is negative, this results in incorrect value
-    var i, num;
-    var lootObj = curCiv.raid.plunderLoot;
-    for (i in lootObj) {
+    let num;
+    let lootObj = curCiv.raid.plunderLoot;
+    for (let i in lootObj) {
         num = lootObj[i];
         if (!num) { continue; }
         civData[i].owned += num;
@@ -180,11 +179,11 @@ function doFight(attacker, defender) {
     if ((attacker.owned <= 0) || (defender.owned <= 0)) {return;}
 
     // Defenses vary depending on whether the player is attacking or defending.
-    var fortMod = (defender.alignment == alignmentType.player ?
+    let fortMod = (defender.alignment == alignmentType.player ?
                     (civData.fortification.owned * civData.fortification.efficiency)
                     : (civData.efort.owned * civData.efort.efficiency));
-    //var palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
-    var defenceMod = 0;
+    //let palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
+    let defenceMod = 0;
     if (defender.alignment == alignmentType.player) {
         defenceMod += civData.rampart.owned ? civData.rampart.efficiency : 0;
         defenceMod += civData.palisade.owned ? civData.palisade.efficiency : 0;
@@ -193,9 +192,9 @@ function doFight(attacker, defender) {
 
     // Determine casualties on each side.  Round fractional casualties
     // probabilistically, and don't inflict more than 100% casualties.
-    var attackerCas = Math.min(attacker.owned, rndRound(getCasualtyMod(defender, attacker) * defender.owned * defender.efficiency));
-    //var defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - palisadeMod) * Math.max(1 - fortMod, 0)));
-    var defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - defenceMod) * Math.max(1 - fortMod, 0)));
+    let attackerCas = Math.min(attacker.owned, rndRound(getCasualtyMod(defender, attacker) * defender.owned * defender.efficiency));
+    //let defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - palisadeMod) * Math.max(1 - fortMod, 0)));
+    let defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - defenceMod) * Math.max(1 - fortMod, 0)));
 
     attacker.owned -= attackerCas;
     defender.owned -= defenderCas;
@@ -203,7 +202,7 @@ function doFight(attacker, defender) {
     updateFightBar(attacker, defender);
 
     // Give player credit for kills.
-    var playerCredit = ((attacker.alignment == alignmentType.player) ? defenderCas : (defender.alignment == alignmentType.player) ? attackerCas : 0);
+    let playerCredit = ((attacker.alignment == alignmentType.player) ? defenderCas : (defender.alignment == alignmentType.player) ? attackerCas : 0);
 
     //Increments enemies slain, corpses, and piety
     curCiv.enemySlain.owned += playerCredit;
@@ -223,7 +222,7 @@ function doFight(attacker, defender) {
 function doWolves(attacker) {
     // eat corpses first
     if (civData.corpses.owned > 0) {
-        var gone = Math.ceil((Math.random() * attacker.owned / 100));
+        let gone = Math.ceil((Math.random() * attacker.owned / 100));
         civData.corpses.owned -= gone;
         attacker.owned -= gone; // wolves leave after eating
         // just in case
@@ -237,28 +236,28 @@ function doWolves(attacker) {
 }
 function doBandits(attacker) {
     // bandits mainly loot
-    var r = Math.random();
+    let r = Math.random();
     if (r < 0.1) { doSlaughter(attacker); }
     else if (r < 0.2) { doSack(attacker); } 
     else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
     //barbarians mainly kill, steal and destroy
-    var r = Math.random();
+    let r = Math.random();
     if (r < 0.3) {
-        if (Math.random() < 0.5) { doSlaughter(attacker); }
+        if (Math.random() < 0.6) { doSlaughter(attacker); }
         else { doSlaughterMulti(attacker); }
     }
     else if (r < 0.6) { doLoot(attacker); }
     else if (r < 0.9) {
-        if (Math.random() < 0.49) { doSack(attacker); }
-        else if (Math.random() < 0.49) { doSackMulti(attacker);}
+        if (Math.random() < 0.59) { doSack(attacker); }
+        else if (Math.random() < 0.39) { doSackMulti(attacker);}
         else { doDesecrate(attacker);}
     }
     else { doConquer(attacker); }
 }
 function doInvaders(attacker) {
-    var r = Math.random();
+    let r = Math.random();
     if (r < 0.24) { doSlaughterMulti(attacker); }
     else if (r < 0.48) { doLoot(attacker); }
     else if (r < 0.72) { doSackMulti(attacker); }
@@ -268,11 +267,11 @@ function doInvaders(attacker) {
 
 // kill
 function doSlaughter(attacker) {
-    var killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
-    //var target = getRandomHealthyWorker(); //Choose random worker
-    var target = getRandomWorker(); //Choose random worker
+    let killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
+    //let target = getRandomHealthyWorker(); //Choose random worker
+    let target = getRandomWorker(); //Choose random worker
     if (target) {
-        var targetUnit = civData[target];
+        let targetUnit = civData[target];
         if (targetUnit.owned >= 1) {
             // An attacker may disappear after killing
             if (Math.random() < attacker.killStop) { --attacker.owned; }
@@ -291,7 +290,7 @@ function doSlaughter(attacker) {
             gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
         }
         if (targetUnit.owned <= 0) { // Attackers slowly leave once everyone is dead
-            var leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
+            let leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
             attacker.owned -= leaving;
         }
     }
@@ -300,14 +299,14 @@ function doSlaughter(attacker) {
 }
 function doSlaughterMulti(attacker) {
     // kill up to %age of attacking force
-    var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
-    var kills = 0;
-    for (var k = 1; k <= targets; k++) {
-        //var target = getRandomHealthyWorker(); //Choose random worker
+    let targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
+    let kills = 0;
+    for (let k = 1; k <= targets; k++) {
+        //let target = getRandomHealthyWorker(); //Choose random worker
         // sick people get killed as well
-        var target = getRandomWorker(); //Choose random worker
-        var lastTarget = "citizen";
-        var targetUnit = civData[target];
+        let target = getRandomWorker(); //Choose random worker
+        let lastTarget = "citizen";
+        let targetUnit = civData[target];
         if (target) {
             if (targetUnit.owned >= 1) {
                 // An attacker may disappear after killing
@@ -328,14 +327,14 @@ function doSlaughterMulti(attacker) {
                 }
             }
             if (targetUnit.owned <= 0) { // Attackers slowly leave once everyone is dead
-                var leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
+                let leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
                 attacker.owned -= leaving;
             }
         }
     }
     if (kills > 0) {
-        var killVerb = Math.random() < 0.5 ? "captured" : "slaughtered";
-        var killNote = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens " + killVerb + " by ";
+        let killVerb = Math.random() < 0.5 ? "captured" : "slaughtered";
+        let killNote = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens " + killVerb + " by ";
         gameLog(prettify(kills) + killNote + attacker.getQtyName(2)); // always use plural attacker
         calculatePopulation();
     }
@@ -345,12 +344,12 @@ function doSlaughterMulti(attacker) {
 // rob
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
-    //var target = lootable[Math.floor(Math.random() * lootable.length)];
-    var targetID = getRandomLootableResource();
-    var target = civData[targetID];
+    //let target = lootable[Math.floor(Math.random() * lootable.length)];
+    let targetID = getRandomLootableResource();
+    let target = civData[targetID];
     if (isValid(target) && target.owned > 0) {
-        var stolenQty = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
-        stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items.  TODO: global var
+        let stolenQty = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
+        stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items.  TODO: global constant for items
         // target.owned can be decimal.  we can't loot more than is available
         stolenQty = Math.min(stolenQty, Math.floor(target.owned));
         if (stolenQty > 0) {
@@ -361,7 +360,7 @@ function doLoot(attacker) {
     }
     if (isValid(target) && target.owned <= 0) {
         //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.lootFatigue);
+        let leaving = Math.ceil(attacker.owned * Math.random() * attacker.lootFatigue);
         attacker.owned -= leaving;
     }
 
@@ -372,10 +371,10 @@ function doLoot(attacker) {
 // burn
 function doSack(attacker) {
     //Destroy building
-    var target = sackable[Math.floor(Math.random() * sackable.length)];
+    let target = sackable[Math.floor(Math.random() * sackable.length)];
 
     if (target.owned > 0) {
-        var destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        let destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
         // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
 
@@ -391,7 +390,7 @@ function doSack(attacker) {
     }
     if (target.owned <= 0) {
         //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
+        let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
@@ -399,14 +398,13 @@ function doSack(attacker) {
 
 function doSackMulti(attacker) {
     //Destroy buildings
-
     // sack up to % of attacking force
-    var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.sackMax);
-    var sacks = 0;
-    var lastTarget = "building";
-    for (var s = 1; s <= targets; s++) {
-        var targetID = getRandomBuilding(); //sackable[Math.floor(Math.random() * sackable.length)];
-        var target = civData[targetID];
+    let targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.sackMax);
+    let sacks = 0;
+    let lastTarget = "building";
+    for (let s = 1; s <= targets; s++) {
+        let targetID = getRandomBuilding(); //sackable[Math.floor(Math.random() * sackable.length)];
+        let target = civData[targetID];
 
         if (isValid(target) && target.owned > 0) {
             --target.owned;
@@ -420,7 +418,7 @@ function doSackMulti(attacker) {
         }
         if (isValid(target) && target.owned <= 0) {
             //some will leave
-            var leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
+            let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
             attacker.owned -= leaving;
         }
         if (attacker.owned < 0) { attacker.owned = 0; }
@@ -428,7 +426,7 @@ function doSackMulti(attacker) {
     }
 
     if (sacks > 0) {
-        var destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
+        let destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
         gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
@@ -441,8 +439,8 @@ function doSackMulti(attacker) {
 function doConquer(attacker) {
     if (civData.freeLand.owned > 0) {
         // up to % of attacking force or land - this might need adjusting
-        var targets = Math.min(attacker.owned, civData.freeLand.owned);
-        var land = Math.ceil(Math.random() * targets * attacker.conquerMax);
+        let targets = Math.min(attacker.owned, civData.freeLand.owned);
+        let land = Math.ceil(Math.random() * targets * attacker.conquerMax);
         land = Math.min(civData.freeLand.owned, land);
         if (land > 0) {
             civData.freeLand.owned -= land;
@@ -453,7 +451,7 @@ function doConquer(attacker) {
     }
     if (civData.freeLand.owned <= 0) {
         //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
+        let leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
         attacker.owned -= leaving;
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
@@ -470,12 +468,12 @@ function doConquer(attacker) {
 // desecrate graves
 function doDesecrate(attacker) {
     if (civData.graveyard.owned > 0) {
-        // up to % of attacking force or land - this might need adjusting
-        var targets = Math.min(attacker.owned, civData.graveyard.owned);
-        var land = Math.ceil(Math.random() * targets * attacker.sackMax);
+        // up to 1% of attacking force or land - this might need adjusting
+        let targets = Math.min(attacker.owned, civData.graveyard.owned);
+        let land = Math.ceil(Math.random() * targets * 0.01);
         land = Math.min(civData.graveyard.owned, land);
         if (land > 0) {
-            var target = (land == 1) ? "graveyard" : "graveyards";
+            let target = (land == 1) ? "graveyard" : "graveyards";
 
             civData.graveyard.owned -= land;
             //curCiv.grave.owned -= 1;
@@ -490,19 +488,19 @@ function doDesecrate(attacker) {
     }
     if (civData.graveyard.owned <= 0) {
         //some will leave
-        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
+        let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
 
 function doShades() {
-    var defender = civData.shade;
+    let defender = civData.shade;
     if (defender.owned <= 0) { return; }
 
     // Attack each enemy in turn.
     getCombatants(defender.place, alignmentType.enemy).forEach(function (attacker) {
-        var num = Math.floor(Math.min((attacker.owned / 4), defender.owned));
+        let num = Math.floor(Math.min((attacker.owned / 4), defender.owned));
         //xxx Should we give book and throne credit here?
         defender.owned -= num;
         attacker.owned -= num;
@@ -537,11 +535,11 @@ function doEsiege(siegeObj, targetObj) {
 // Process siege engine attack.
 // Returns the number of hits.
 function doSiege(siegeObj, targetObj) {
-    var i, hit, hits = 0;
+    let hit, hits = 0;
     // Only half can fire every round due to reloading time.
     // We also allow no more than 2 per defending fortification.
-    var firing = Math.ceil(Math.min(siegeObj.owned / 2, targetObj.owned * 2));
-    for (i = 0; i < firing; ++i) {
+    let firing = Math.ceil(Math.min(siegeObj.owned / 2, targetObj.owned * 2));
+    for (let i = 0; i < firing; ++i) {
         hit = Math.random();
         if (hit > 0.95) { --siegeObj.owned; } // misfire; destroys itself
         if (hit >= siegeObj.efficiency) { continue; } // miss
@@ -559,8 +557,8 @@ function doRaid(place, attackAlignment, defendAlignment) {
         return;
     } // We're not raiding right now.
     
-    var attackers = getCombatants(place, attackAlignment);
-    var defenders = getCombatants(place, defendAlignment);
+    let attackers = getCombatants(place, attackAlignment);
+    let defenders = getCombatants(place, defendAlignment);
 
     ui.show("#fightBar", attackers.length && defenders.length);
 
@@ -598,10 +596,10 @@ function doRaid(place, attackAlignment, defendAlignment) {
 
 function doRaidCheck(place, attackAlignment, defendAlignment) {
     if (curCiv.raid.raiding && curCiv.raid.victory) {
-        var attackers = getCombatants(place, attackAlignment);
+        let attackers = getCombatants(place, attackAlignment);
         if (curCiv.raid.left > 0) {
             plunder(); // plunder resources before new raid
-            var troopsCount = attackers.reduce((acc, val) => acc + val.owned, 0);
+            let troopsCount = attackers.reduce((acc, val) => acc + val.owned, 0);
             if (troopsCount > 0) { // attack
                 curCiv.raid.left -= 1;
                 invade(curCiv.raid.invadeciv);
@@ -615,20 +613,20 @@ function doRaidCheck(place, attackAlignment, defendAlignment) {
 function doMobs() {
     //Checks when mobs will attack
     //xxx Perhaps this should go after the mobs attack, so we give 1 turn's warning?
-    var mobType, choose;
-    //var civLimit = population.current; 
-    var civLimit = population.limit; // attacks can still happen if there are buildings to destroy
+    let mobType, choose;
+    //let civLimit = population.current; 
+    let civLimit = population.limit; // attacks can still happen if there are buildings to destroy
     if (civLimit > 0) { // No attacks if nothing.
         ++curCiv.attackCounter;
     }
 
     // we don't want mobs attacking tiny populations
-    var limit = (60 * 5) + Math.floor(60 * 5 * Math.random()); //Minimum 5 minutes, max 10
+    let limit = (60 * 5) + Math.floor(60 * 5 * Math.random()); //Minimum 5 minutes, max 10
     if (curCiv.attackCounter > limit) {
         // attempt at forcing attacks more frequently the larger the civ
         // 10 because that is max pop of a thorp
-        var rnum = civLimit * Math.random();
-        var rnum2 = (civLimit * Math.random()) / 10;
+        let rnum = civLimit * Math.random();
+        let rnum2 = (civLimit * Math.random()) / 10;
         
         //if (600 * Math.random() < 1) {
         //debug(rnum + "<" + rnum2);
@@ -717,7 +715,7 @@ function doMobs() {
     getCombatants(placeType.home, alignmentType.enemy).forEach(function (attacker) {
         if (attacker.owned <= 0) { return; } // In case the last one was killed in an earlier iteration.
 
-        var defenders = getCombatants(attacker.place, alignmentType.player);
+        let defenders = getCombatants(attacker.place, alignmentType.player);
         if (!defenders.length) { attacker.onWin(); return; } // Undefended 
 
         defenders.forEach(function (defender) { doFight(attacker, defender); }); // FIGHT!
