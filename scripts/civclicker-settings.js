@@ -209,7 +209,7 @@ function save(savetype) {
 
         //Update console for debugging, also the player depending on the type of save (manual/auto)
         if (savetype == saveTypes.auto) {
-            console.log("Autosave");
+            //console.log("Autosaved");
             sysLog("Autosaved");
         } else if (savetype == saveTypes.manual) {
             alert("Game Saved");
