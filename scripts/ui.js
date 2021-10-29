@@ -44,11 +44,11 @@
 		},
 		isHidden: function (selector) {
 			// NOTE: This does not work for fixed-position elements
-			var elt = ui.find(selector);
+			let elt = ui.find(selector);
 			return (elt.offsetParent === null);
 		},
 		toggle: function (selector, force) {
-			var elt = ui.find(selector);
+			let elt = ui.find(selector);
 			if (ui.isHidden(elt)) {
 				elt.style.display = "block";
 				return true;
@@ -68,13 +68,11 @@
 		// Returns the input visibility state, or undefined on an error.
 		show: function (selector, visible) {
 
-			var elt = ui.find(selector);
-			var displayVal;
-			var tagName;
+			let elt = ui.find(selector);
+			let displayVal;
+			let tagName;
 
-			if (!elt) {
-				return undefined;
-			}
+			if (!elt) { return undefined; }
 
 			// If the visibility is unspecified, toggle it.
 			if (visible === undefined) { 
