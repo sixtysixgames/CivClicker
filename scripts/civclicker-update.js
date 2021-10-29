@@ -443,6 +443,18 @@ function updateLandBar() {
     barElt.innerHTML = ('<div style="width: ' + p + '%; background-color: ' + bg + '"></div>');
 }
 
+function updateFightBar(attacker, defender) {
+    var barElt = ui.find("#fightBar");
+    var h = '';
+    var apc = attacker.owned * 100 / (attacker.owned + defender.owned);
+    var dpc = 100 - apc;
+
+    h += '<div class="attacker" style="width: ' + apc + '%"></div>';
+    h += '<div class="defender" style="width: ' + dpc + '%"></div>';
+    
+    barElt.innerHTML = '<div style="min-width: 100%">' + h + '</div>';
+}
+
 // Check to see if the player has an upgrade and hide as necessary
 // Check also to see if the player can afford an upgrade and enable/disable as necessary
 function updateUpgrades() {
