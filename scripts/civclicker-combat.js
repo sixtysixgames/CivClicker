@@ -246,28 +246,24 @@ function doBarbarians(attacker) {
     //barbarians mainly kill, steal and destroy
     var r = Math.random();
     if (r < 0.3) {
-        if (Math.random() < 0.5) {
-            doSlaughter(attacker);
-        } else {
-            doSlaughterMulti(attacker);
-        }
+        if (Math.random() < 0.5) { doSlaughter(attacker); }
+        else { doSlaughterMulti(attacker); }
     }
     else if (r < 0.6) { doLoot(attacker); }
     else if (r < 0.9) {
-        if (Math.random() < 0.5) {
-            doSack(attacker);
-        } else {
-            doSackMulti(attacker);
-        }
+        if (Math.random() < 0.49) { doSack(attacker); }
+        else if (Math.random() < 0.49) { doSackMulti(attacker);}
+        else { doDesecrate(attacker);}
     }
     else { doConquer(attacker); }
 }
 function doInvaders(attacker) {
     var r = Math.random();
-    if (r < 0.25) { doSlaughterMulti(attacker); }
-    else if (r < 0.5) { doLoot(attacker); }
-    else if (r < 0.75) { doSackMulti(attacker); }
-    else { doConquer(attacker); }
+    if (r < 0.24) { doSlaughterMulti(attacker); }
+    else if (r < 0.48) { doLoot(attacker); }
+    else if (r < 0.72) { doSackMulti(attacker); }
+    else if (r < 0.96) { doConquer(attacker); }
+    else { doDesecrate(attacker);}
 }
 
 // kill
@@ -404,7 +400,7 @@ function doSack(attacker) {
 function doSackMulti(attacker) {
     //Destroy buildings
 
-    // sack up to 25% of attacking force
+    // sack up to % of attacking force
     var targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.sackMax);
     var sacks = 0;
     var lastTarget = "building";
@@ -444,7 +440,7 @@ function doSackMulti(attacker) {
 // occupy land
 function doConquer(attacker) {
     if (civData.freeLand.owned > 0) {
-        // up to 25% of attacking force or land - this might need adjusting
+        // up to % of attacking force or land - this might need adjusting
         var targets = Math.min(attacker.owned, civData.freeLand.owned);
         var land = Math.ceil(Math.random() * targets * attacker.conquerMax);
         land = Math.min(civData.freeLand.owned, land);
@@ -456,6 +452,43 @@ function doConquer(attacker) {
         }
     }
     if (civData.freeLand.owned <= 0) {
+        //some will leave
+        var leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
+        attacker.owned -= leaving;
+    }
+    if (attacker.owned < 0) { attacker.owned = 0; }
+}
+
+/*// these buildings have 10 units
+    total = getTotalByJob(unitType.soldier);
+    if (total > 0 && total > civData.barracks.owned * 10) {
+        diff = total - (civData.barracks.owned * 10);
+        civData.soldier.owned -= diff;
+        civData.unemployed.owned += diff;
+    }
+ * */
+// desecrate graves
+function doDesecrate(attacker) {
+    if (civData.graveyard.owned > 0) {
+        // up to % of attacking force or land - this might need adjusting
+        var targets = Math.min(attacker.owned, civData.graveyard.owned);
+        var land = Math.ceil(Math.random() * targets * attacker.sackMax);
+        land = Math.min(civData.graveyard.owned, land);
+        if (land > 0) {
+            var target = (land == 1) ? "graveyard" : "graveyards";
+
+            civData.graveyard.owned -= land;
+            //curCiv.grave.owned -= 1;
+            if (curCiv.grave.owned > (civData.graveyard.owned * 100)) {
+                curCiv.grave.owned = curCiv.grave.owned - (civData.graveyard.owned * 100);
+            }
+            civData.freeLand.owned += land;
+            gameLog(prettify(land) + " " + target + " desecrated by " + attacker.getQtyName(2)); // always plural
+            // Attackers might leave after conquering land.
+            if (Math.random() < attacker.sackStop) { attacker.owned -= land; }
+        }
+    }
+    if (civData.graveyard.owned <= 0) {
         //some will leave
         var leaving = Math.ceil(attacker.owned * Math.random() * attacker.conquerFatigue);
         attacker.owned -= leaving;
