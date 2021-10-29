@@ -4,7 +4,7 @@
 
 function getCivData() {
     // Initialize Data
-    var civData = [
+    let civData = [
         // Resources
         new Resource({
             id: resourceType.food, name: "food", increment: 1, specialChance: 0.1,
@@ -13,7 +13,7 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                var barnBonus = (civData.granaries.owned ? 2 : 1) * 200;
+                let barnBonus = (civData.granaries.owned ? 2 : 1) * 200;
                 return 200 + (civData.barn.owned * barnBonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -25,7 +25,7 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                var bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
                 return 200 + (civData.woodstock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -37,7 +37,7 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                var bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
                 return 200 + (civData.stonestock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -48,7 +48,7 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 return 100 + (civData.barn.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -59,7 +59,7 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 return 100 + (civData.woodstock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -70,7 +70,7 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                var bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 return 100 + (civData.stonestock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -81,7 +81,7 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 return civData.tannery.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -92,7 +92,7 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 return civData.apothecary.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -103,7 +103,7 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                var bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 return civData.smithy.owned * bonus;
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -112,11 +112,7 @@ function getCivData() {
             id: resourceType.piety, name: "piety",
             vulnerable: false, // Can't be stolen
             get limit() {
-                //var bonus1 = ((civData.theism.owned ? 2 : 1) * 10);
-                //var bonus2 = ((civData.polytheism.owned ? 2 : 1) * 25);
-                //var bonus3 = ((civData.monotheism.owned ? 2 : 1) * 50);
-                //var bonus = bonus1 + bonus2 + bonus3;
-                var bonus = getPietyBonus();
+                let bonus = getPietyLimitBonus();
                 return (civData.temple.owned * 50) + (civData.temple.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -157,7 +153,7 @@ function getCivData() {
             prereqs: { construction: true },
             require: { wood: 30, stone: 70 },
             get effectText() {
-                var maxPop = 10 + 2 * (civData.slums.owned + civData.tenements.owned);
+                let maxPop = 10 + 2 * (civData.slums.owned + civData.tenements.owned);
                 return "+" + maxPop + " max pop.";
             },
             set effectText(value) { return this.require; }, // Only here for JSLint.
@@ -182,8 +178,8 @@ function getCivData() {
             prereqs: { carpentry: true },
             require: { wood: 100, stone: 10 },
             get effectText() {
-                var fbonus = ((civData.granaries.owned ? 2 : 1) * 200);
-                var sbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                let fbonus = ((civData.granaries.owned ? 2 : 1) * 200);
+                let sbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
                 return "+" + fbonus + " food storage; +" + sbonus + " skin storage";
             },
             set effectText(value) { return this.effectText; },
@@ -196,8 +192,8 @@ function getCivData() {
             prereqs: { carpentry: true },
             require: { wood: 100, stone: 10 },
             get effectText() {
-                var wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                var hbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                let wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
+                let hbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
                 return "+" + wbonus + " wood storage; +" + hbonus + " herb storage";
             },
             set effectText(value) { return this.effectText; },
@@ -210,8 +206,8 @@ function getCivData() {
             prereqs: { carpentry: true },
             require: { wood: 100, stone: 10 },
             get effectText() {
-                var sbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                var obonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                let sbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
+                let obonus = ((civData.storehouses.owned ? 2 : 1) * 100);
                 return "+" + sbonus + " stone storage; +" + obonus + " ore storage";
             },
             set effectText(value) { return this.effectText; },
@@ -224,7 +220,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, skins: 5 },
             get effectText() {
-                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
                 return "allows 1 tanner; +" + bonus + " leather storage";
             },
             set effectText(value) { return this.effectText; },
@@ -237,7 +233,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, ore: 5 },
             get effectText() {
-                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
                 return "allows 1 blacksmith; +" + bonus + " metal storage";
             },
             set effectText(value) { return this.effectText; },
@@ -250,7 +246,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
             get effectText() {
-                var bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
                 return "allows 1 healer; +" + bonus + " potion storage";
             },
             set effectText(value) { return this.effectText; },
@@ -264,11 +260,7 @@ function getCivData() {
             require: { wood: 30, stone: 120, herbs: 10 },
             //effectText: "allows 1 cleric; +50 piety storage",
             get effectText() {
-                //var bonus1 = ((civData.theism.owned ? 1 : 0) * 50);
-                //var bonus2 = ((civData.polytheism.owned ? 1 : 0) * 50);
-                //var bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
-                //var bonus = 50 + bonus1 + bonus2 + bonus3;
-                var bonus = 50 + getPietyBonus();
+                let bonus = 50 + getPietyLimitBonus();
                 return "allows 1 cleric; +" + bonus + " piety storage";
             },
             set effectText(value) { return this.effectText; },
@@ -1334,12 +1326,11 @@ function getCivData() {
     ];
 
     function augmentCivData() {
-        var i;
-        var testCivSizeAch = function () {
+        let testCivSizeAch = function () {
             return (this.id == civSizes.getCivSize(population.living).id + "Ach");
         };
         // Add the civ size based achievements to the front of the data, so that they come first.
-        for (i = civSizes.length - 1; i > 0; --i) {
+        for (let i = civSizes.length - 1; i > 0; --i) {
             civData.unshift(new Achievement({
                 id: civSizes[i].id + "Ach",
                 name: civSizes[i].name,
