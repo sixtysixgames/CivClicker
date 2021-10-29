@@ -462,7 +462,7 @@ function getCivData() {
         new Upgrade({
             id: "ploughshares", name: "Ploughshares", subType: subTypes.upgrade,
             prereqs: { domestication: true, metalwork: true },
-            require: { metal: 20 },
+            require: { metal: 200 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
@@ -513,19 +513,19 @@ function getCivData() {
         new Upgrade({
             id: "croprotation", name: "Crop Rotation", subType: subTypes.upgrade,
             prereqs: { agriculture: true },
-            require: { herbs: 5000, piety: 5000 },
+            require: { skins: 5000, herbs: 5000 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
             id: "selectivebreeding", name: "Selective Breeding", subType: subTypes.upgrade,
             prereqs: { agriculture: true },
-            require: { skins: 5000, herbs: 5000 },
+            require: { herbs: 5000, ore: 5000 },
             effectText: "Increase farmer food output"
         }),
         new Upgrade({
             id: "fertilisers", name: "Fertilisers", subType: subTypes.upgrade,
             prereqs: { agriculture: true },
-            require: { ore: 5000, herbs: 5000 },
+            require: { ore: 5000, skins: 5000 },
             effectText: "Increase farmer food output"
         }),
 
@@ -657,19 +657,19 @@ function getCivData() {
         new Upgrade({
             id: "theism", name: "Theism", subType: subTypes.upgrade,
             prereqs: { cleric: 1 },
-            require: { skins: 100, piety: 100 },
+            require: { piety: 100 },
             effectText: "Increase cleric piety generation. Increase piety storage"
         }),
         new Upgrade({
             id: "polytheism", name: "Polytheism", subType: subTypes.upgrade,
             prereqs: { theism: true },
-            require: { skins: 1000, piety: 1000  },
+            require: { piety: 1000  },
             effectText: "Increase cleric piety generation. Increase piety storage"
         }),
         new Upgrade({
             id: "monotheism", name: "Monotheism", subType: subTypes.upgrade,
             prereqs: { polytheism: true },
-            require: { skins: 2500, piety: 5000  },
+            require: { piety: 5000  },
             effectText: "Increase cleric piety generation. Increase piety storage"
         }),
 
@@ -1160,6 +1160,7 @@ function getCivData() {
             id: unitType.soldierParty, singular: "soldier", plural: "soldiers",
             source: unitType.soldier,
             combatType: combatTypes.infantry,
+            require: { food: 2 },
             efficiency_base: 0.05,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
@@ -1171,6 +1172,7 @@ function getCivData() {
             id: unitType.cavalryParty, singular: "cavalry", plural: "cavalry",
             source: unitType.cavalry,
             combatType: combatTypes.cavalry,
+            require: { food: 5 },
             efficiency_base: 0.08,
             get efficiency() { return this.efficiency_base + playerCombatMods(); },
             set efficiency(value) { this.efficiency_base = value; },
