@@ -242,7 +242,7 @@ function doPlague() {
 
     //var deathRoll = (100 * Math.random());
     // there are 4 possibilities: die, survive, spread, nothing - therefore
-    var chance = 0.1;
+    var chance = 0.025;
 
     if (Math.random() < chance) { 
         var victims = Math.ceil(population.totalSick / 2 * Math.random());
@@ -447,12 +447,14 @@ function dismissWorkers() {
         civData.unemployed.owned += diff;
     }
 
+    // cavalry first
     total = getTotalByJob(unitType.cavalry);
     if (total > 0 && total > civData.stable.owned * 10) {
         diff = total - (civData.stable.owned * 10);
         civData.cavalry.owned -= diff;
         civData.unemployed.owned += diff;
     }
+    
 }
 
 function farmerMods(efficiency_base) {
