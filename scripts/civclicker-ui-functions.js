@@ -4,22 +4,22 @@
 // Called when user switches between the various panes on the left hand side of the interface
 // Returns the target pane element.
 function paneSelect(control) {
-    var i, oldTarget;
+    let oldTarget;
     //alert("hello");
 
     // Identify the target pane to be activated, and the currently active
     // selector tab(s).
-    var newTarget = dataset(control, "target");
-    var selectors = ui.find("#selectors");
+    let newTarget = dataset(control, "target");
+    let selectors = ui.find("#selectors");
     if (!selectors) {
         console.log("No selectors found");
         sysLog("No selectors found");
         return null;
     }
-    var curSelects = selectors.getElementsByClassName("selected");
+    let curSelects = selectors.getElementsByClassName("selected");
 
     // Deselect the old panels.
-    for (i = 0; i < curSelects.length; ++i) {
+    for (let i = 0; i < curSelects.length; ++i) {
         oldTarget = dataset(curSelects[i], "target");
         if (oldTarget == newTarget) { continue; }
         document.getElementById(oldTarget).classList.remove("selected");
@@ -28,7 +28,7 @@ function paneSelect(control) {
 
     // Select the new panel.
     control.classList.add("selected");
-    var targetElem = document.getElementById(newTarget);
+    let targetElem = document.getElementById(newTarget);
     if (targetElem) { targetElem.classList.add("selected"); }
     return targetElem;
 }
@@ -50,10 +50,10 @@ function setAutosave(value) {
 function onToggleAutosave(control) { return setAutosave(control.checked); }
 
 function setCustomQuantities(value) {
-    var i;
-    var elems;
-    var curPop = population.current;
-    var totLand = getLandTotals().lands;
+    let i;
+    let elems;
+    let curPop = population.current;
+    let totLand = getLandTotals().lands;
 
     if (value !== undefined) { settings.customIncr = value; }
     ui.find("#toggleCustomQuantities").checked = settings.customIncr;
@@ -139,9 +139,8 @@ function setNotes(value) {
     if (value !== undefined) { settings.notes = value; }
     ui.find("#toggleNotes").checked = settings.notes;
 
-    var i;
-    var elems = document.getElementsByClassName("note");
-    for (i = 0; i < elems.length; ++i) {
+    let elems = document.getElementsByClassName("note");
+    for (let i = 0; i < elems.length; ++i) {
         ui.show(elems[i], settings.notes);
     }
 }
@@ -162,7 +161,7 @@ function textSize(value) {
 function setShadow(value) {
     if (value !== undefined) { settings.textShadow = value; }
     ui.find("#toggleShadow").checked = settings.textShadow;
-    var shadowStyle = "3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff"
+    let shadowStyle = "3px 0 0 #fff, -3px 0 0 #fff, 0 3px 0 #fff, 0 -3px 0 #fff"
         + ", 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff";
     ui.body.style.textShadow = settings.textShadow ? shadowStyle : "none";
 }
@@ -176,9 +175,8 @@ function setIcons(value) {
     if (value !== undefined) { settings.useIcons = value; }
     ui.find("#toggleIcons").checked = settings.useIcons;
 
-    var i;
-    var elems = document.getElementsByClassName("icon");
-    for (i = 0; i < elems.length; ++i) {
+    let elems = document.getElementsByClassName("icon");
+    for (let i = 0; i < elems.length; ++i) {
         // Worksafe implies no icons.
         elems[i].style.visibility = (settings.useIcons && !settings.worksafe) ? "visible" : "hidden";
     }
@@ -216,9 +214,9 @@ function onToggleWorksafe(control) {
 // Generate two HTML <span> texts to display an item's cost and effect note.
 function getCostNote(civObj) {
     // Only add a ":" if both items are present.
-    var reqText = getReqText(civObj.require);
-    var effectText = (isValid(civObj.effectText)) ? civObj.effectText : "";
-    var separator = (reqText && effectText) ? ": " : "";
+    let reqText = getReqText(civObj.require);
+    let effectText = (isValid(civObj.effectText)) ? civObj.effectText : "";
+    let separator = (reqText && effectText) ? ": " : "";
 
     return "<span id='" + civObj.id + "Cost' class='cost'>" + reqText + "</span>"
         + "<span id='" + civObj.id + "Note' class='note'>" + separator + civObj.effectText + "</span>";
@@ -229,16 +227,16 @@ function getCostNote(civObj) {
 function gameLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
-    var d = new Date();
+    let d = new Date();
     // todo: output some sort of in-game date based on how long played
-    var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
+    let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
 
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#logL").innerHTML != message) {
         logRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
-        var i = 30; // Number of lines of log to keep. See the logTable in index.html
+        let i = 30; // Number of lines of log to keep. See the logTable in index.html
         while (--i > 1) { ui.find("#log" + i).innerHTML = ui.find("#log" + (i - 1)).innerHTML; }
         //Since ids need to be unique, log1 strips the ids from the log0 elements when copying the contents.
         ui.find("#log1").innerHTML = (
@@ -248,7 +246,7 @@ function gameLog(message) {
         );
     }
     // Updates most recent line with new time, message, and xNumber.
-    var s = "<td id='logT'>" + curTime + "</td><td id='logL'>" + message + "</td><td id='logR'>";
+    let s = "<td id='logT'>" + curTime + "</td><td id='logL'>" + message + "</td><td id='logR'>";
     if (++logRepeat > 1) { s += "(x" + logRepeat + ")"; } // Optional (xNumber)
     s += "</td>";
     ui.find("#log0").innerHTML = s;
@@ -264,8 +262,8 @@ function debug(message) {
 function sysLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
-    var d = new Date();
-    var curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
+    let d = new Date();
+    let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
 
     console.log(message);
 
@@ -274,7 +272,7 @@ function sysLog(message) {
         sysLogRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
-        var i = 20; // Number of lines of log to keep.
+        let i = 20; // Number of lines of log to keep.
         while (--i > 1) { ui.find("#syslog" + i).innerHTML = ui.find("#syslog" + (i - 1)).innerHTML; }
         //Since ids need to be unique, log1 strips the ids from the log0 elements when copying the contents.
         ui.find("#syslog1").innerHTML = (
@@ -284,7 +282,7 @@ function sysLog(message) {
         );
     }
     // Updates most recent line with new time, message, and xNumber.
-    var s = "<td id='syslogT'>" + curTime + "</td><td id='syslogL'>" + message + "</td><td id='syslogR'>";
+    let s = "<td id='syslogT'>" + curTime + "</td><td id='syslogL'>" + message + "</td><td id='syslogR'>";
     if (++sysLogRepeat > 1) { s += "(x" + sysLogRepeat + ")"; } // Optional (xNumber)
     s += "</td>";
     ui.find("#syslog0").innerHTML = s;
@@ -292,10 +290,10 @@ function sysLog(message) {
 
 function getCustomNumber(civObj) {
     if (!civObj || !civObj.customQtyId) { return undefined; }
-    var elem = document.getElementById(civObj.customQtyId);
+    let elem = document.getElementById(civObj.customQtyId);
     if (!elem) { return undefined; }
 
-    var num = Number(elem.value);
+    let num = Number(elem.value);
 
     // Check the above operations haven't returned NaN
     // Also don't allow negative increments.
