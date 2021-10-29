@@ -31,7 +31,7 @@ function getDeityRowText(deityId, deityObj) {
 
 function makeDeitiesTables() {
     // Display the active deity
-    var deityId = "deityA";
+    let deityId = "deityA";
     ui.find("#activeDeity").innerHTML = '<tr id="' + deityId + '">'
         + '<td><strong><span id="' + deityId + 'Name">' + '</span></strong>'
         + '<span id="' + deityId + 'Domain" class="deityDomain">' + '</span></td>'
@@ -39,7 +39,7 @@ function makeDeitiesTables() {
 
     // Display the table of prior deities.
     //xxx Change this to <th>, need to realign left.
-    var s = "<tr><td><b>Name</b></td><td><b>Domain</b></td><td><b>Max Devotion</b></td></tr>";
+    let s = "<tr><td><b>Name</b></td><td><b>Domain</b></td><td><b>Max Devotion</b></td></tr>";
     curCiv.deities.forEach(function (elem, i) {
         if ((i === 0) && (!elem.name)) { return; } // Don't display current deity-in-waiting.
         s += getDeityRowText("deity" + i, elem);
@@ -89,7 +89,7 @@ function summonShade() {
     if (curCiv.enemySlain.owned <= 0) { return 0; }
     if (!payFor(civData.summonShade.require)) { return 0; }
 
-    var num = Math.ceil(curCiv.enemySlain.owned / 4 + (Math.random() * curCiv.enemySlain.owned / 4));
+    let num = Math.ceil(curCiv.enemySlain.owned / 4 + (Math.random() * curCiv.enemySlain.owned / 4));
     curCiv.enemySlain.owned -= num;
     civData.shade.owned += num;
 
@@ -113,7 +113,7 @@ function selectDeity(domain, force) {
 //xxx This should probably scale based on population (and maybe devotion).
 function wickerman() {
     //Select a random worker
-    var job = getRandomHealthyWorker();
+    let job = getRandomHealthyWorker();
     if (!job) { return; }
 
     //Pay the price
@@ -122,9 +122,9 @@ function wickerman() {
     calculatePopulation(); //Removes killed worker
 
     //Select a random lootable resource
-    var rewardObj = lootable[Math.floor(Math.random() * lootable.length)];
+    let rewardObj = lootable[Math.floor(Math.random() * lootable.length)];
 
-    var qty = Math.floor(Math.random() * 1000);
+    let qty = Math.floor(Math.random() * 1000);
     //xxx Note that this presumes the price is 500 wood.
     if (rewardObj.id == resourceType.wood) { qty = (qty / 2) + 500; } // Guaranteed to at least restore initial cost.
     rewardObj.owned += qty;
@@ -162,15 +162,14 @@ function walk(increment) {
 }
 
 function tickWalk() {
-    var i;
-    var target = "";
+    let target = "";
     if (civData.walk.rate > population.healthy) {
         civData.walk.rate = population.healthy;
         ui.find("#ceaseWalk").disabled = true;
     }
     if (civData.walk.rate <= 0) { return; }
 
-    for (i = 0; i < civData.walk.rate; ++i) {
+    for (let i = 0; i < civData.walk.rate; ++i) {
         target = getRandomHealthyWorker(); //xxx Need to modify this to do them all at once.
         if (!target) { break; }
         --civData[target].owned;
@@ -190,14 +189,13 @@ function pestControl(length) {
 
 /* Iconoclasm */
 function iconoclasmList() {
-    var i;
     //Lists the deities for removing
     if (civData.piety.owned >= 1000) {
         civData.piety.owned -= 1000;
         updateResourceTotals();
         ui.find("#iconoclasm").disabled = true;
-        var append = "<br />";
-        for (i = 1; i < curCiv.deities.length; ++i) {
+        let append = "<br />";
+        for (let i = 1; i < curCiv.deities.length; ++i) {
             append += '<button onclick="iconoclasm(' + i + ')">';
             append += curCiv.deities[i].name;
             append += '</button><br />';
@@ -229,7 +227,7 @@ function iconoclasm(index) {
 
 function smiteMob(mobObj) {
     if (!isValid(mobObj.owned) || mobObj.owned <= 0) { return 0; }
-    var num = Math.min(mobObj.owned, Math.floor(civData.piety.owned / 100));
+    let num = Math.min(mobObj.owned, Math.floor(civData.piety.owned / 100));
     civData.piety.owned -= num * 100;
     mobObj.owned -= num;
     civData.corpses.owned += num; //xxx Should dead wolves count as corpses?
