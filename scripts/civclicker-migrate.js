@@ -500,8 +500,8 @@ function migrateGameData(loadVar, settingsVarReturn) {
     }
 
     //v1.4.10 - potions
-    if (!isValid(loadVar.curCiv.potions.tradeAmount)) {
-        loadVar.curCiv.potions.tradeAmount = civData.potions.initTradeAmount;
+    if (!isValid(loadVar.curCiv.potions)) {
+        loadVar.curCiv.potions = { owned: 0, tradeAmount: civData.potions.initTradeAmount };
     }
 
     //v1.4.11 - carpentry
