@@ -25,9 +25,9 @@ var UIComponents = createUIComponents();
 //    // Make sure to update this if the number of columns changes.
 //    if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='6'/>&nbsp;</tr>"; }
 
-//    var objId = purchaseObj.id;
-//    var objName = purchaseObj.getQtyName(0);
-//    var s = (
+//    let objId = purchaseObj.id;
+//    let objName = purchaseObj.getQtyName(0);
+//    let s = (
 //        '<tr id="' + objId + 'Row" class="purchaseRow" data-target="' + objId + '">'
 //        + '<td>'
 //        + '<img src="images/' + objId + '.png" class="icon icon-lg" alt="' + objName + '"/>'
@@ -47,9 +47,9 @@ function getResourceRowText(purchaseObj) {
     // Make sure to update this if the number of columns changes.
     if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='3'/>&nbsp;</tr>"; }
 
-    var objId = purchaseObj.id;
-    var objName = purchaseObj.getQtyName(0);
-    var s = (
+    let objId = purchaseObj.id;
+    let objName = purchaseObj.getQtyName(0);
+    let s = (
         '<tr id="' + objId + 'Row" class="purchaseRow" data-target="' + objId + '">'
         + '<td>'
         + '<img src="images/' + objId + '.png" class="icon icon-lg" alt="' + objName + '"/>'
@@ -70,7 +70,7 @@ function getPurchaseCellText(purchaseObj, qty, inTable) {
     //xxx Hack: Special formatting for booleans, Infinity and 1k, 10k.
     function infchr(x) { return (x == Infinity) ? "&infin;" : (x == 1000) ? "1k" : (x == 10000) ? "10k" : (x == 100000) ? "100k" : x; }
     function fmtbool(x) {
-        var neg = (sgn(x) < 0);
+        let neg = (sgn(x) < 0);
         return (neg ? "(" : "") + purchaseObj.getQtyName(0) + (neg ? ")" : "");
     }
     function fmtqty(x) { return (typeof x == "boolean") ? fmtbool(x) : sgnchr(sgn(x)) + infchr(abs(x)); }
@@ -93,10 +93,10 @@ function getPurchaseCellText(purchaseObj, qty, inTable) {
         return true;
     }
 
-    var tagName = inTable ? "td" : "span";
-    var className = (abs(qty) == "custom") ? "buy" : purchaseObj.type;  // 'custom' buttons all use the same class.
+    let tagName = inTable ? "td" : "span";
+    let className = (abs(qty) == "custom") ? "buy" : purchaseObj.type;  // 'custom' buttons all use the same class.
 
-    var s = "<" + tagName + " class='" + className + abs(qty) + "' data-quantity='" + qty + "' >";
+    let s = "<" + tagName + " class='" + className + abs(qty) + "' data-quantity='" + qty + "' >";
     if (allowPurchase()) {
         s += "<button class='x" + abs(qty) + "' data-action='purchase'" + " disabled='disabled'>" + fmtqty(qty) + "</button>";
     }
@@ -109,14 +109,14 @@ function getPurchaseCellText(purchaseObj, qty, inTable) {
 function getPurchaseRowText(purchaseObj) {
     // Make sure to update this if the number of columns changes.
     if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='17'/>&nbsp;</tr>"; }
-    var showSellButtons = true;
+    let showSellButtons = true;
 
     if (purchaseObj.type === civObjType.building) {
         // we don't sell buildings, yet
         showSellButtons = false;
     }
-    var objId = purchaseObj.id;
-    var s = "<tr id='" + objId + "Row' class='purchaseRow' data-target='" + purchaseObj.id + "'>";
+    let objId = purchaseObj.id;
+    let s = "<tr id='" + objId + "Row' class='purchaseRow' data-target='" + purchaseObj.id + "'>";
 
     if (showSellButtons) {
         [-Infinity, "-custom", -100000, -10000, -1000, -100, -10, -1]
@@ -124,13 +124,13 @@ function getPurchaseRowText(purchaseObj) {
                 s += getPurchaseCellText(purchaseObj, elem);
             });
     }
-    //var enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
-    var flag = "";
+    //let enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
+    let flag = "";
     if (purchaseObj.alignment == alignmentType.enemy) {flag = " enemy";}
     else if (purchaseObj.id == unitType.totalSick ) {flag = " sick";}
     s += "<td class='itemname" + flag + "'>" + purchaseObj.getQtyName(0) + ": </td>";
 
-    var action = (isValid(population[objId])) ? "display_pop" : "display"; //xxx Hack
+    let action = (isValid(population[objId])) ? "display_pop" : "display"; //xxx Hack
     s += "<td class='number'><span data-action='" + action + "'>0</span></td>";
 
     // Don't allow Infinite (max) purchase on things we can't sell back. 
@@ -145,13 +145,13 @@ function getPurchaseRowText(purchaseObj) {
 }
 
 function addUITable(civObjs, groupElemName) {
-    var s = "";
+    let s = "";
     civObjs.forEach(function (elem) {
         s += elem.type == civObjType.resource ? getResourceRowText(elem)
             : elem.type == civObjType.upgrade ? getUpgradeRowText(elem)
                 : getPurchaseRowText(elem);
     });
-    var groupElem = document.getElementById(groupElemName);
+    let groupElem = document.getElementById(groupElemName);
     groupElem.innerHTML += s;
     groupElem.onmousedown = onBulkEvent;
     return groupElem;
@@ -165,12 +165,12 @@ function addUITable(civObjs, groupElemName) {
 //    outside of one with <span>.
 function getUpgradeRowText(upgradeObj, inTable) {
     if (inTable === undefined) { inTable = true; }
-    var cellTagName = inTable ? "td" : "span";
-    var rowTagName = inTable ? "tr" : "span";
+    let cellTagName = inTable ? "td" : "span";
+    let rowTagName = inTable ? "tr" : "span";
     // Make sure to update this if the number of columns changes.
     if (!upgradeObj) { return inTable ? "<" + rowTagName + " class='purchaseRow'><td colspan='2'/>&nbsp;</" + rowTagName + ">" : ""; }
 
-    var s = "<" + rowTagName + " id='" + upgradeObj.id + "Row' class='purchaseRow'";
+    let s = "<" + rowTagName + " id='" + upgradeObj.id + "Row' class='purchaseRow'";
     s += " data-target='" + upgradeObj.id + "'>";
     s += getPurchaseCellText(upgradeObj, true, inTable);
     s += "<" + cellTagName + ">" + getCostNote(upgradeObj) + "</" + cellTagName + ">";
@@ -182,7 +182,7 @@ function getUpgradeRowText(upgradeObj, inTable) {
 function getPantheonUpgradeRowText(upgradeObj) {
     if (!upgradeObj) { return ""; }
 
-    var s = "<tr id='" + upgradeObj.id + "Row' class='purchaseRow'>";
+    let s = "<tr id='" + upgradeObj.id + "Row' class='purchaseRow'>";
     // Don't include devotion if it isn't valid.
     //xxx Should write a chained dereference eval
     s += "<td class='devcost'>";
@@ -207,7 +207,7 @@ function getPantheonUpgradeRowText(upgradeObj) {
 // Returns the new element
 function setPantheonUpgradeRowText(upgradeObj) {
     if (!upgradeObj) { return null; }
-    var elem = document.getElementById(upgradeObj.id + "Row");
+    let elem = document.getElementById(upgradeObj.id + "Row");
     if (!elem) { return null; }
 
     elem.outerHTML = getPantheonUpgradeRowText(upgradeObj); // Replaces elem
@@ -223,7 +223,7 @@ function addUpgradeRows() {
         if (elem.subType == subTypes.upgrade) { return; } // Did these in getUpgradeRowText.
         if (elem.subType == subTypes.pantheon) { setPantheonUpgradeRowText(elem); }
         else { // One of the 'atypical' upgrades not displayed in the main upgrade list.
-            var stubElem = document.getElementById(elem.id + "Row");
+            let stubElem = document.getElementById(elem.id + "Row");
             if (!stubElem) {
                 console.log("Missing UI element for " + elem.id);
                 sysLog("Missing UI element for " + elem.id);
@@ -243,7 +243,7 @@ function addUpgradeRows() {
 
     // Dynamically create two lists for purchased upgrades.
     // One for regular upgrades, one for pantheon upgrades.
-    var text = "", standardUpgStr = "", pantheonUpgStr = "";
+    let text = "", standardUpgStr = "", pantheonUpgStr = "";
 
     upgradeData.forEach(function (upgradeObj) {
         text = "<span id='P" + upgradeObj.id + "' class='Pupgrade'>"
