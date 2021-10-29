@@ -130,7 +130,16 @@ function canPurchase(purchaseObj, qty) {
     // If this is a destination item, it's just a relocation of an existing
     // item, so we ignore purchase limits.  Otherwise we check them.
     if (purchaseObj.isDest && !purchaseObj.isDest()) {
-        qty = Math.min(qty, purchaseObj.limit - purchaseObj.total);
+        //qty = Math.min(qty, purchaseObj.limit - purchaseObj.total);
+        qty = Math.min(qty, Math.max(0, purchaseObj.limit - purchaseObj.total));
+    }
+    // if source limit has changed ie barracks destroyed, we need to check limit of source
+    if (purchaseObj.isDest && purchaseObj.isDest() && qty < 0) {
+        // we can't relocate back more than the limit
+        //debug(purchaseObj.id + " dest qty = " + qty);
+        //debug(purchaseObj.id + " dest qty = " + qty + " - limit=" + civData[purchaseObj.source].limit + " - owned=" + civData[purchaseObj.source].owned);
+        qty = Math.max(qty, civData[purchaseObj.source].owned - civData[purchaseObj.source].limit);
+        //debug(" dest qty = " + qty);
     }
 
     // See if we can afford them; return fewer if we can't afford them all
@@ -426,22 +435,34 @@ function calculatePopulation() {
 // Picks the next worker to starve.  Kills the sick first, then the healthy.
 // Deployed military starve last.
 // Return the job ID of the selected target.
-function pickStarveTarget() {
-    var modNum, jobNum;
-    var modList = ["ill", "owned"]; // The sick starve first
-    //xxx Remove this hard-coded list.  Priority of least to most importance
-    // todo: should probably be random job
-    var jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
-    unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
+//function pickStarveTarget() {
+//    var modNum, jobNum;
+//    var modList = ["ill", "owned"]; // The sick starve first
+//    //xxx Remove this hard-coded list.  Priority of least to most importance
+//    // todo: should probably be random job
+//    var jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
+//    unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
 
-    for (modNum = 0; modNum < modList.length; ++modNum) {
-        for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
-            if (civData[jobList[jobNum]][modList[modNum]] > 0) { return civData[jobList[jobNum]]; }
-        }
-    }
-    // These don't have Ill variants at the moment.
-    if (civData.cavalryParty.owned > 0) { return civData.cavalryParty; }
-    if (civData.soldierParty.owned > 0) { return civData.soldierParty; }
+//    for (modNum = 0; modNum < modList.length; ++modNum) {
+//        for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
+//            if (civData[jobList[jobNum]][modList[modNum]] > 0) { return civData[jobList[jobNum]]; }
+//        }
+//    }
+//    // These don't have Ill variants at the moment.
+//    if (civData.cavalryParty.owned > 0) { return civData.cavalryParty; }
+//    if (civData.soldierParty.owned > 0) { return civData.soldierParty; }
+
+//    return null;
+//}
+function pickStarveTarget() {
+
+    var id = getRandomPatient();
+    //debug(id);
+    if (isValid(id) && id) { return civData[id];}
+
+    id = getRandomWorker();
+    //debug(id);
+    if (isValid(id) && id) { return civData[id]; }
 
     return null;
 }
