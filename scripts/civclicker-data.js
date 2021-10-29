@@ -299,7 +299,7 @@ function getCivData() {
             id: buildingType.graveyard, singular: "graveyard", plural: "graveyards",
             prereqs: { masonry: true },
             require: { wood: 100, stone: 250 },
-            vulnerable: false, // Graveyards can't be sacked
+            vulnerable: false, // Graveyards can't be sacked, but they can be descrated
             effectText: "contains 100 graves",
             onGain: function (num) { if (num === undefined) { num = 1; } digGraves(num); }
         }),
@@ -909,7 +909,7 @@ function getCivData() {
             id: "summonShade", name: "Summon Shades", subType: subTypes.prayer,
             prereqs: { deity: deityDomains.underworld, devotion: 40 },
             require: { piety: 1000 },  //xxx Also need slainEnemies
-            effectText: "Souls of the defeated rise to fight for you"
+            effectText: "Souls of your defeated enemies rise to fight for you"
         }),
         new Upgrade({
             id: "pestControl", name: "Pest Control", subType: subTypes.prayer,
@@ -1082,9 +1082,9 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.05,
             onWin: function () { doWolves(this); },
-            killFatigue: (1 / 2), // Max fraction that leave after killing the last person
+            killFatigue: (0.99), // Max fraction that leave after killing the last person
             killStop: (1.0), // Chance of an attacker leaving after killing a person
-            killMax: (0.9), // Max fraction that will kill
+            killMax: (0.99), // Max fraction that will kill
             species: speciesType.animal,
             effectText: "Eat your workers"
         }),
@@ -1095,14 +1095,14 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
-            lootFatigue: (1 / 9), // Max fraction that leave after cleaning out a resource. 9 lootable resources
-            lootStop: (0.75), // Chance of an attacker leaving after looting a resource
-            lootMax: (0.75), // Max fraction that will loot
-            sackFatigue: (1 / 16), // Max fraction that leave after destroying a building type. 16 sackable buildings
-            sackStop: (0.75), // Chance of an attacker leaving after sacking a building
+            lootFatigue: (0.25), // Max fraction that leave after cleaning out a resource. 
+            lootStop: (0.25), // Chance of an attacker leaving after looting a resource
+            lootMax: (0.99), // Max fraction that will loot
+            sackFatigue: (0.25), // Max fraction that leave after destroying a building type. 
+            sackStop: (0.99), // Chance of an attacker leaving after sacking a building
             sackMax: (0.25), // Max fraction that will sack
-            killFatigue: (1 / 7), // Max fraction that leave after killing the last person. 7 job types
-            killStop: (0.75), // Chance of an attacker leaving after killing a person
+            killFatigue: (0.5), // Max fraction that leave after killing the last person. 
+            killStop: (0.99), // Chance of an attacker leaving after killing a person
             killMax: (0.1), // Max fraction that will kill
             effectText: "Steal your resources"
         }),
@@ -1113,17 +1113,17 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
-            lootFatigue: (1 / 18), // Max fraction that leave after cleaning out a resource
-            lootStop: (0.5), // Chance of an attacker leaving after looting a resource
-            lootMax: (0.33), // Max fraction that will loot
-            sackFatigue: (1 / 32), // Max fraction that leave after destroying a building type
-            sackStop: (0.5), // Chance of an attacker leaving after sacking a building
-            sackMax: (0.5), // Max fraction that will sack
-            killFatigue: (1 / 14), // Max fraction that leave after killing the last person
-            killStop: (0.5), // Chance of an attacker leaving after killing a person
-            killMax: (0.5), // Max fraction that will kill
-            conquerFatigue: (1 / 15), // Max fraction that leave after conquering the last land
-            conquerStop: (0.5), // Chance of an attacker leaving after conquering land
+            lootFatigue: (0.33), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.66), // Chance of an attacker leaving after looting a resource
+            lootMax: (0.99), // Max fraction that will loot
+            sackFatigue: (0.33), // Max fraction that leave after destroying a building type
+            sackStop: (0.66), // Chance of an attacker leaving after sacking a building
+            sackMax: (0.99), // Max fraction that will sack
+            killFatigue: (0.33), // Max fraction that leave after killing the last person
+            killStop: (0.99), // Chance of an attacker leaving after killing a person
+            killMax: (0.33), // Max fraction that will kill
+            conquerFatigue: (0.25), // Max fraction that leave after conquering the last land
+            conquerStop: (0.99), // Chance of an attacker leaving after conquering land
             conquerMax: (0.25), // Max fraction that will take land
             effectText: "Slaughter, plunder, and burn"
         }),
@@ -1134,18 +1134,18 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
-            lootFatigue: (1 / 27), // Max fraction that leave after cleaning out a resource
-            lootStop: (0.25), // Chance of an attacker leaving after looting a resource
+            lootFatigue: (0.25), // Max fraction that leave after cleaning out a resource
+            lootStop: (0.99), // Chance of an attacker leaving after looting a resource
             lootMax: (0.25), // Max fraction that will loot
-            sackFatigue: (1 / 48), // Max fraction that leave after destroying a building type
-            sackStop: (0.25), // Chance of an attacker leaving after sacking a building
+            sackFatigue: (0.25), // Max fraction that leave after destroying a building type
+            sackStop: (0.99), // Chance of an attacker leaving after sacking a building
             sackMax: (0.25), // Max fraction that will sack
-            killFatigue: (1 / 21), // Max fraction that leave after killing the last person
-            killStop: (0.25), // Chance of an attacker leaving after killing a person
-            killMax: (0.5), // Max fraction that will kill
-            conquerFatigue: (1 / 30), // Max fraction that leave after conquering the last land
+            killFatigue: (0.25), // Max fraction that leave after killing the last person
+            killStop: (0.99), // Chance of an attacker leaving after killing a person
+            killMax: (0.25), // Max fraction that will kill
+            conquerFatigue: (0.25), // Max fraction that leave after conquering the last land
             conquerStop: (0.25), // Chance of an attacker leaving after conquering land
-            conquerMax: (0.75), // Max fraction that will take land
+            conquerMax: (0.99), // Max fraction that will take land
             effectText: "Conquer your lands"
         }),
         new Unit({
