@@ -183,6 +183,7 @@ function pestControl(length) {
     if (length === undefined) { length = 10; }
     if (civData.piety.owned < (10 * length)) { return; }
     civData.piety.owned -= (10 * length);
+    ui.show("#pestControlGroup", true)
     civData.pestControl.timer = length * civData.cat.owned;
     gameLog("The vermin are exterminated.");
 }
@@ -273,7 +274,13 @@ function grace(delta) {
 
 function doPestControl() {
     //Decrements the pestControl Timer
-    if (civData.pestControl.timer > 0) { --civData.pestControl.timer; }
+    //if (civData.pestControl.timer > 0) { --civData.pestControl.timer; }
+    if (civData.pestControl.timer > 0) {
+        //ui.show("#pestControlGroup", true)
+        ui.find("#pestControlTimer").innerHTML = civData.pestControl.timer--;
+    } else {
+        ui.find("#pestControlGroup").style.display = "none";
+    }
 }
 
 function tickGlory() {
