@@ -1,7 +1,6 @@
 "use strict";
 
 // Update functions. Called by other routines in order to update the interface.
-
 function updateAll() {
     updateTrader();
     updateUpgrades();
@@ -19,10 +18,9 @@ function updateAll() {
 function updateWonderList() {
     if (curCiv.wonders.length === 0) { return; }
 
-    var i;
     //update wonder list
-    var wonderhtml = "<tr><td><strong>Name</strong></td><td><strong>Type</strong></td></tr>";
-    for (i = (curCiv.wonders.length - 1); i >= 0; --i) {
+    let wonderhtml = "<tr><td><strong>Name</strong></td><td><strong>Type</strong></td></tr>";
+    for (let i = (curCiv.wonders.length - 1); i >= 0; --i) {
         try {
             wonderhtml += "<tr><td>" + curCiv.wonders[i].name + "</td><td>" + curCiv.wonders[i].resourceId + "</td></tr>";
         } catch (err) {
@@ -93,7 +91,7 @@ function updateAfterReset() {
 }
 
 function updateTrader() {
-    var isHere = isTraderHere();
+    let isHere = isTraderHere();
     if (isHere) {
         ui.find("#tradeType").innerHTML = civData[curCiv.trader.materialId].getQtyName(curCiv.trader.requested);
         ui.find("#tradeRequested").innerHTML = prettify(curCiv.trader.requested);
@@ -109,14 +107,14 @@ function updateTrader() {
 
 //xxx This should become an onGain() member method of the building classes
 function updateRequirements(buildingObj) {
-    var displayNode = document.getElementById(buildingObj.id + "Cost");
+    let displayNode = document.getElementById(buildingObj.id + "Cost");
     if (displayNode) { displayNode.innerHTML = getReqText(buildingObj.require); }
 }
 
 function updatePurchaseRow(purchaseObj) {
     if (!purchaseObj) { return; }
 
-    var elem = ui.find("#" + purchaseObj.id + "Row");
+    let elem = ui.find("#" + purchaseObj.id + "Row");
     if (!elem) { console.warn("Missing UI element for " + purchaseObj.id); return; }
 
     // If the item's cost is variable, update its requirements.
@@ -124,23 +122,23 @@ function updatePurchaseRow(purchaseObj) {
 
     // Already having one reveals it as though we met the prereq.
     // freeLand added to stop annoying UI jump
-    var havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == buildingType.freeLand;
+    let havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == buildingType.freeLand;
     //|| (purchaseObj.id == "freeLand" && purchaseObj.owned == 0)
 
     // Special check: Hide one-shot upgrades after purchase; they're
     // redisplayed elsewhere.
-    var hideBoughtUpgrade = ((purchaseObj.type == civObjType.upgrade) && (purchaseObj.owned == purchaseObj.limit) && !purchaseObj.salable);
+    let hideBoughtUpgrade = ((purchaseObj.type == civObjType.upgrade) && (purchaseObj.owned == purchaseObj.limit) && !purchaseObj.salable);
 
-    var maxQty = canPurchase(purchaseObj);
-    var minQty = canPurchase(purchaseObj, -Infinity);
+    let maxQty = canPurchase(purchaseObj);
+    let minQty = canPurchase(purchaseObj, -Infinity);
 
-    var buyElems = elem.querySelectorAll("[data-action='purchase']");
+    let buyElems = elem.querySelectorAll("[data-action='purchase']");
 
     buyElems.forEach(function (elt) {
-        var purchaseQty = dataset(elt, "quantity");
+        let purchaseQty = dataset(elt, "quantity");
         // Treat 'custom' or Infinity as +/-1.
         //xxx Should we treat 'custom' as its appropriate value instead?
-        var absQty = abs(purchaseQty);
+        let absQty = abs(purchaseQty);
         if ((absQty == "custom") || (absQty == Infinity)) {
             purchaseQty = sgn(purchaseQty);
         }
@@ -172,8 +170,8 @@ function updatePartyButtons() {
 //xxx Maybe add a function here to look in various locations for vars, so it
 //doesn't need multiple action types?
 function updateResourceTotals() {
-    var i, displayElems, elem, val;
-    var landTotals = getLandTotals();
+    let i, displayElems, elem, val;
+    let landTotals = getLandTotals();
 
     // Scan the HTML document for elements with a "data-action" element of
     // "display".  The "data-target" of such elements (or their ancestors) 
@@ -244,7 +242,7 @@ function updateResourceTotals() {
 
 //Update page with numbers
 function updatePopulation(calc) {
-    var i, elem, elems, displayElems,
+    let i, elem, elems, displayElems,
         spawn1button = ui.find("#spawn1button"),
         spawnCustomButton = ui.find("#spawnCustomButton"),
         spawnMaxbutton = ui.find("#spawnMaxbutton"),
@@ -265,7 +263,7 @@ function updatePopulation(calc) {
     // by updateResourceTotals().
     displayElems = document.querySelectorAll("[data-action='display_pop']");
     displayElems.forEach(function (elt) {
-        var prop = dataset(elt, "target");
+        let prop = dataset(elt, "target");
         elt.innerHTML = prettify(Math.floor(population[prop]));
     });
 
@@ -361,7 +359,7 @@ function updatePopulation(calc) {
     }
 
     //Turning on/off buttons based on free space.
-    var maxSpawn = Math.max(0, Math.min((population.limit - population.living), logSearchFn(calcWorkerCost, civData.food.owned)));
+    let maxSpawn = Math.max(0, Math.min((population.limit - population.living), logSearchFn(calcWorkerCost, civData.food.owned)));
 
     spawn1button.disabled = (maxSpawn < 1);
     spawnCustomButton.disabled = (maxSpawn < 1);
@@ -372,8 +370,8 @@ function updatePopulation(calc) {
     spawn10000button.disabled = (maxSpawn < 10000);
     spawn100000button.disabled = (maxSpawn < 100000);
 
-    var canRaise = (getCurDeityDomain() == deityDomains.underworld && civData.devotion.owned >= 20);
-    var maxRaise = canRaise ? logSearchFn(calcZombieCost, civData.piety.owned) : 0;
+    let canRaise = (getCurDeityDomain() == deityDomains.underworld && civData.devotion.owned >= 20);
+    let maxRaise = canRaise ? logSearchFn(calcZombieCost, civData.piety.owned) : 0;
     ui.show("#raiseDeadRow", canRaise);
     ui.find("#raiseDead").disabled = (maxRaise < 1);
     ui.find("#raiseDeadMax").disabled = (maxRaise < 1);
@@ -403,13 +401,13 @@ function updatePopulation(calc) {
 }
 
 function updatePopulationBar() {
-    var barElt = ui.find("#populationBar");
-    var h = '';
+    let barElt = ui.find("#populationBar");
+    let h = '';
     function getUnitPercent(x, y) {
         return (Math.floor(100000 * (x / y)) / 1000);
     }
     unitData.forEach(function (unit) {
-        var p;
+        let p;
         if (unit.isPopulation) {
             p = getUnitPercent(unit.owned, population.current);
             h += (
@@ -428,13 +426,13 @@ function updatePopulationBar() {
 }
 
 function updateLandBar() {
-    var barElt = ui.find("#landBar");
-    var landTotals = getLandTotals();
-    var p = (Math.floor(1000 * (landTotals.buildings / landTotals.lands)) / 10);
+    let barElt = ui.find("#landBar");
+    let landTotals = getLandTotals();
+    let p = (Math.floor(1000 * (landTotals.buildings / landTotals.lands)) / 10);
 
     // show warnings if we're getting close to full
-    var bg = "#aaccaa";
-    var pc = 100 - ((landTotals.buildings * 100) / landTotals.lands);
+    let bg = "#aaccaa";
+    let pc = 100 - ((landTotals.buildings * 100) / landTotals.lands);
     if (pc <= 5) {
         bg = "#ff3300";
     } else if (pc <= 10) {
@@ -444,10 +442,10 @@ function updateLandBar() {
 }
 
 function updateFightBar(attacker, defender) {
-    var barElt = ui.find("#fightBar");
-    var h = '';
-    var apc = attacker.owned * 100 / (attacker.owned + defender.owned);
-    var dpc = 100 - apc;
+    let barElt = ui.find("#fightBar");
+    let h = '';
+    let apc = attacker.owned * 100 / (attacker.owned + defender.owned);
+    let dpc = 100 - apc;
 
     h += '<div class="attacker" style="width: ' + apc + '%"></div>';
     h += '<div class="defender" style="width: ' + dpc + '%"></div>';
@@ -458,9 +456,9 @@ function updateFightBar(attacker, defender) {
 // Check to see if the player has an upgrade and hide as necessary
 // Check also to see if the player can afford an upgrade and enable/disable as necessary
 function updateUpgrades() {
-    var domain = getCurDeityDomain();
-    var hasDomain = (getCurDeityDomain() === "") ? false : true;
-    var canSelectDomain = ((civData.worship.owned) && !hasDomain);
+    let domain = getCurDeityDomain();
+    let hasDomain = (getCurDeityDomain() === "") ? false : true;
+    let canSelectDomain = ((civData.worship.owned) && !hasDomain);
 
     // Update all of the upgrades
     upgradeData.forEach(function (elem) {
@@ -474,7 +472,7 @@ function updateUpgrades() {
     ui.show("#deitySelect .info", false);
     ui.show("#conquestSelect .info", false);
     ui.show("#tradeSelect .info", false);
-    for (var s = 0; s < upgradeData.length; s++) {
+    for (let s = 0; s < upgradeData.length; s++) {
         if (canPurchase(upgradeData[s]) && !upgradeData[s].owned) {
             if (upgradeData[s].subType === subTypes.upgrade) {
                 ui.show("#upgradesSelect .info", true);
@@ -519,7 +517,7 @@ function updateUpgrades() {
 }
 
 function updateDeity() {
-    var hasDeity = (curCiv.deities[0].name) ? true : false;
+    let hasDeity = (curCiv.deities[0].name) ? true : false;
     //Update page with deity details
     ui.find("#deityAName").innerHTML = curCiv.deities[0].name;
     ui.find("#deityADomain").innerHTML = getCurDeityDomain() ? ", deity of " + idToType(getCurDeityDomain()) : "";
@@ -569,7 +567,7 @@ function updateDevotion() {
 
 // Dynamically create the achievement display
 function addAchievementRows() {
-    var s = '';
+    let s = '';
     achData.forEach(function (elem) {
         s += (
             '<div class="achievement" title="' + elem.getQtyName() + ": " + elem.effectText + '">'
@@ -590,25 +588,25 @@ function updateAchievements() {
 
 // Dynamically add the raid buttons for the various civ sizes.
 function addRaidRows() {
-    var s = '';
+    let s = '';
     civSizes.forEach(function (elem) {
         s += UIComponents.raidRow(elem);
     });
 
-    var group = ui.find("#raidGroup");
+    let group = ui.find("#raidGroup");
     group.innerHTML += s;
     group.onmousedown = onBulkEvent;
 }
 
 // Enable the raid buttons for eligible targets.
 function updateTargets() {
-    var i;
-    var raidButtons = document.getElementsByClassName("raid");
-    var raid10Buttons = document.querySelectorAll(".raid-mult.mult-10");
-    var raid100Buttons = document.querySelectorAll(".raid-mult.mult-100");
-    var raidInfButtons = document.querySelectorAll(".raid-mult.mult-inf");
+    let i;
+    let raidButtons = document.getElementsByClassName("raid");
+    let raid10Buttons = document.querySelectorAll(".raid-mult.mult-10");
+    let raid100Buttons = document.querySelectorAll(".raid-mult.mult-100");
+    let raidInfButtons = document.querySelectorAll(".raid-mult.mult-inf");
 
-    var haveArmy = false;
+    let haveArmy = false;
 
     ui.show("#victoryGroup", curCiv.raid.victory);
     ui.show("#conquestSelect .alert", curCiv.raid.victory);
@@ -620,11 +618,11 @@ function updateTargets() {
     if (ui.show("#raidGroup", !curCiv.raid.raiding)) {
         if (getCombatants(placeType.party, alignmentType.player).length > 0) { haveArmy = true; }
 
-        var curElem;
+        let curElem;
         for (i = 0; i < raidButtons.length; ++i) {
             // Disable if we have no standard, no army, or they are too big a target.
             curElem = raidButtons[i];
-            var isDisabled = (!civData.standard.owned || !haveArmy || (civSizes[dataset(curElem, "target")].idx > civSizes[curCiv.raid.targetMax].idx));
+            let isDisabled = (!civData.standard.owned || !haveArmy || (civSizes[dataset(curElem, "target")].idx > civSizes[curCiv.raid.targetMax].idx));
             curElem.disabled = (isDisabled);
             raid10Buttons[i].disabled = (isDisabled);
             raid100Buttons[i].disabled = (isDisabled);
@@ -635,8 +633,8 @@ function updateTargets() {
 
 function updateMorale() {
     //updates the morale stat
-    var happinessRank; // Lower is better
-    var elt = ui.find("#morale");
+    let happinessRank; // Lower is better
+    let elt = ui.find("#morale");
     //first check there's someone to be happy or unhappy, not including zombies
     if (population.living < 1) {
         elt.className = "";
@@ -662,13 +660,13 @@ function updateMoraleIcon(morale) {
 }
 
 function addWonderSelectText() {
-    var wcElem = ui.find("#wonderCompleted");
+    let wcElem = ui.find("#wonderCompleted");
     if (!wcElem) {
         console.log("Error: No wonderCompleted element found.");
         sysLog("Error: No wonderCompleted element found.");
         return;
     }
-    var s = wcElem.innerHTML;
+    let s = wcElem.innerHTML;
     wonderResources.forEach(function (elem, i, wr) {
         s += "<button onmousedown='wonderSelect(\"" + elem.id + "\")'>" + elem.getQtyName(0) + "</button>";
         // Add newlines to group by threes (but no newline for the last one)
@@ -680,9 +678,9 @@ function addWonderSelectText() {
 
 //updates the display of wonders and wonder building
 function updateWonder() {
-    var haveTech = (civData.architecture.owned && civData.monotheism.owned);
-    var isLimited = isWonderLimited();
-    var lowItem = getWonderLowItem();
+    let haveTech = (civData.architecture.owned && civData.monotheism.owned);
+    let isLimited = isWonderLimited();
+    let lowItem = getWonderLowItem();
 
     ui.show("#lowResources", isLimited);
     ui.show("#upgradesSelect .alert", isLimited);
