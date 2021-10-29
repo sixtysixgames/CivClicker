@@ -269,10 +269,7 @@ var LZString = {
 
         return LZString.decompress(output);
         //return output;
-
     },
-
-
 
     compress: function (uncompressed) {
         if (uncompressed == null) return "";
