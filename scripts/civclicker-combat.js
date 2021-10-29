@@ -155,7 +155,6 @@ function plunder() {
     resetRaiding();
     updateResourceTotals();
     updateTargets();
-
 }
 
 // Returns all of the combatants present for a given place and alignment that.
@@ -175,7 +174,7 @@ function getCasualtyMod(attacker, defender) {
 }
 
 function doFight(attacker, defender) {
-    if ((attacker.owned <= 0) || (defender.owned <= 0)) { return; }
+    if ((attacker.owned <= 0) || (defender.owned <= 0)) {return;}
 
     // Defenses vary depending on whether the player is attacking or defending.
     var fortMod = (defender.alignment == alignmentType.player ?
@@ -197,6 +196,8 @@ function doFight(attacker, defender) {
 
     attacker.owned -= attackerCas;
     defender.owned -= defenderCas;
+
+    updateFightBar(attacker, defender);
 
     // Give player credit for kills.
     var playerCredit = ((attacker.alignment == alignmentType.player) ? defenderCas : (defender.alignment == alignmentType.player) ? attackerCas : 0);
@@ -518,10 +519,15 @@ function doSiege(siegeObj, targetObj) {
 
 //Handling raids
 function doRaid(place, attackAlignment, defendAlignment) {
-    if (!curCiv.raid.raiding) { return; } // We're not raiding right now.
-
+    if (!curCiv.raid.raiding) {
+        ui.show("#fightBar", false);
+        return;
+    } // We're not raiding right now.
+    
     var attackers = getCombatants(place, attackAlignment);
     var defenders = getCombatants(place, defendAlignment);
+
+    ui.show("#fightBar", attackers.length && defenders.length);
 
     if (attackers.length && !defenders.length) { // Win check.
         // Slaughter any losing noncombatant units.
