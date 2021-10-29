@@ -132,7 +132,7 @@ function getCivData() {
             prereqs: undefined,  // Cannot be purchased.
             require: undefined,  // Cannot be purchased.
             vulnerable: false, // Cannot be stolen by looting
-            initOwned: 1000,
+            initOwned: 100, // used to be 1000, let's make it more difficult
             effectText: "Conquer more from your neighbors."
         }),
         new Building({
@@ -689,7 +689,7 @@ function getCivData() {
             id: "astronomy", name: "Astronomy", subType: subTypes.upgrade,
             prereqs: { writing: true },
             require: { leather: 2500, piety: 2500 },
-            effectText: "Increase leather efficiency"
+            effectText: "Increase leather production"
         }),
         new Upgrade({
             id: "medicine", name: "Medicine", subType: subTypes.upgrade,
