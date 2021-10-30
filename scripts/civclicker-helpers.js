@@ -310,7 +310,9 @@ function getRandomTradeableResource() {
     let total = 0;
     let tradeable = [];
     for (let i = 0; i < lootable.length; ++i) {
-        if (lootable[i].owned > 0) {
+        // we only want a resource that is owned
+        if (lootable[i].owned >= 1) {
+            // >= 1 because resources can be fractional
             tradeable.push(lootable[i]);
         }
     }
