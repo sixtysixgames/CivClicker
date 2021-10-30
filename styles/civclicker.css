@@ -177,6 +177,12 @@ a {
             display: none;
         }
 
+#gameDate {
+    font-size: 75%;
+    color: #666;
+    margin-left: 1em;
+}
+
 #strip {
     box-sizing: border-box;
     padding: 0 1em;
@@ -580,7 +586,8 @@ button {
 }
 
     #logTable td {
-        padding-right: 5px;
+        font-size: 0.9em;
+        padding-right: 2px;
         vertical-align: top;
     }
 
@@ -593,7 +600,7 @@ button {
 }
 
 #logT, #sysLogT {
-    width: 4em;
+    width: 8em;
 }
 /*
 #graveTotal {
