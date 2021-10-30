@@ -407,13 +407,16 @@ function clearSpecialResourceNets() {
     civData.food.net = 0;
     civData.wood.net = 0;
     civData.stone.net = 0;
+
     civData.skins.net = 0;
     civData.herbs.net = 0;
     civData.ore.net = 0;
+
     civData.leather.net = 0;
     civData.potions.net = 0;
-    civData.piety.net = 0;
     civData.metal.net = 0;
+
+    civData.piety.net = 0;
 }
 
 function checkResourceLimits() {
@@ -423,13 +426,18 @@ function checkResourceLimits() {
         if (resource.owned > resource.limit) {
             let excess = resource.owned - resource.limit;
             excess = Math.ceil(Math.random() * 0.25 * excess);
-            //resource.owned = resource.limit;
-            resource.owned -= excess
+            resource.owned -= excess;
+            resource.net -= excess;
         }
         if (resource.owned < 0) {
             resource.owned = 0;
         }
     });
+    // because of desecration
+    if (civData.graveyard.owned <= 0) {
+        civData.graveyard.owned = 0;
+        curCiv.grave.owned = 0;
+    }
 }
 
 function calculatePopulation() {
@@ -503,25 +511,6 @@ function calculatePopulation() {
 // Picks the next worker to starve.  Kills the sick first, then the healthy.
 // Deployed military starve last.
 // Return the job ID of the selected target.
-//function pickStarveTarget() {
-//    let modNum, jobNum;
-//    let modList = ["ill", "owned"]; // The sick starve first
-//    //xxx Remove this hard-coded list.  Priority of least to most importance
-//    // todo: should probably be random job
-//    let jobList = [unitType.unemployed, unitType.labourer, unitType.cleric, unitType.healer, unitType.blacksmith, unitType.tanner, unitType.miner,
-//    unitType.woodcutter, unitType.cavalry, unitType.soldier, unitType.farmer];
-
-//    for (modNum = 0; modNum < modList.length; ++modNum) {
-//        for (jobNum = 0; jobNum < jobList.length; ++jobNum) {
-//            if (civData[jobList[jobNum]][modList[modNum]] > 0) { return civData[jobList[jobNum]]; }
-//        }
-//    }
-//    // These don't have Ill variants at the moment.
-//    if (civData.cavalryParty.owned > 0) { return civData.cavalryParty; }
-//    if (civData.soldierParty.owned > 0) { return civData.soldierParty; }
-
-//    return null;
-//}
 function pickStarveTarget() {
     let id = getRandomPatient();
     if (isValid(id) && id) { return civData[id];}
@@ -612,8 +601,6 @@ function doStarve() {
     }
 
     if (civData.food.owned < 0) { // starve if there's not enough food.
-        //xxx This is very kind.  Only 0.1% deaths no matter how big the shortage?
-        //numberStarve = starve(Math.ceil(population.living / 1000));
         //Only 1.0% deaths no matter how big the shortage? a larger number will reduce the population quicker
         numberStarve = starve(Math.ceil(Math.random() * population.living / 100));
         if (numberStarve == 1) {
@@ -621,7 +608,6 @@ function doStarve() {
         } else if (numberStarve > 1) {
             gameLog(prettify(numberStarve) + " citizens starved to death");
         }
-        //adjustMorale(-0.0025); adjusted in kill
         civData.food.owned = 0;
     }
 }
