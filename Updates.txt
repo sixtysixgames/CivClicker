@@ -1,0 +1,168 @@
+
+Forked deppressivesherry version
+
+Added 1k, 10k, 100k everywhere
+Moved population to tab to accommodate new buttons
+Separated system Events onto own tab, and game events
+Move land bar above tabs because building can be built on different tabs
+Change land bar colour to yellow if available land < 10%
+Change land bar colour to red if available land < 5%
+Move unfilled graves to below Corpses
+Display wonder progress to 4 decimal places
+Buy buildings buttons appear based on total land, not current population
+
+Breaking change: Added new Town and City sizes
+Changed minimum population for civ sizes
+
+Change land gained from plunder to be random 75-95% of civ size
+Fixed negative corpse count (Somehow managed to get 0.5 corpse)
+
+Moved 'sick' to bottom of unit list - annoying when interface jumps around
+Show alert if population sick or under attack
+Changed metropolis name to Province
+
+Attacks should be more frequent as civ grows
+
+Wolves don't attack large settlements.  
+Barbarians don't attack small settlements.
+New enemy type: Invader - does everything a barbarian does, and can steal free land
+Invaders attack nations and above
+
+Sacking a building removes its worker (where applicable) and adds to idle workers.
+
+Fixed bug that didn't count sick as population - because the subType was set to special for some reason, but surely sick people are still living an eat food?
+
+Up to 1% starve
+
+Increase piety required for building altars
+
+xxxRandomly change how much resource can buy for 1 gold every time trader appears
+
+Added multi slaughter and sack
+
+Homeless die of exposure;  homeless = living - total housing
+
+Lose piety for having temples but no clerics
+
+Sick citizens can sometimes recover
+
+Plague can spread to multiple citizens
+
+Limits added to special resources.  Stored in special buildings.  because they should have a limit
+
+Wolves will eat corpses before attacking the living
+
+Fixed bug with herbs and healing not taking into account herbs owned
+
+Added palace building
+
+Added potions resource - healers produce and use instead of herbs
+
+Added Reaping upgrade for extra herbs
+
+Added Carpentry upgrade
+
+Added Warehouses, Storehouses and Storerooms upgrades
+
+Added Engineering upgrade between construction and architecure
+
+Added Rampart and Battlement defences
+
+==========
+TODO
+
+Add dwellings Manor House, Palace 
+Add shrine = 1 cleric; temple = 3 clerics; cathedral = 7 or give boost to clerics
+Add hospital = 3 healers or give boost to healers
+Add storehouse  for secondary resources - skins, herbs, ore;  warehouses for tertiary - leather metal
+
+ramparts/palisades/battlements
+contruction/engineering/architecture
+domestication/farming/agriculture
+
+
+Altars are not shown in buildings tab
+
+bug: negative idle workers sometimes
+
+need some upgrades to affect efficiency of other trades
+- woodcutter
+- miner
+- tanner
+- apothecary
+- blacksmith
+
+
+
+
+
+
+
+
+
+
+
+
+
+=====
+Make up random names for thorps, hamlets,towns with standard stems
+eg Nor, Suf/Suth/Sut, Eas, Wes
+Suffixes
+Thorp - thorpe eg Northorpe
+Hamlet - ham eg Sufham
+Village - by eg Easby
+Towns - ton eg Weston
+Cities - borough eg Norborough
+Province ?
+Nation - erland? ia?
+
+=====
+New trades requiring buildings
+Change Farmers to Hunters; Woodcutters to Gatherers; Miners to ?? Builders
+Farmers = increase food, rename base to hunter
+Millers
+Butchers
+Bakers
+Tailors
+Weavers
+Builders?
+Potters
+
+References
+https://www.worldhistory.org/crafts/
+https://en.wikipedia.org/wiki/Metals_of_antiquity
+https://en.wikipedia.org/wiki/Abundance_of_elements_in_Earth's_crust
+
+
+Hunter      => Skins    => Tanner       => Leather
+            => Fur/Wool => Weaver       => Cloth
+            => Meat     => Butcher      => Food
+
+Gatherer    => Herbs    => Apothecary   => Potions
+            => Flax     => Weaver       => Cloth
+            => Crops    => Baker        => Bread/Food
+
+Cutter      => Logs     => Carpenter    => Wood
+            => Herbs    => Apothecary   => Potions
+
+Digger      => Stone    => Mason
+            => Ore      => Smelter      => 7 Metals   => Blacksmith   => Tools/Armour/Weapons
+            => Clay     => Potter
+
+=================================
+Exported Games
+Basic Economy
+
+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
+
+Several Wonders
+
+
+
+Lots of homeless
+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
+
+
+
+https://historum.com/threads/size-of-ancient-armies.63673/
+

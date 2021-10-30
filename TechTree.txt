@@ -1,0 +1,222 @@
+﻿
+Current Tech Tree/Upgrades
+Name                Cost                                Requires Parent Upgrade
+skinning:           10 skins
+harvesting:         10 herbs
+prospecting:        10 ore
+domestication       20 leather                          masonry
+ploughshares        20 metal                            masonry
+irrigation          500 wood, 200 stone                 masonry
+butchering          40 leather                          construction, skinning
+gardening           40 herbs                            construction, harvesting
+extraction          40 metal                            construction, prospecting
+flensing            1000 metal                          architecture
+macerating          leather: 500, stone: 500            architecture
+croprotation        herbs: 5000, piety: 1000            architecture
+selectivebreeding   skins: 5000, piety: 1000            architecture
+fertilisers         ore: 5000, piety: 1000              architecture
+masonry             wood: 100, stone: 100       
+construction        wood: 1000, stone: 1000             masonry
+architecture        wood: 10000, stone: 10000           construction
+tenements           food: 200, wood: 500, stone: 500    construction
+slums               food: 500, wood: 1000, stone: 1000  architecture
+granaries           wood: 1000, stone: 1000             masonry
+palisade            wood: 2000, stone: 1000             construction
+weaponry            wood: 500, metal: 500               masonry
+shields             wood: 500, leather: 500             masonry
+horseback           food: 500, wood: 500                masonry
+wheel               wood: 500, stone: 500               masonry
+writing             skins: 500                          masonry
+administration      stone: 1000, skins: 1000            writing
+codeoflaws          stone: 1000, skins: 1000            writing
+mathematics         herbs: 1000, piety: 1000            writing
+aesthetics          piety: 5000                         writing
+civilservice        piety: 5000                         architecture
+feudalism           piety: 10000                        civilservice
+guilds              piety: 10000                        civilservice
+serfs               piety: 20000                        civilservice
+nationalism         piety: 50000                        civilservice
+
+Buildings
+tent                wood:2, skins:2
+hut                 wood:20, skins:1
+cottage             wood:10, stone:30                   masonry
+house               wood:30, stone:70                   construction
+mansion             wood:200, stone:200, leather:20     architecture
+barn                wood: 100
+woodstock           wood:100
+stonestock          wood:100
+tannery             wood:30, stone:70, skins:2          masonry
+smithy              wood:30, stone:70, ore:2            masonry
+apothecary          wood:30, stone:70, herbs:2          masonry
+temple              wood:30, stone:120                  masonry
+barracks            food:20, wood:60, stone:120, metal:10   masonry
+stable              food:60, wood:60, stone:120, leather:10 horseback
+graveyard           wood:50, stone:200, herbs:50        masonry
+mill                varies                              wheel
+fortification       varies                              architecture
+
+
+==========
+New Tech
+carpentry           100 wood                            harvesting
+fencing             1000 wood                           carpentry
+smelting            100 ore                             prospecting
+farming                                                 skinning, harvesting 
+
+
+====
+Current tree
+* indicates new upgrade required
+Farming => Agriculture 
+?=> Alchemy => Science
+Combat => Warfare
+
+Storehouse = increase storage of secondary resources
+Warehouse = increase stock of tertiary resources
+
+Carpentry   => Masonry =>
+            => Theism =>
+            => Wooden Huts
+            => Barn
+            => Wood stockpile
+            => Stone stockpile
+            => felling
+
+=> Masonry     => Construction =>
+            => Metalwork =>
+            => Cottage
+            => Tannery
+            => Smithy
+            => Apothecary *Medicine
+            => Temple *Religion?
+            => Barracks *Warfare?
+            => Graveyard *Religion?
+            => wheel *Science?  => mill
+
+=> Metalwork   => weaponry         => advweaponry
+            => shields          => advshields                                                          
+            => horseback (+dom) => Stables
+
+=> Construction    => engineering =>
+                => house
+                => tenements
+                => rampart 
+                
+
+=> Engineering     => architecture =>
+                => mansion
+                => slums
+                => palisade
+
+=> Architecture    => palace
+                => fortification *Warfare?
+                => battlement
+
+Domestication   => Farming =>
+                => skinning    => butchering
+                => harvesting  => gardening
+                => Ploughshares
+                => Irrigation
+                => Granaries 
+                => butchering
+                => gardening
+
+=> Farming         => Agriculture =>
+                => flensing
+                => reaping
+                
+=> Agriculture     =>
+                => croprotation 
+                => selectivebreeding 
+                => fertilisers 
+
+quarrying       => Mining       => prospecting => extraction => macerating
+
+=> Theism          => Polytheism   => Monotheism
+                                => aesthetics
+                => Writing      => Astronomy    => Guilds =>
+                                => Mathematics  => Guilds =>
+                                => Medicine     => Guilds =>
+                                => administration
+                                => codeoflaws   => civilservice => nationalism 
+
+Guilds          => serfs    
+                => feudalism
+
+==========
+references
+https://gosciencegirls.com/evolution-of-agriculture/
+
+https://www.explainthatstuff.com/timeline.html
+Stone/bone tools
+Fire
+Settlements
+Farming (Agric)
+Bricks
+Iron
+Glass
+Wheel
+Language
+Paper/Papyrus
+Bronze
+Irrigation
+Alphabet
+Concrete
+Windmills
+
+
+https://en.wikipedia.org/wiki/History_of_science
+https://en.wikipedia.org/wiki/Theism
+100         => 250      => 500              => 1000         => 2500         => 5000
+20          => 50       => 100              => 250
+Carpentry   => Masonry  => Construction     => engineering  => architecture => palace
+                                                                            => fortification *Warfare?
+                                                                            => battlement
+                                                            => mansion
+                                                            => slums
+                                                            => palisade
+                                            => house
+                                            => tenements
+                                            => rampart
+                        => Metalwork        => weaponry         => advweaponry
+                                            => shields          => advshields 
+                                            => horseback (+dom) => Stables
+                        => Cottage
+                        => Tannery
+                        => Smithy
+                        => Apothecary *Medicine
+                        => Temple *Religion?
+                        => Barracks *Warfare?
+                        => Graveyard *Religion?
+                        => wheel *Science?  => mill
+            => Theism   => Polytheism       => Monotheism
+                                            => aesthetics
+                        => Writing          => Astronomy    => Guilds =>
+                                            => Mathematics  => Guilds =>
+                                            => Medicine     => Guilds => serfs    
+                                                                  => feudalism
+                                            => administration
+                                            => codeoflaws   => civilservice => nationalism
+            => Wooden Hut
+            => Barn
+            => Wood stockpile
+            => Stone stockpile
+            => felling
+
+Domestic    => Farming  => Agriculture      => croprotation 
+                                            => selectivebreeding
+                                            => fertilisers
+                        => flensing
+                        => reaping
+            => skinning     => butchering
+            => harvesting   => gardening
+            => Ploughshares
+            => Irrigation
+            => Granaries 
+            => butchering
+            => gardening
+
+
+quarrying   => Mining       => prospecting => extraction => macerating
+    
