@@ -62,10 +62,6 @@ function invade(ecivtype) {
     curCiv.raid.raiding = true;
     curCiv.raid.last = ecivtype;
 
-    //////////curCiv.raid.epop = civSizes[ecivtype].max_pop + 1; // this means enemies will always have maximum
-    //////////// If no max pop, use 2x min pop.
-    //////////if (curCiv.raid.epop === Infinity) { curCiv.raid.epop = civSizes[ecivtype].min_pop * 2; }
-
     let minpop = civSizes[ecivtype].min_pop;
     let maxpop = civSizes[ecivtype].max_pop;
     if (maxpop === Infinity) { maxpop = civSizes[ecivtype].min_pop * 2; }
@@ -79,14 +75,13 @@ function invade(ecivtype) {
     civData.esoldier.owned += (curCiv.raid.epop / 20) + Math.floor(Math.random() * (curCiv.raid.epop / 5));
     civData.efort.owned += Math.floor(Math.random() * (curCiv.raid.epop / 5000));
 
+    // 66g todo: should we should take into account size of raiding party
+    // baseLoot = Math.min(civData.soldierParty.owned + civData.cavalryParty.owned, baseLoot);
+
     // Glory redoubles rewards (doubled here because doubled already above)
     let baseLoot = curCiv.raid.epop / (1 + (civData.glory.timer <= 0));
 
     // Set rewards of land and other random plunder.
-    //xxx Maybe these should be partially proportionate to the actual number of defenders?
-    //curCiv.raid.plunderLoot = { 
-    //	freeLand: Math.round(baseLoot * (1 + (civData.administration.owned))) 
-    //};
     // land between 25 and 50% of one third because it can be doubled with administration and we don't want to gain too much
     let baseLand = (baseLoot / 3) * (1 + (civData.administration.owned));
     curCiv.raid.plunderLoot = {
@@ -144,8 +139,6 @@ function plunder() {
     if (civData.lament.owned) { curCiv.attackCounter -= Math.ceil(curCiv.raid.epop / 2000); }
 
     // Collect loot
-    //payFor(curCiv.raid.plunderLoot, -1);  // We pay for -1 of these to receive them. 
-    // Why?  If land is negative, this results in incorrect value
     let num;
     let lootObj = curCiv.raid.plunderLoot;
     for (let i in lootObj) {
@@ -191,7 +184,7 @@ function doFight(attacker, defender) {
     let fortMod = (defender.alignment == alignmentType.player ?
         (civData.fortification.owned * civData.fortification.efficiency)
         : (civData.efort.owned * civData.efort.efficiency));
-    //let palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
+
     let defenceMod = 0;
     if (defender.alignment == alignmentType.player) {
         defenceMod += civData.rampart.owned ? civData.rampart.efficiency : 0;
@@ -202,7 +195,6 @@ function doFight(attacker, defender) {
     // Determine casualties on each side.  Round fractional casualties
     // probabilistically, and don't inflict more than 100% casualties.
     let attackerCas = Math.min(attacker.owned, rndRound(getCasualtyMod(defender, attacker) * defender.owned * defender.efficiency));
-    //let defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - palisadeMod) * Math.max(1 - fortMod, 0)));
     let defenderCas = Math.min(defender.owned, rndRound(getCasualtyMod(attacker, defender) * attacker.owned * (attacker.efficiency - defenceMod) * Math.max(1 - fortMod, 0)));
 
     attacker.owned -= attackerCas;
@@ -284,17 +276,12 @@ function doSlaughter(attacker) {
             if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
                 // An attacker may disappear after killing
                 if (Math.random() < attacker.killStop) { --attacker.owned; }
-                //targetUnit.owned -= 1;
+
                 killUnit(targetUnit);
                 // Animals will eat the corpse
                 if (attacker.species == speciesType.animal) {
                     civData.corpses.owned -= 1;
                 }
-
-                //if (population.living > 50) {
-                //    // the greater the population, the less the drop in morale
-                //    adjustMorale(-0.0025 / population.living);
-                //}
 
                 gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
             }
@@ -324,7 +311,7 @@ function doSlaughterMulti(attacker) {
                 if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
                     // An attacker may disappear after killing
                     if (Math.random() < attacker.killStop) { --attacker.owned; }
-                    //targetUnit.owned -= 1;
+
                     killUnit(targetUnit);
                     // Animals will eat the corpse
                     if (attacker.species == speciesType.animal) {
@@ -332,11 +319,6 @@ function doSlaughterMulti(attacker) {
                     }
                     kills++;
                     lastTarget = targetUnit.singular;
-
-                    //if (population.living > 50) {
-                    //    // the greater the population, the less the drop in morale
-                    //    adjustMorale(-0.0025 / population.living);
-                    //}
                 }
                 else {
                     --attacker.owned;
@@ -627,24 +609,20 @@ function doMobs() {
     for (let i = 0; i < lootable.length; ++i) {
         resources += lootable[i].owned;
     }
-    //civData.graveyard.owned
+
     if (population.limit === 0 && landTotals.sackableTotal === 0 && resources === 0 && civData.freeLand.owned === 0 && civData.graveyard.owned === 0) {
         // nothing to do
         return false;
     }
-    //let civLimit = population.current; 
+
     let civLimit = population.limit; // attacks can still happen if there are habitable buildings to destroy, resource to pluder, graves to desecrate
     if (civLimit > 0 || landTotals.sackableTotal > 0 || resources > 0 || civData.freeLand.owned > 0 && civData.graveyard.owned > 0) {
         // only attack if something available.
         ++curCiv.attackCounter;
     }
 
-    //force attacks of human types only if population is 0 and there are buildings to sack/loot
-    //let humansOnly = population.current === 0 && (landTotals.sackableTotal > 0 || resources > 0);
-    //debug("humansOnly=" + humansOnly);
     let limit = (60 * 5) + Math.floor(60 * 5 * Math.random()); //Minimum 5 minutes, max 10
-    //debug("curCiv.attackCounter = " +curCiv.attackCounter);
-    //debug("limit = " + limit);
+
     if ((curCiv.attackCounter > limit) ) {
         // attempt at forcing attacks more frequently the larger the civ
         // 10 because that is min pop of a thorp
@@ -652,8 +630,6 @@ function doMobs() {
         let rnum = totalStuff * Math.random();
         let rnum2 = (totalStuff * Math.random()) / 10;
 
-        //if (600 * Math.random() < 1) {
-        //debug(rnum + "<" + rnum2);
         if ((rnum < rnum2) ) {
             curCiv.attackCounter = 0;
 
@@ -736,7 +712,6 @@ function doMobs() {
             if (population.current === 0 && mobType == mobTypeIds.wolf) {
                 mobType = mobTypeIds.barbarian; // they do a bit of everything
                 mobNum = Math.ceil((landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned) * Math.random() / 50);
-                //Math.ceil(max_mob * Math.random())
             }
             spawnMob(civData[mobType], mobNum);
         }
