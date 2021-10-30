@@ -430,16 +430,8 @@ function migrateGameData(loadVar, settingsVarReturn) {
         if (!isValid(loadVar.curCiv.curWonder)) { loadVar.curCiv.curWonder = loadVar.wonder; }
         delete loadVar.wonder;
     }
-    ////////////////////////////////////////////////////
 
-    //v1.4.0
-    // new civ sizes
-    // TODO: do we need to add these here?
-    // We don't need these here.  They just show what's been added
-    //if (!isValid(loadVar.curCiv.townAch)) { }
-    //if (!isValid(loadVar.curCiv.cityAch)) { }
-    //v1.4.1
-    //if (!isValid(loadVar.curCiv.invader)) { }
+    ////////////////////////////////////////////////////
 
     //v1.4.2
     // variable trading prices
@@ -469,21 +461,7 @@ function migrateGameData(loadVar, settingsVarReturn) {
     }
 
     // v1.4.4
-    // resource stockpiles
-    //if (!isValid(curCiv.resourcestock.owned)) {
-        // let's be generous and give barns + wood + stone / 5
-    //    curCiv.resourcestock.owned = Math.ceil((curCiv.barn.owned + curCiv.woodstock.owned + curCiv.stonestock.owned) / 5);
-    //}
-
     // v1.4.5
-    // remove resource stock - failed attempt
-    //if (isValid(loadVar.curCiv.resourcestock)) {
-    //    delete loadVar.curCiv.resourcestock;
-    //}
-    //if (isValid(curCiv.resourcestock)) {
-    //    delete curCiv.resourcestock;
-    //}
-
     //v1.4.7 - palace
 
     //v1.4.8 - cornexchange
