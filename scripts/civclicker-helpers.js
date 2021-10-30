@@ -417,11 +417,14 @@ function clearSpecialResourceNets() {
 }
 
 function checkResourceLimits() {
-    //Resources occasionally go above their caps.
+    //Resources occasionally go above their caps. eg after raids
     //Cull the excess /after/ other workers have taken their inputs.
     resourceData.forEach(function (resource) {
         if (resource.owned > resource.limit) {
-            resource.owned = resource.limit;
+            let excess = resource.owned - resource.limit;
+            excess = Math.ceil(Math.random() * 0.5 * excess);
+            //resource.owned = resource.limit;
+            resource.owned -= excess
         }
         if (resource.owned < 0) {
             resource.owned = 0;
@@ -525,6 +528,10 @@ function pickStarveTarget() {
 
     id = getRandomWorker();
     if (isValid(id) && id) { return civData[id]; }
+
+    // These don't have .ill variants at the moment.
+    if (civData.cavalryParty.owned > 0) { return civData.cavalryParty; }
+    if (civData.soldierParty.owned > 0) { return civData.soldierParty; }
 
     return null;
 }
@@ -702,4 +709,14 @@ function increment(objId) {
 
     ui.find("#clicks").innerHTML = prettify(Math.round(++curCiv.resourceClicks));
     updateResourceTotals(); //Update the page with totals
+}
+
+function getStoreroomBonus() {
+    return (civData.storerooms.owned ? 2 : 1) * 50;
+}
+function getStorehouseBonus() {
+    return (civData.storehouses.owned ? 2 : 1) * 100;
+}
+function getWarehouseBonus() {
+    return (civData.warehouses.owned ? 2 : 1) * 200;
 }
