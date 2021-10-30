@@ -1,6 +1,5 @@
 ﻿"use strict";
 
-
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
     let millMod = 1;
@@ -58,7 +57,7 @@ function doMiners() {
 }
 
 function doBlacksmiths() {
-    if (civData.blacksmith.owned  <= 0) { return; }
+    if (civData.blacksmith.owned <= 0) { return; }
     // we don't want to use up ore if we aren't making metal
     if (civData.metal.owned < civData.metal.limit) {
         let efficiency = civData.blacksmith.efficiency + (0.1 * civData.blacksmith.efficiency * civData.mathematics.owned);
@@ -74,8 +73,8 @@ function doBlacksmiths() {
 }
 
 function doTanners() {
-    if (civData.tanner.owned  <= 0) { return; }
-     // we don't want to use up skins if we aren't making leather
+    if (civData.tanner.owned <= 0) { return; }
+    // we don't want to use up skins if we aren't making leather
     if (civData.leather.owned < civData.leather.limit) {
         let efficiency = civData.tanner.efficiency + (0.1 * civData.tanner.efficiency * civData.astronomy.owned);
         let skinsUsed = Math.min(civData.skins.owned, (civData.tanner.owned * efficiency * curCiv.morale.efficiency));
@@ -89,7 +88,7 @@ function doTanners() {
     }
 }
 function doApothecaries() {
-    if (civData.healer.owned  <= 0) { return; }
+    if (civData.healer.owned <= 0) { return; }
     // we don't want to use up herbs if we aren't making potions
     if (civData.potions.owned < civData.potions.limit) {
         let efficiency = civData.healer.efficiency + (0.1 * civData.healer.efficiency * civData.medicine.owned);
@@ -114,7 +113,7 @@ function doClerics() {
 }
 
 function doHealers() {
-    if (civData.healer.owned <= 0 || civData.potions.owned <= 0 || population.totalSick <= 0) { return 0;} // we can't heal without potions
+    if (civData.healer.owned <= 0 || civData.potions.owned <= 0 || population.totalSick <= 0) { return 0; } // we can't heal without potions
 
     let job, numHealed = 0;
     let numHealers = civData.healer.owned + (civData.cat.owned * (civData.companion.owned));
@@ -130,7 +129,7 @@ function doHealers() {
     // Cure people until we run out of healing capacity or potions
     while (civData.healer.cureCount >= 1 && civData.potions.owned >= 1) {
         job = getNextPatient();
-        if (!job) {break;}
+        if (!job) { break; }
         healByJob(job);
         --civData.healer.cureCount;
         --civData.potions.owned;
@@ -235,7 +234,7 @@ function doPlague() {
     // there are 4 possibilities: die, survive, spread, nothing 
     let chance = 0.015;
 
-    if (Math.random() < chance) { 
+    if (Math.random() < chance) {
         let victims = Math.ceil(population.totalSick / 2 * Math.random());
 
         if (victims <= 0) { return false; }
@@ -286,7 +285,7 @@ function doPlague() {
         }
         calculatePopulation();
         return true;
-    } else if (Math.random() < chance && canSpreadPlague()) {  
+    } else if (Math.random() < chance && canSpreadPlague()) {
         // plague spreads
         // needs to be same odds as catching plague in doCorpses civData.corpses.owned
         //let infected = Math.floor(population.healthy / 2 * Math.random()) + 1;
@@ -340,7 +339,7 @@ function doCorpses() {
 
     // if we have enough clerics to bury the dead, then do nothing
     // why 7?  Because after about 7 days corpses start decaying
-    if (civData.corpses.owned <= civData.cleric.owned * 7 && curCiv.grave.owned > 0 ) { return; }
+    if (civData.corpses.owned <= civData.cleric.owned * 7 && curCiv.grave.owned > 0) { return; }
 
     // Corpses lying around will occasionally make people sick.
     // 1-in-50 chance (1-in-100 with feast)
@@ -379,7 +378,7 @@ function doCorpses() {
         //civData.corpses.owned -= 1;
         let gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
-        let corpse = " corpse" + ((gone > 1) ? "s" : "");
+        let what = " corpse" + ((gone > 1) ? "s" : "");
         let action = " rotted away";
         if (Math.random() < 0.33) {
             action = " eaten by vermin";
@@ -387,12 +386,13 @@ function doCorpses() {
             action = " devoured by scavengers";
         }
 
-        gameLog(prettify(gone) + corpse + action);
+        gameLog(prettify(gone) + what + action);
     }
     if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 }
+
 function canSpreadPlague() {
- // more corpses should mean more chance of disease
+    // more corpses should mean more chance of disease
     let sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
     // increase percentage to reduce frequency
     //let test = population.healthy * 0.5 * Math.random();
@@ -452,16 +452,16 @@ function dismissWorkers() {
         civData.cavalry.owned -= diff;
         civData.unemployed.owned += diff;
     }
-    
+
 }
 
 function farmerMods(efficiency_base) {
     //+ civData.domestication.owned
     return efficiency_base + (0.1 * (
-             + civData.farming.owned + civData.agriculture.owned
-            + civData.ploughshares.owned + civData.irrigation.owned
-            + civData.croprotation.owned + civData.selectivebreeding.owned + civData.fertilisers.owned
-            + civData.blessing.owned));
+        + civData.farming.owned + civData.agriculture.owned
+        + civData.ploughshares.owned + civData.irrigation.owned
+        + civData.croprotation.owned + civData.selectivebreeding.owned + civData.fertilisers.owned
+        + civData.blessing.owned));
 }
 
 function woodcutterMods(efficiency_base) {
