@@ -13,6 +13,7 @@ function updateAll() {
     updateDevotion();
     updateWonder();
     updateReset();
+    updateGameDate();
 }
 
 function updateWonderList() {
@@ -236,7 +237,7 @@ function updateResourceTotals() {
 
     // Cheaters don't get names.
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
-    
+
     ui.show("#resourcesSelect .info", curCiv.resourceClicks == 22);// neverclick is on
 }
 
@@ -449,7 +450,7 @@ function updateFightBar(attacker, defender) {
 
     h += '<div class="attacker" style="width: ' + apc + '%"></div>';
     h += '<div class="defender" style="width: ' + dpc + '%"></div>';
-    
+
     barElt.innerHTML = '<div style="min-width: 100%">' + h + '</div>';
 }
 
@@ -489,7 +490,7 @@ function updateUpgrades() {
             //break;
         }
     }
-    
+
     // Deity techs
     ui.show("#deityPane .notYet", (!hasDomain && !canSelectDomain));
     ui.find("#renameDeity").disabled = (!civData.worship.owned);
@@ -721,4 +722,64 @@ function updateNote(id, text) {
         return;
     }
     document.getElementById(id + "Note").innerHTML = ": " + text;
+}
+
+function updateGameDate() {
+    if (!curCiv.loopCounter) {
+        curCiv.loopCounter = 1;
+    }
+    else {
+        // can't have been playing longer than since 29/06/2021 16:18
+        let date1 = new Date();
+        let date2 = new Date("June 29, 2021 16:18:00");
+
+        // get total seconds between two dates
+        let seconds = Math.floor(Math.abs(date1.getTime() - date2.getTime()) / 1000);
+        //debug("updateGameDate " + seconds + ". curCiv.loopCounter " + curCiv.loopCounter );
+
+        if (curCiv.loopCounter > seconds) {
+            curCiv.loopCounter = seconds;
+        }
+    }
+    let elem = ui.find("#gameDate");
+    if (curCiv.loopCounter % 24 != 0 && elem.innerHTML != "0000-00-00") { return; }
+
+    elem.innerHTML = getGameDate();
+}
+function getGameDate() {
+    let t = Math.floor(curCiv.loopCounter / 24);
+    let y = Math.floor(t / 360) + 1;
+    t = t % 360;
+    let m = Math.floor(t / 30) + 1;
+    let d = (t % 30) + 1;
+
+    return y + "-" + ('00' + m).slice(-2) + "-" + ('00' + d).slice(-2);
+}
+function getGameTime() {
+    let h = curCiv.loopCounter % 24;
+    let s = Math.floor(Math.random() * 60);
+    return ('00' + h).slice(-2) + ":" + ('00' + s).slice(-2);
+}
+function getGameDateTime() {
+    return getGameDate() + " " + getGameTime();
+}
+function getPlayingTime() {
+    let oneDay = 24 * 60 * 60;
+    let oneHour = 60 * 60;
+    let oneMinute = 60;
+    let c = curCiv.loopCounter;
+    let days = Math.floor(c / oneDay);
+    c = c % oneDay;
+    let hours = Math.floor(c / oneHour);
+    c = c % oneHour;
+    let mins = Math.floor(c / oneMinute);
+    let seconds = c % oneMinute;
+
+    let ret = "Playing time: ";
+    if (days > 0) { ret += days + " days " }
+    if (hours > 0) { ret += hours + " hours " }
+    if (mins > 0) { ret += mins + " minutes " }
+    if (seconds > 0) { ret += seconds + " seconds " }
+
+    return ret;
 }
