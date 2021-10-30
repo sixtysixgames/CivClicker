@@ -9,20 +9,7 @@
  * do not use the defer attribute on the script tag in index.html
  * because these must exist before everything else
  */
-const app = {
-    loopTimer: 0,
 
-    // TODO: Update the version numbering internally
-    version: 33, // This is an ordinal used to trigger reloads. 66g No it doesn't 
-    //66g Always increment versionData if adding/modifying element to civData
-    versionData: new VersionData(1, 4, 24, "alpha"), // this is not accurate.  
-
-    saveTag: "civ",
-    saveTag2: this.saveTag + "2", // For old saves.
-    saveSettingsTag: "civSettings",
-    logRepeat: 1,
-    sysLogRepeat: 1
-};
 
 // see -classes
 const civObjType = {
