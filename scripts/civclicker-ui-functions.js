@@ -5,7 +5,6 @@
 // Returns the target pane element.
 function paneSelect(control) {
     let oldTarget;
-    //alert("hello");
 
     // Identify the target pane to be activated, and the currently active
     // selector tab(s).
