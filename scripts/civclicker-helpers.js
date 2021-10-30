@@ -164,7 +164,7 @@ function doPurchase(objId, num) {
     // Pay for them
     num = payFor(purchaseObj.require, num);
     if (abs(num) < 1) {
-        gameLog("Could not build, insufficient resources."); // I18N
+        gameLog("Could not build, insufficient resources"); // I18N
         return 0;
     }
 
@@ -191,7 +191,7 @@ function doPurchase(objId, num) {
         civData.freeLand.owned -= num;
         // check for overcrowding
         if (civData.freeLand.owned < 0) {
-            gameLog("You are suffering from overcrowding.");  // I18N
+            gameLog("You are suffering from overcrowding");  // I18N
             adjustMorale(Math.max(num, -civData.freeLand.owned) * -0.0025 * (civData.codeoflaws.owned ? 0.5 : 1.0));
         }
 
@@ -623,10 +623,11 @@ function doHomeless() {
         let numHomeless = population.living - population.limit;
         // kill off up to 20% of homeless
         let numDie = starve(Math.ceil(Math.random() * numHomeless / 5));
-        if (numDie == 1) {
-            gameLog("A homeless citizen died of exposure");
-        } else if (numDie > 1) {
-            gameLog(prettify(numDie) + " homeless citizens died of exposure");
+        if (numDie > 0) {
+            let who = numDie == 1 ? " homeless citizen" : " homeless citizens";
+            let where = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
+            let what = Math.random() < 0.5 ? " died of exposure" : " migrated " + where[Math.floor(Math.random() * where.length)];
+            gameLog(prettify(numDie) + who + what);
         }
     }
 }
