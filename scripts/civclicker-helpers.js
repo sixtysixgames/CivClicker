@@ -284,6 +284,7 @@ function getRandomBuilding() {
 
     for (let i = 0; i < sackable.length; ++i) {
         chance += civData[sackable[i].id].owned;
+        //debug(sackable[i].id + ": " + chance + " > " + num);
         if (chance > num) { return sackable[i].id; }
     }
     return "";
