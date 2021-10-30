@@ -49,7 +49,7 @@ function wonderSelect(resourceId) {
     if (curCiv.curWonder.stage !== 2) { return; }
     ++curCiv.curWonder.stage;
     ++curCiv.curWonder[resourceId];
-    gameLog("You now have a permanent bonus to " + resourceId + " production.");
+    gameLog("You now have a permanent bonus to " + resourceId + " production");
     curCiv.wonders.push({ name: curCiv.curWonder.name, resourceId: resourceId });
     curCiv.curWonder.name = "";
     curCiv.curWonder.progress = 0;
