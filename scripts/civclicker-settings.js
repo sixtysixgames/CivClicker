@@ -32,10 +32,10 @@ function load(loadType) {
 
     if (loadType === "cookie") {
         //check for cookies
-        if (read_cookie(saveTag) && read_cookie(saveTag2)) {
+        if (read_cookie(app.saveTag) && read_cookie(app.saveTag2)) {
             //set variables to load from
-            loadVar = read_cookie(saveTag);
-            loadVar2 = read_cookie(saveTag2);
+            loadVar = read_cookie(app.saveTag);
+            loadVar2 = read_cookie(app.saveTag2);
             loadVar = mergeObj(loadVar, loadVar2);
             loadVar2 = undefined;
             //notify user
@@ -54,19 +54,21 @@ function load(loadType) {
         let string2;
         let settingsString;
         try {
-            settingsString = localStorage.getItem(saveSettingsTag);
-            string1 = localStorage.getItem(saveTag);
-            string2 = localStorage.getItem(saveTag2);
+            settingsString = localStorage.getItem(app.saveSettingsTag);
+            string1 = localStorage.getItem(app.saveTag);
+            string2 = localStorage.getItem(app.saveTag2);
 
             if (!string1) {
                 console.log("Unable to find variables in localStorage. Attempting to load cookie.");
                 sysLog("Unable to find variables in localStorage. Attempting to load cookie.");
-                return load("cookie");
+                //return load("cookie");
+                return false;
             }
         } catch (err) {
             if (!string1) { // It could be fine if string2 or settingsString fail.
                 handleStorageError(err);
-                return load("cookie");
+                //return load("cookie");
+                return false;
             }
         }
 
@@ -93,15 +95,15 @@ function load(loadType) {
     }
 
     saveVersion = mergeObj(saveVersion, loadVar.versionData);
-    if (saveVersion.toNumber() > versionData.toNumber()) {
+    if (saveVersion.toNumber() > app.versionData.toNumber()) {
         // Refuse to load saved games from future versions.
-        let alertStr = "Cannot load; saved game version " + saveVersion + " is newer than game version " + versionData;
+        let alertStr = "Cannot load; saved game version " + saveVersion + " is newer than game version " + app.versionData;
         console.log(alertStr);
         sysLog(alertStr);
         alert(alertStr);
         return false;
     }
-    if (saveVersion.toNumber() < versionData.toNumber()) {
+    if (saveVersion.toNumber() < app.versionData.toNumber()) {
         // Migrate saved game data from older versions.
         let settingsVarReturn = { val: {} };
         migrateGameData(loadVar, settingsVarReturn);
@@ -180,7 +182,7 @@ function save(savetype) {
     let xmlhttp;
 
     let saveVar = {
-        versionData: versionData, // Version information header
+        versionData: app.versionData, // Version information header
         curCiv: curCiv // Game data
     };
 
@@ -199,13 +201,13 @@ function save(savetype) {
     //set localstorage
     try {
         // Delete the old cookie-based save to avoid mismatched saves
-        deleteCookie(saveTag);
-        deleteCookie(saveTag2);
+        deleteCookie(app.saveTag);
+        deleteCookie(app.saveTag2);
 
-        localStorage.setItem(saveTag, JSON.stringify(saveVar));
+        localStorage.setItem(app.saveTag, JSON.stringify(saveVar));
 
         // We always save the game settings.
-        localStorage.setItem(saveSettingsTag, JSON.stringify(settingsVar));
+        localStorage.setItem(app.saveSettingsTag, JSON.stringify(settingsVar));
 
         //Update console for debugging, also the player depending on the type of save (manual/auto)
         if (savetype == saveTypes.auto) {
@@ -238,11 +240,11 @@ function deleteSave() {
     if (!confirm("All progress and achievements will be lost.\nReally delete save?")) { return; } //Check the player really wanted to do that.
 
     try {
-        deleteCookie(saveTag);
-        deleteCookie(saveTag2);
-        localStorage.removeItem(saveTag);
-        localStorage.removeItem(saveTag2);
-        localStorage.removeItem(saveSettingsTag);
+        deleteCookie(app.saveTag);
+        deleteCookie(app.saveTag2);
+        localStorage.removeItem(app.saveTag);
+        localStorage.removeItem(app.saveTag2);
+        localStorage.removeItem(app.saveSettingsTag);
         sysLog("Save Deleted");
         if (confirm("Save Deleted. Refresh page to start over?")) {
             window.location.reload();
