@@ -272,9 +272,7 @@ function grace(delta) {
 
 function doPestControl() {
     //Decrements the pestControl Timer
-    //if (civData.pestControl.timer > 0) { --civData.pestControl.timer; }
     if (civData.pestControl.timer > 0) {
-        //ui.show("#pestControlGroup", true)
         ui.find("#pestControlTimer").innerHTML = civData.pestControl.timer--;
     } else {
         ui.find("#pestControlGroup").style.display = "none";
