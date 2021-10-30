@@ -21,22 +21,38 @@
  * Variables
  */
 
-var setup = {};
-var loopTimer = 0;
+const setup = {};
 
-// TODO: Update the version numbering internally
-var version = 33; // This is an ordinal used to trigger reloads. 66g No it doesn't 
-//66g Always increment versionData if adding/modifying element to civData
-var versionData = new VersionData(1, 4, 24, "alpha"); // this is not accurate.  
+//var loopTimer = 0;
 
-var saveTag = "civ";
-var saveTag2 = saveTag + "2"; // For old saves.
-var saveSettingsTag = "civSettings";
-var logRepeat = 1;
-var sysLogRepeat = 1;
+//// TODO: Update the version numbering internally
+//var version = 33; // This is an ordinal used to trigger reloads. 66g No it doesn't 
+////66g Always increment versionData if adding/modifying element to civData
+//var versionData = new VersionData(1, 4, 24, "alpha"); // this is not accurate.  
+
+//var saveTag = "civ";
+//var saveTag2 = saveTag + "2"; // For old saves.
+//var saveSettingsTag = "civSettings";
+//var logRepeat = 1;
+//var sysLogRepeat = 1;
+
+const app = {
+    loopTimer: 0,
+
+    // TODO: Update the version numbering internally
+    version: 33, // This is an ordinal used to trigger reloads. 66g No it doesn't 
+    //66g Always increment versionData if adding/modifying element to civData
+    versionData: new VersionData(1, 4, 24, "alpha"), // this is not accurate.  
+
+    saveTag: "civ",
+    saveTag2: this.saveTag + "2", // For old saves.
+    saveSettingsTag: "civSettings",
+    logRepeat: 1,
+    sysLogRepeat: 1
+};
 
 // Declare variables here so they can be referenced later.  
-var curCiv = {
+let curCiv = {
     civName: "Tribe",
     rulerName: "Chief",
 
@@ -81,14 +97,16 @@ var curCiv = {
     // Known deities.  The 0th element is the current game's deity.
     // If the name is "", no deity has been created (can also check for worship upgrade)
     // If the name is populated but the domain is not, the domain has not been selected.
-    deities: [{ name: "", domain: "", maxDev: 0 }]  // array of { name, domain, maxDev }
+    deities: [{ name: "", domain: "", maxDev: 0 }],  // array of { name, domain, maxDev }
+
+    loopCounter: 0
 
     //xxx We're still accessing many of the properties put here by civData
     //elements without going through the civData accessors.  That should change.
 };
 
 // These are not saved, but we need them up here for the asset data to init properly.
-var population = {
+let population = {
     current: 0,
     living: 0,
     zombie: 0,
@@ -99,27 +117,27 @@ var population = {
 };
 
 // Caches the total number of each wonder, so that we don't have to recount repeatedly.
-var wonderCount = {};
+let wonderCount = {};
 
 // Build a variety of additional indices so that we can iterate over specific
 // subsets of our civ objects.
-var resourceData = []; // All resources
-var buildingData = []; // All buildings
-var upgradeData = []; // All upgrades
-var powerData = []; // All 'powers' //xxx This needs refinement.
-var unitData = []; // All units
-var achData = []; // All achievements
-var sackable = []; // All buildings that can be destroyed
-var lootable = []; // All resources that can be stolen
-var killable = []; // All units that can be destroyed
-var homeBuildings = []; // All buildings to be displayed in the home area
-var homeUnits = []; // All units to be displayed in the home area
-var armyUnits = []; // All units to be displayed in the army area
-var basicResources = []; // All basic (click-to-get) resources
-var normalUpgrades = []; // All upgrades to be listed in the normal upgrades area
+const resourceData = []; // All resources
+const buildingData = []; // All buildings
+const upgradeData = []; // All upgrades
+const powerData = []; // All 'powers' //xxx This needs refinement.
+const unitData = []; // All units
+const achData = []; // All achievements
+const sackable = []; // All buildings that can be destroyed
+const lootable = []; // All resources that can be stolen
+const killable = []; // All units that can be destroyed
+const homeBuildings = []; // All buildings to be displayed in the home area
+const homeUnits = []; // All units to be displayed in the home area
+const armyUnits = []; // All units to be displayed in the army area
+const basicResources = []; // All basic (click-to-get) resources
+const normalUpgrades = []; // All upgrades to be listed in the normal upgrades area
 
 // These are settings that should probably be tied to the browser.
-var settings = {
+let settings = {
     autosave: true,
     autosaveCounter: 1,
     autosaveTime: 60, //Currently autosave is every minute. Might change to 5 mins in future.
@@ -132,11 +150,12 @@ var settings = {
     useIcons: true
 };
 
-var civData = getCivData(); // Giant array of data, defined in "data" js
+const civData = getCivData(); // Giant array of data, defined in "-data" js
 
 function getWonderResources(civData) {
     // The resources that Wonders consume, and can give bonuses for.
-    return wonderResources = [
+    //return wonderResources = [
+    return [
         civData.food,
         civData.wood,
         civData.stone,
@@ -150,7 +169,7 @@ function getWonderResources(civData) {
     ];
 }
 // The resources that Wonders consume, and can give bonuses for.
-var wonderResources = getWonderResources(civData); // defined in "data" js
+const wonderResources = getWonderResources(civData); 
 
 function setIndexArrays(civData) {
     civData.forEach(function (elem) {
@@ -285,6 +304,8 @@ function gameLoop() {
     updateResourceTotals(); //This is the point where the page is updated with new resource totals
     testAchievements();
 
+    curCiv.loopCounter++;
+
     //Data changes should be done; now update the UI.
     updateAll();
 
@@ -397,8 +418,9 @@ setup.game = function () {
 setup.loop = function () {
     // This sets up the main game loop, which is scheduled to execute once per second.
     console.log("Setting up Main Loop");
+    sysLog(getPlayingTime());
     gameLoop();
-    loopTimer = window.setInterval(gameLoop, 1000); //updates once per second (1000 milliseconds)
+    app.loopTimer = window.setInterval(gameLoop, 1000); //updates once per second (1000 milliseconds)
 };
 
 setup.all();
