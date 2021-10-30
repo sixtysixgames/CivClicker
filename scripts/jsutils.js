@@ -190,7 +190,6 @@ function indexArrayByAttr(inArray, attr) {
     });
 }
 
-
 // Number format utility functions.
 // - Allows testing the sign of strings that might be prefixed with '-' (like "-custom")
 // - Output format uses the proper HTML entities for minus sign and infinity.
