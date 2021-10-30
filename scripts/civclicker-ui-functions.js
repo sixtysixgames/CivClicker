@@ -227,13 +227,13 @@ function getCostNote(civObj) {
 function gameLog(message) {
     //get the current date, extract the current time in HH.MM format
     //xxx It would be nice to use Date.getLocaleTimeString(locale,options) here, but most browsers don't allow the options yet.
-    let d = new Date();
+    //let d = new Date();
     // todo: output some sort of in-game date based on how long played
-    let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
-
+    //let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
+    let curTime = getGameDateTime();
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#logL").innerHTML != message) {
-        logRepeat = 0; //Reset the (xNumber) value
+        app.logRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
         let i = 30; // Number of lines of log to keep. See the logTable in index.html
@@ -247,7 +247,7 @@ function gameLog(message) {
     }
     // Updates most recent line with new time, message, and xNumber.
     let s = "<td id='logT'>" + curTime + "</td><td id='logL'>" + message + "</td><td id='logR'>";
-    if (++logRepeat > 1) { s += "(x" + logRepeat + ")"; } // Optional (xNumber)
+    if (++app.logRepeat > 1) { s += "(x" + app.logRepeat + ")"; } // Optional (xNumber)
     s += "</td>";
     ui.find("#log0").innerHTML = s;
 }
@@ -269,7 +269,7 @@ function sysLog(message) {
 
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#syslogL").innerHTML != message) {
-        sysLogRepeat = 0; //Reset the (xNumber) value
+        app.sysLogRepeat = 0; //Reset the (xNumber) value
 
         //Go through all the logs in order, moving them down one and successively overwriting them.
         let i = 20; // Number of lines of log to keep.
@@ -283,7 +283,7 @@ function sysLog(message) {
     }
     // Updates most recent line with new time, message, and xNumber.
     let s = "<td id='syslogT'>" + curTime + "</td><td id='syslogL'>" + message + "</td><td id='syslogR'>";
-    if (++sysLogRepeat > 1) { s += "(x" + sysLogRepeat + ")"; } // Optional (xNumber)
+    if (++app.sysLogRepeat > 1) { s += "(x" + app.sysLogRepeat + ")"; } // Optional (xNumber)
     s += "</td>";
     ui.find("#syslog0").innerHTML = s;
 }
