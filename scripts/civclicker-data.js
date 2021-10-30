@@ -129,24 +129,24 @@ function getCivData() {
             require: undefined,  // Cannot be purchased.
             vulnerable: false, // Cannot be stolen by looting
             initOwned: 100, // used to be 1000, let's make it more difficult
-            effectText: "Conquer more from your neighbors."
+            effectText: "Conquer more from your neighbors"
         }),
         new Building({
             id: buildingType.tent, singular: "tent", plural: "tents",
             require: { wood: 2, skins: 2 },
-            effectText: "+1 max pop."
+            effectText: "+1 citizen"
         }),
         new Building({
             id: buildingType.hut, singular: "wooden hut", plural: "wooden huts",
             prereqs: { carpentry: true },
             require: { wood: 20, skins: 1 },
-            effectText: "+3 max pop."
+            effectText: "+3 citizens"
         }),
         new Building({
             id: buildingType.cottage, singular: "cottage", plural: "cottages",
             prereqs: { masonry: true },
             require: { wood: 10, stone: 30 },
-            effectText: "+6 max pop."
+            effectText: "+6 citizens"
         }),
         new Building({
             id: buildingType.house, singular: "house", plural: "houses",
@@ -154,7 +154,7 @@ function getCivData() {
             require: { wood: 30, stone: 70 },
             get effectText() {
                 let maxPop = 10 + 2 * (civData.slums.owned + civData.tenements.owned);
-                return "+" + maxPop + " max pop.";
+                return "+" + maxPop + " citizens";
             },
             set effectText(value) { return this.require; }, // Only here for JSLint.
             update: function () {
@@ -165,13 +165,13 @@ function getCivData() {
             id: buildingType.mansion, singular: "mansion", plural: "mansions",
             prereqs: { engineering: true },
             require: { wood: 500, stone: 500, leather: 100, metal: 100 },
-            effectText: "+50 max pop."
+            effectText: "+50 citizens"
         }),
         new Building({
             id: buildingType.palace, singular: "palace", plural: "palaces",
             prereqs: { architecture: true },
             require: { wood: 1000, stone: 1000, leather: 250, metal: 250, gold: 10 },
-            effectText: "+150 max pop."
+            effectText: "+150 citizens"
         }),
         new Building({
             id: buildingType.barn, singular: "barn", plural: "barns",
@@ -886,7 +886,7 @@ function getCivData() {
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.rate = 0; },
             get rate() { return this.data.rate; }, // Sacrifice rate
             set rate(value) { this.data.rate = value; },
-            effectText: "boost food production by sacrificing 1 worker/sec.",
+            effectText: "boost food production by sacrificing 1 worker/sec",
             extraText: "<br /><button id='ceaseWalk' onmousedown='walk(false)' disabled='disabled'>Cease Walking</button>"
         }),
         new Upgrade({
