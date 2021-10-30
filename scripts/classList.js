@@ -170,8 +170,5 @@ if ("document" in self && !("classList" in document.createElement("_"))) {
         } else if (objCtr[protoProp].__defineGetter__) {
             elemCtrProto.__defineGetter__(classListProp, classListGetter);
         }
-
     }(self));
-
 }
-
