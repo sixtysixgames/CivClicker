@@ -30,11 +30,6 @@
 		},
 		find: function (selector) {
 			if (typeof selector === 'string') {
-				/*
-				if (selector.substr(0,1) === "#") {
-					return document.getElementById(selector.substr(1));
-				}
-				*/
 				return document.querySelectorAll(selector)[0];
 			} else if (typeof selector === 'object') {
 				return selector;
