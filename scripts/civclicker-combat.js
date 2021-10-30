@@ -457,15 +457,7 @@ function doConquer(attacker) {
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
 
-/*// these buildings have 10 units
-    total = getTotalByJob(unitType.soldier);
-    if (total > 0 && total > civData.barracks.owned * 10) {
-        diff = total - (civData.barracks.owned * 10);
-        civData.soldier.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
- * */
-// desecrate graves
+// desecrate graves, maybe altars
 function doDesecrate(attacker) {
     if (civData.graveyard.owned > 0) {
         // up to 1% of attacking force or land - this might need adjusting
@@ -519,7 +511,7 @@ function doEsiege(siegeObj, targetObj) {
         getCombatants(targetObj.place, targetObj.alignment).length) {
         //the siege engines are undefended; maybe capture them.
         if ((targetObj.alignment == alignmentType.player) && civData.wheel.owned) { //Can we use them?
-            gameLog("Captured " + prettify(siegeObj.owned) + " enemy siege engines.");
+            gameLog("Captured " + prettify(siegeObj.owned) + " enemy siege engines");
             civData.siege.owned += siegeObj.owned; //capture them
         }
         siegeObj.owned = 0;
