@@ -21,28 +21,6 @@ var UIComponents = createUIComponents();
 
 // Pass this the item definition object.
 // Or pass nothing, to create a blank row.
-//function getResourceRowText(purchaseObj) {
-//    // Make sure to update this if the number of columns changes.
-//    if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='6'/>&nbsp;</tr>"; }
-
-//    let objId = purchaseObj.id;
-//    let objName = purchaseObj.getQtyName(0);
-//    let s = (
-//        '<tr id="' + objId + 'Row" class="purchaseRow" data-target="' + objId + '">'
-//        + '<td>'
-//        + '<img src="images/' + objId + '.png" class="icon icon-lg" alt="' + objName + '"/>'
-//        + '<button data-action="increment">' + purchaseObj.verb + '</button>'
-//        + '<label>' + objName + ':</label>'
-//        + '</td>'
-//        + '<td class="number mainNumber"><span data-action="display">.</span></td>'
-//        + '<td class="number maxNumber">/ max: <span id="max' + objId + '">...</span></td>'
-//        + '<td class="number net"><span data-action="displayNet">..</span><span class="perSecond">/s</span></td>'
-//        + '</tr>'
-//    );
-//    return s;
-//}
-
-//<span class="number" data-action="display" data-target="leather">0</span>&nbsp;/&nbsp;<span class="maxNumber" id="maxleather">...</span>
 function getResourceRowText(purchaseObj) {
     // Make sure to update this if the number of columns changes.
     if (!purchaseObj) { return "<tr class='purchaseRow'><td colspan='3'/>&nbsp;</tr>"; }
@@ -124,7 +102,7 @@ function getPurchaseRowText(purchaseObj) {
                 s += getPurchaseCellText(purchaseObj, elem);
             });
     }
-    //let enemyFlag = (purchaseObj.alignment == alignmentType.enemy) ? " enemy" : "";
+
     let flag = "";
     if (purchaseObj.alignment == alignmentType.enemy) {flag = " enemy";}
     else if (purchaseObj.id == unitType.totalSick ) {flag = " sick";}
@@ -137,7 +115,6 @@ function getPurchaseRowText(purchaseObj) {
     [1, 10, 100, 1000, 10000, 100000, "custom", (purchaseObj.salable) ? Infinity : 0]
         .forEach(function (elem) { s += getPurchaseCellText(purchaseObj, elem); });
 
-    // style='border: 1px solid black'
     s += "<td>" + getCostNote(purchaseObj) + "</td>";
     s += "</tr>";
 
@@ -216,8 +193,6 @@ function setPantheonUpgradeRowText(upgradeObj) {
 
 // Dynamically create the upgrade purchase buttons.
 function addUpgradeRows() {
-    //ui.find("#pupgradesContainer").innerHTML += "";
-
     // Fill in any pre-existing stubs.
     upgradeData.forEach(function (elem) {
         if (elem.subType == subTypes.upgrade) { return; } // Did these in getUpgradeRowText.
