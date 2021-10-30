@@ -57,7 +57,6 @@ function wonderSelect(resourceId) {
 }
 
 function getWonderCostMultiplier() { // Based on the most wonders in any single resource.
-    //var i;
     let mostWonders = 0;
     for (let i in wonderCount) { if (wonderCount.hasOwnProperty(i)) { mostWonders = Math.max(mostWonders, wonderCount[i]); } }
     return Math.pow(1.5, mostWonders);
@@ -73,7 +72,6 @@ function speedWonder() {
 
 // Note:  Returns the index (which could be 0), or 'false'.
 function haveDeity(name) {
-    //var i;
     for (let i = 0; i < curCiv.deities.length; ++i) {
         if (curCiv.deities[i].name == name) { return i; }
     }
@@ -144,10 +142,10 @@ function isWonderLimited() {
 
 function getLabourerMods() {
     let mod = 0;
-    mod += civData.civilservice.owned ? 0.0001 : 0;
-    mod += civData.guilds.owned ? 0.0002 : 0;
-    mod += civData.feudalism.owned ? 0.0005 : 0;
-    mod += civData.serfs.owned ? 0.0005 : 0;
-    mod += civData.nationalism.owned ? 0.001 : 0;
+    mod += civData.civilservice.owned ? 0.001 : 0;
+    mod += civData.guilds.owned ? 0.002 : 0;
+    mod += civData.feudalism.owned ? 0.005 : 0;
+    mod += civData.serfs.owned ? 0.005 : 0;
+    mod += civData.nationalism.owned ? 0.01 : 0;
     return mod;
 }
