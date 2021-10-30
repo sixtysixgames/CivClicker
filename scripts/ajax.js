@@ -1,5 +1,4 @@
 (function(){
-
 	var ajax = {};
 	ajax.get = function ajaxGet (url, callback) {
 		var req = new XMLHttpRequest();
