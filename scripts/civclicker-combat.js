@@ -38,8 +38,8 @@ function spawnMob(mobObj, num) {
         num = Math.ceil(max_mob * Math.random());
         
     }
-    // invaders require a larger army TODO: this is arbitrary needs changing
-    if (mobObj.id === unitType.invader) { num *= 4; }
+    // invaders require a larger army TODO: this is arbitrary. needs changing.  maybe property on unit
+    if (mobObj.id === unitType.invader) { num *= Math.ceil(4 * Math.random()); }
 
     if (num === 0) { return num; }  // Nobody came
 
@@ -87,8 +87,8 @@ function invade(ecivtype) {
     //curCiv.raid.plunderLoot = { 
     //	freeLand: Math.round(baseLoot * (1 + (civData.administration.owned))) 
     //};
-    // land between 25 and 50% because it can be doubled with administration
-    let baseLand = baseLoot * (1 + (civData.administration.owned));
+    // land between 25 and 50% of one third because it can be doubled with administration and we don't want to gain too much
+    let baseLand = (baseLoot / 3) * (1 + (civData.administration.owned));
     curCiv.raid.plunderLoot = {
         freeLand: Math.floor((baseLand * 0.25) + Math.floor(Math.random() * (baseLand * 0.25)))
     };
@@ -493,6 +493,8 @@ function doDesecrate(attacker) {
         }
     }
     if (civData.graveyard.owned <= 0) {
+        civData.graveyard.owned = 0;
+        curCiv.grave.owned = 0;
         //some will leave
         let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
