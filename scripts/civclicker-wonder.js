@@ -14,14 +14,11 @@ function tallyWonderCount() {
 function getWonderBonus(resourceObj) {
     let ret = 0;
     if (!resourceObj) {
-        //return 1;
         ret = 1;
     }
     else {
-        //return (1 + (wonderCount[resourceObj.id] || 0) / 10);
         ret = 1 + (wonderCount[resourceObj.id] || 0) / 10;
     }
-    //debug("getWonderBonus=" + ret);
     return ret;
 }
 
@@ -94,26 +91,24 @@ function doLabourers() {
         //then set wonder.stage so things will be updated appropriately
         ++curCiv.curWonder.stage;
     } else { //we're still building
-        //if (!isWonderLimited()) {
-            prod = getWonderProduction();
+        prod = getWonderProduction();
 
-            //remove resources
-            wonderResources.forEach(function (resource) {
-                resource.owned -= prod;
-                resource.net -= prod;
-            });
+        //remove resources
+        wonderResources.forEach(function (resource) {
+            resource.owned -= prod;
+            resource.net -= prod;
+        });
 
-            // labourers use prods more efficiently with mods
-            prod += getLabourerMods();
-            //increase progress
-            curCiv.curWonder.progress += prod / (1000000 * getWonderCostMultiplier());
-        //}
+        // labourers use prods more efficiently with mods
+        prod += getLabourerMods();
+        //increase progress
+        curCiv.curWonder.progress += prod / (1000000 * getWonderCostMultiplier());
     }
 }
 
 function getWonderLowItem() {
     let lowItem = null;
-    //var i = 0;
+
     for (let i = 0; i < wonderResources.length; ++i) {
         if (wonderResources[i].owned < 1) {
             lowItem = wonderResources[i];
