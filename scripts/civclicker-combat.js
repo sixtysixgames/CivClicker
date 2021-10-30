@@ -24,7 +24,7 @@ function resetRaiding() {
 
 function playerCombatMods() {
     return (0.01 * (civData.riddle.owned + civData.weaponry.owned + civData.shields.owned + civData.armour.owned
-            + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
+        + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
 }
 
 /* Enemies */
@@ -176,12 +176,12 @@ function getCasualtyMod(attacker, defender) {
 }
 
 function doFight(attacker, defender) {
-    if ((attacker.owned <= 0) || (defender.owned <= 0)) {return;}
+    if ((attacker.owned <= 0) || (defender.owned <= 0)) { return; }
 
     // Defenses vary depending on whether the player is attacking or defending.
     let fortMod = (defender.alignment == alignmentType.player ?
-                    (civData.fortification.owned * civData.fortification.efficiency)
-                    : (civData.efort.owned * civData.efort.efficiency));
+        (civData.fortification.owned * civData.fortification.efficiency)
+        : (civData.efort.owned * civData.efort.efficiency));
     //let palisadeMod = ((defender.alignment == alignmentType.player) && (civData.palisade.owned)) * civData.palisade.efficiency;
     let defenceMod = 0;
     if (defender.alignment == alignmentType.player) {
@@ -238,7 +238,7 @@ function doBandits(attacker) {
     // bandits mainly loot
     let r = Math.random();
     if (r < 0.1) { doSlaughter(attacker); }
-    else if (r < 0.2) { doSack(attacker); } 
+    else if (r < 0.3) { doSack(attacker); }
     else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
@@ -251,8 +251,8 @@ function doBarbarians(attacker) {
     else if (r < 0.6) { doLoot(attacker); }
     else if (r < 0.9) {
         if (Math.random() < 0.59) { doSack(attacker); }
-        else if (Math.random() < 0.39) { doSackMulti(attacker);}
-        else { doDesecrate(attacker);}
+        else if (Math.random() < 0.39) { doSackMulti(attacker); }
+        else { doDesecrate(attacker); }
     }
     else { doConquer(attacker); }
 }
@@ -262,7 +262,7 @@ function doInvaders(attacker) {
     else if (r < 0.48) { doLoot(attacker); }
     else if (r < 0.72) { doSackMulti(attacker); }
     else if (r < 0.96) { doConquer(attacker); }
-    else { doDesecrate(attacker);}
+    else { doDesecrate(attacker); }
 }
 
 // kill
@@ -273,21 +273,26 @@ function doSlaughter(attacker) {
     if (target) {
         let targetUnit = civData[target];
         if (targetUnit.owned >= 1) {
-            // An attacker may disappear after killing
-            if (Math.random() < attacker.killStop) { --attacker.owned; }
 
-            targetUnit.owned -= 1;
-            // Animals will eat the corpse
-            if (attacker.species != speciesType.animal) {
-                civData.corpses.owned += 1;
+            if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
+                // An attacker may disappear after killing
+                if (Math.random() < attacker.killStop) { --attacker.owned; }
+                targetUnit.owned -= 1;
+                // Animals will eat the corpse
+                if (attacker.species != speciesType.animal) {
+                    civData.corpses.owned += 1;
+                }
+
+                if (population.living > 50) {
+                    // the greater the population, the less the drop in morale
+                    adjustMorale(-0.0025 / population.living);
+                }
+
+                gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
             }
-
-            if (population.living > 50) {
-                // the greater the population, the less the drop in morale
-                adjustMorale(-0.0025 / population.living);
+            else {
+                --attacker.owned;
             }
-
-            gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
         }
         if (targetUnit.owned <= 0) { // Attackers slowly leave once everyone is dead
             let leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
@@ -309,21 +314,26 @@ function doSlaughterMulti(attacker) {
         let targetUnit = civData[target];
         if (target) {
             if (targetUnit.owned >= 1) {
-                // An attacker may disappear after killing
-                if (Math.random() < attacker.killStop) { --attacker.owned; }
 
-                targetUnit.owned -= 1;
-                kills++;
-                lastTarget = targetUnit.singular;
+                if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
+                    // An attacker may disappear after killing
+                    if (Math.random() < attacker.killStop) { --attacker.owned; }
+                    targetUnit.owned -= 1;
+                    kills++;
+                    lastTarget = targetUnit.singular;
 
-                // Animals will eat the corpse
-                if (attacker.species != speciesType.animal) {
-                    civData.corpses.owned += 1;
+                    // Animals will eat the corpse
+                    if (attacker.species != speciesType.animal) {
+                        civData.corpses.owned += 1;
+                    }
+
+                    if (population.living > 50) {
+                        // the greater the population, the less the drop in morale
+                        adjustMorale(-0.0025 / population.living);
+                    }
                 }
-
-                if (population.living > 50) {
-                    // the greater the population, the less the drop in morale
-                    adjustMorale(-0.0025 / population.living);
+                else {
+                    --attacker.owned;
                 }
             }
             if (targetUnit.owned <= 0) { // Attackers slowly leave once everyone is dead
@@ -548,7 +558,7 @@ function doRaid(place, attackAlignment, defendAlignment) {
         ui.show("#fightBar", false);
         return;
     } // We're not raiding right now.
-    
+
     let attackers = getCombatants(place, attackAlignment);
     let defenders = getCombatants(place, defendAlignment);
 
@@ -619,7 +629,7 @@ function doMobs() {
         // 10 because that is max pop of a thorp
         let rnum = civLimit * Math.random();
         let rnum2 = (civLimit * Math.random()) / 10;
-        
+
         //if (600 * Math.random() < 1) {
         //debug(rnum + "<" + rnum2);
         if (rnum < rnum2) {
