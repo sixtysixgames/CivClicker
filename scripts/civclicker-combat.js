@@ -268,12 +268,10 @@ function doInvaders(attacker) {
 // kill
 function doSlaughter(attacker) {
     let killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
-    //let target = getRandomHealthyWorker(); //Choose random worker
     let target = getRandomWorker(); //Choose random worker
     if (target) {
         let targetUnit = civData[target];
         if (targetUnit.owned >= 1) {
-
             if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
                 // An attacker may disappear after killing
                 if (Math.random() < attacker.killStop) { --attacker.owned; }
@@ -306,15 +304,13 @@ function doSlaughterMulti(attacker) {
     // kill up to %age of attacking force
     let targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
     let kills = 0;
+    let lastTarget = "citizen";
+
     for (let k = 1; k <= targets; k++) {
-        //let target = getRandomHealthyWorker(); //Choose random worker
-        // sick people get killed as well
         let target = getRandomWorker(); //Choose random worker
-        let lastTarget = "citizen";
         let targetUnit = civData[target];
         if (target) {
             if (targetUnit.owned >= 1) {
-
                 if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
                     // An attacker may disappear after killing
                     if (Math.random() < attacker.killStop) { --attacker.owned; }
@@ -350,11 +346,9 @@ function doSlaughterMulti(attacker) {
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
-
 // rob
 function doLoot(attacker) {
     // Select random resource, steal random amount of it.
-    //let target = lootable[Math.floor(Math.random() * lootable.length)];
     let targetID = getRandomLootableResource();
     let target = civData[targetID];
     if (isValid(target) && target.owned > 0) {
@@ -377,13 +371,13 @@ function doLoot(attacker) {
     if (attacker.owned < 0) { attacker.owned = 0; }
     updateResourceTotals();
 }
-
 // burn
 function doSack(attacker) {
     //Destroy building
-    let target = sackable[Math.floor(Math.random() * sackable.length)];
+    let targetID = getRandomBuilding();
+    let target = civData[targetID];
 
-    if (target.owned > 0) {
+    if (isValid(target) && target.owned > 0) {
         let destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
         // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
@@ -398,14 +392,13 @@ function doSack(attacker) {
 
         gameLog("1 " + target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(2)); // always plural
     }
-    if (target.owned <= 0) {
+    if (isValid(target) && target.owned <= 0) {
         //some will leave
         let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
         attacker.owned -= leaving;
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
-
 function doSackMulti(attacker) {
     //Destroy buildings
     // sack up to % of attacking force
@@ -413,9 +406,8 @@ function doSackMulti(attacker) {
     let sacks = 0;
     let lastTarget = "building";
     for (let s = 1; s <= targets; s++) {
-        let targetID = getRandomBuilding(); //sackable[Math.floor(Math.random() * sackable.length)];
+        let targetID = getRandomBuilding();
         let target = civData[targetID];
-
         if (isValid(target) && target.owned > 0) {
             --target.owned;
             ++civData.freeLand.owned;
@@ -432,12 +424,14 @@ function doSackMulti(attacker) {
             attacker.owned -= leaving;
         }
         if (attacker.owned < 0) { attacker.owned = 0; }
-        updateRequirements(target);
+        if (isValid(target)){
+            updateRequirements(target);
+        }
     }
-
     if (sacks > 0) {
-        let destroyVerb = (sacks == 1) ? " " + lastTarget + " burned by " : " buildings destroyed by ";
-        gameLog(prettify(sacks) + destroyVerb + attacker.getQtyName(2)); // always use plural attacker
+        let destroyVerb = (Math.random() < 0.5) ? " burned by " : " destroyed by ";
+        let destroyNote = (sacks == 1) ? " " + lastTarget + destroyVerb : " buildings " + destroyVerb;
+        gameLog(prettify(sacks) + destroyNote + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
     }
