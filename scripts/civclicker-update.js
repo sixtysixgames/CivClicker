@@ -124,7 +124,6 @@ function updatePurchaseRow(purchaseObj) {
     // Already having one reveals it as though we met the prereq.
     // freeLand added to stop annoying UI jump
     let havePrereqs = (purchaseObj.owned > 0) || meetsPrereqs(purchaseObj.prereqs) || purchaseObj.id == buildingType.freeLand;
-    //|| (purchaseObj.id == "freeLand" && purchaseObj.owned == 0)
 
     // Special check: Hide one-shot upgrades after purchase; they're
     // redisplayed elsewhere.
@@ -201,12 +200,7 @@ function updateResourceTotals() {
         else { elem.style.color = "#000"; }
 
         elem.innerHTML = ((val <= 0) ? "" : "+") + prettify(val.toFixed(1));
-        // val.toFixed(2)
     }
-
-    //if (civData.gold.owned >= 1){
-    //	ui.show("#goldRow",true);
-    //}
 
     //Update page with building numbers, also stockpile limits.
     ui.find("#maxfood").innerHTML = prettify(civData.food.limit);
@@ -238,7 +232,7 @@ function updateResourceTotals() {
     // Cheaters don't get names.
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
 
-    ui.show("#resourcesSelect .info", curCiv.resourceClicks == 22);// neverclick is on
+    ui.show("#resourcesSelect .info", curCiv.resourceClicks == 22);// neverclick is a possibility
 }
 
 //Update page with numbers
@@ -268,16 +262,13 @@ function updatePopulation(calc) {
         elt.innerHTML = prettify(Math.floor(population[prop]));
     });
 
-    //civData.house.update(); // TODO: Effect might change dynamically.  Need a more general way to do this.
-    //civData.barn.update();
-    // todo: need to loop over elements and if has an update then call it
+    // loop over elements and if has an update then call it
     buildingData.forEach(function (elt) {
         if (isValid(elt.update)) {
             elt.update();
         }
     });
 
-    //ui.show("#graveTotal", (curCiv.grave.owned > 0)); // always show grave total
     ui.show("#totalSickRow", (population.totalSick > 0));
 
     // alert about sickness and attacks
@@ -504,7 +495,6 @@ function updateUpgrades() {
     ui.findAll("#deityDomains button.purchaseFor500Piety").forEach(function (button) {
         button.disabled = (!canSelectDomain || (civData.piety.owned < 500));
     });
-    //ui.show("#deitySelect .alert", canSelectDomain);
 
     ui.show("#" + domain + "Upgrades", hasDomain);
 
@@ -585,7 +575,6 @@ function updateAchievements() {
         ui.show("#" + achObj.id, achObj.owned);
     });
 }
-
 
 // Dynamically add the raid buttons for the various civ sizes.
 function addRaidRows() {
