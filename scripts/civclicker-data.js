@@ -25,7 +25,6 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                //let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
                 let bonus = getWarehouseBonus();
                 return 200 + (civData.woodstock.owned * bonus);
             },
@@ -38,7 +37,6 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                //let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
                 let bonus = getWarehouseBonus();
                 return 200 + (civData.stonestock.owned * bonus);
             },
@@ -50,7 +48,6 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 let bonus = getStorehouseBonus();
                 return 100 + (civData.barn.owned * bonus);
             },
@@ -62,7 +59,6 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 let bonus = getStorehouseBonus();
                 return 100 + (civData.woodstock.owned * bonus);
             },
@@ -74,7 +70,6 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
                 let bonus = getStorehouseBonus();
                 return 100 + (civData.stonestock.owned * bonus);
             },
@@ -86,7 +81,6 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 let bonus = getStoreroomBonus();
                 return 50 + (civData.tannery.owned * bonus);
             },
@@ -98,7 +92,6 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 let bonus = getStoreroomBonus();
                 return 50 + (civData.apothecary.owned * bonus);
             },
@@ -110,7 +103,6 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
                 let bonus = getStoreroomBonus();
                 return 50 + (civData.smithy.owned * bonus);
             },
@@ -266,7 +258,6 @@ function getCivData() {
             id: buildingType.temple, singular: "temple", plural: "temples",
             prereqs: { masonry: true },
             require: { wood: 30, stone: 120, herbs: 10 },
-            //effectText: "allows 1 cleric; +50 piety storage",
             get effectText() {
                 let bonus = 50 + getPietyLimitBonus();
                 return "allows 1 cleric; +" + bonus + " piety storage";
@@ -458,7 +449,6 @@ function getCivData() {
             effectText: "Unlock more buildings and upgrades"
         }),
         
-
         new Upgrade({
             id: "ploughshares", name: "Ploughshares", subType: subTypes.upgrade,
             prereqs: { domestication: true, metalwork: true },
@@ -953,7 +943,6 @@ function getCivData() {
         new Unit({
             id: unitType.woodcutter, singular: "woodcutter", plural: "woodcutters",
             source: unitType.unemployed,
-            //efficiency: 0.5,
             efficiency_base: 0.49,
             defence: 0.055, // default is 0.05
             get efficiency() {
@@ -965,7 +954,6 @@ function getCivData() {
         new Unit({
             id: unitType.miner, singular: "miner", plural: "miners",
             source: unitType.unemployed,
-            //efficiency: 0.2,
             efficiency_base: 0.19,
             defence: 0.055, // default is 0.05
             get efficiency() {
@@ -1057,7 +1045,6 @@ function getCivData() {
         }),
         new Unit({
             id: unitType.totalSick, singular: "sick citizen", plural: "sick citizens",
-            //subType: "special", // it's not special! it's still player it still needs food, it still counts towards population
             prereqs: undefined,  // Hide until we get one.
             require: undefined,  // Cannot be purchased.
             salable: false,  // Cannot be sold.
@@ -1092,9 +1079,10 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.05,
             onWin: function () { doWolves(this); },
-            killFatigue: (0.99), // Max fraction that leave after killing the last person
-            killStop: (1.0), // Chance of an attacker leaving after killing a person
-            killMax: (0.99), // Max fraction that will kill
+            // see invader for definitions
+            killFatigue: (0.99), 
+            killStop: (1.0), 
+            killMax: (0.99), 
             species: speciesType.animal,
             effectText: "Eat your workers"
         }),
@@ -1105,15 +1093,16 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
-            lootFatigue: (0.25), // Max fraction that leave after cleaning out a resource. 
-            lootStop: (0.25), // Chance of an attacker leaving after looting a resource
-            lootMax: (0.99), // Max fraction that will loot
-            sackFatigue: (0.25), // Max fraction that leave after destroying a building type. 
-            sackStop: (0.99), // Chance of an attacker leaving after sacking a building
-            sackMax: (0.25), // Max fraction that will sack
-            killFatigue: (0.5), // Max fraction that leave after killing the last person. 
-            killStop: (0.99), // Chance of an attacker leaving after killing a person
-            killMax: (0.1), // Max fraction that will kill
+            // see invader for definitions
+            lootFatigue: (0.25),  
+            lootStop: (0.25), 
+            lootMax: (0.99), 
+            sackFatigue: (0.25),  
+            sackStop: (0.99), 
+            sackMax: (0.25), 
+            killFatigue: (0.5),  
+            killStop: (0.99), 
+            killMax: (0.1), 
             effectText: "Steal your resources"
         }),
         new Unit({
@@ -1123,18 +1112,19 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
-            lootFatigue: (0.33), // Max fraction that leave after cleaning out a resource
-            lootStop: (0.66), // Chance of an attacker leaving after looting a resource
-            lootMax: (0.99), // Max fraction that will loot
-            sackFatigue: (0.33), // Max fraction that leave after destroying a building type
-            sackStop: (0.66), // Chance of an attacker leaving after sacking a building
-            sackMax: (0.99), // Max fraction that will sack
-            killFatigue: (0.33), // Max fraction that leave after killing the last person
-            killStop: (0.99), // Chance of an attacker leaving after killing a person
-            killMax: (0.33), // Max fraction that will kill
-            conquerFatigue: (0.25), // Max fraction that leave after conquering the last land
-            conquerStop: (0.99), // Chance of an attacker leaving after conquering land
-            conquerMax: (0.25), // Max fraction that will take land
+            // see invader for definitions
+            lootFatigue: (0.33), 
+            lootStop: (0.66), 
+            lootMax: (0.99), 
+            sackFatigue: (0.33), 
+            sackStop: (0.66), 
+            sackMax: (0.99), 
+            killFatigue: (0.33), 
+            killStop: (0.99), 
+            killMax: (0.33), 
+            conquerFatigue: (0.25), 
+            conquerStop: (0.99), 
+            conquerMax: (0.25), 
             effectText: "Slaughter, plunder, and burn"
         }),
         new Unit({
@@ -1200,6 +1190,17 @@ function getCivData() {
             salable: false,
             effectText: "Destroy enemy fortifications"
         }),
+        // TODO: mercenaries only on conquest
+        //new Unit({
+        //    id: unitType.mercenary, singular: "mercenary", plural: "mercenaries",
+        //    efficiency: 0.05, // 
+        //    prereqs: { standard: true, wheel: true },
+        //    require: { food: 20, gold: 1 },
+        //    species: speciesType.human,
+        //    place: placeType.party,
+        //    salable: false,
+        //    effectText: "Destroy enemy fortifications"
+        //}),
         new Unit({
             id: unitType.esoldier, singular: "soldier", plural: "soldiers",
             alignment: alignmentType.enemy,
@@ -1210,6 +1211,7 @@ function getCivData() {
             effectText: "Defending enemy troops"
         }),
         /* Not currently used.
+         * 66G TODO: use them
         new Unit({ id:unitType.ecavalry, name:"cavalry",
             alignment:alignmentType.enemy,
             combatType:combatTypes.cavalry, 
