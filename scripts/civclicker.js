@@ -23,19 +23,6 @@
 
 const setup = {};
 
-//var loopTimer = 0;
-
-//// TODO: Update the version numbering internally
-//var version = 33; // This is an ordinal used to trigger reloads. 66g No it doesn't 
-////66g Always increment versionData if adding/modifying element to civData
-//var versionData = new VersionData(1, 4, 24, "alpha"); // this is not accurate.  
-
-//var saveTag = "civ";
-//var saveTag2 = saveTag + "2"; // For old saves.
-//var saveSettingsTag = "civSettings";
-//var logRepeat = 1;
-//var sysLogRepeat = 1;
-
 const app = {
     loopTimer: 0,
 
@@ -154,7 +141,6 @@ const civData = getCivData(); // Giant array of data, defined in "-data" js
 
 function getWonderResources(civData) {
     // The resources that Wonders consume, and can give bonuses for.
-    //return wonderResources = [
     return [
         civData.food,
         civData.wood,
@@ -189,7 +175,10 @@ function setIndexArrays(civData) {
         }
         if (elem.type == civObjType.building) {
             buildingData.push(elem);
-            if (elem.vulnerable === true) { sackable.push(elem); }
+            if (elem.vulnerable === true) {
+                // add to start so that dwellings get sacked last.  see getRandomBuilding
+                sackable.unshift(elem);
+            }
             if (elem.subType == subTypes.normal || elem.subType == subTypes.land) { homeBuildings.push(elem); }
         }
         if (elem.subType == subTypes.prayer) {
@@ -269,9 +258,11 @@ function gameLoop() {
     doFarmers();
     doWoodcutters();
     doMiners();
+
     doBlacksmiths();
     doApothecaries();
     doTanners();
+
     doClerics();
 
     // Check for starvation
@@ -352,19 +343,7 @@ setup.all = function () {
 };
 
 setup.events = function () {
-    //let openSettingsElt = ui.find(".openSettings");
 
-    //openSettingsElt.addEventListener("click", function () {
-    //	let settingsShown = ui.toggle("#settings");
-    //	let header = ui.find("#header");
-    //	if (settingsShown) {
-    //		header.className = "condensed";
-    //		openSettingsElt.className = "selected openSettings";
-    //	} else {
-    //		header.className = "";
-    //		openSettingsElt.className = "openSettings";
-    //	}
-    //});
 };
 
 setup.data = function () {
