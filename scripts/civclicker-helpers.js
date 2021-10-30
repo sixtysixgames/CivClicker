@@ -422,7 +422,7 @@ function checkResourceLimits() {
     resourceData.forEach(function (resource) {
         if (resource.owned > resource.limit) {
             let excess = resource.owned - resource.limit;
-            excess = Math.ceil(Math.random() * 0.5 * excess);
+            excess = Math.ceil(Math.random() * 0.25 * excess);
             //resource.owned = resource.limit;
             resource.owned -= excess
         }
