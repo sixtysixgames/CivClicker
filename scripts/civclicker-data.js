@@ -25,7 +25,8 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                //let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                let bonus = getWarehouseBonus();
                 return 200 + (civData.woodstock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -37,7 +38,8 @@ function getCivData() {
             initTradeAmount: 5000, // how much to offer on Trade for 1 gold
             baseTradeAmount: 1000, // the least on offer
             get limit() {
-                let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                //let bonus = (civData.warehouses.owned ? 2 : 1) * 200;
+                let bonus = getWarehouseBonus();
                 return 200 + (civData.stonestock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -48,7 +50,8 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = getStorehouseBonus();
                 return 100 + (civData.barn.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -59,7 +62,8 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = getStorehouseBonus();
                 return 100 + (civData.woodstock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -70,7 +74,8 @@ function getCivData() {
             initTradeAmount: 500, // how much to offer on Trade for 1 gold
             baseTradeAmount: 100, // the least on offer
             get limit() {
-                let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                //let bonus = (civData.storehouses.owned ? 2 : 1) * 100;
+                let bonus = getStorehouseBonus();
                 return 100 + (civData.stonestock.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
@@ -81,8 +86,9 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return civData.tannery.owned * bonus;
+                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = getStoreroomBonus();
+                return 50 + (civData.tannery.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -92,8 +98,9 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return civData.apothecary.owned * bonus;
+                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = getStoreroomBonus();
+                return 50 + (civData.apothecary.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -103,8 +110,9 @@ function getCivData() {
             initTradeAmount: 250, // how much to offer on Trade for 1 gold
             baseTradeAmount: 50, // the least on offer
             get limit() {
-                let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
-                return civData.smithy.owned * bonus;
+                //let bonus = (civData.storerooms.owned ? 2 : 1) * 50;
+                let bonus = getStoreroomBonus();
+                return 50 + (civData.smithy.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }),
@@ -113,7 +121,7 @@ function getCivData() {
             vulnerable: false, // Can't be stolen
             get limit() {
                 let bonus = getPietyLimitBonus();
-                return (civData.temple.owned * 50) + (civData.temple.owned * bonus);
+                return 50 + (civData.temple.owned * 50) + (civData.temple.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
@@ -192,8 +200,8 @@ function getCivData() {
             prereqs: { carpentry: true },
             require: { wood: 100, stone: 10 },
             get effectText() {
-                let wbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                let hbonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                let wbonus = getWarehouseBonus();
+                let hbonus = getStorehouseBonus();
                 return "+" + wbonus + " wood storage; +" + hbonus + " herb storage";
             },
             set effectText(value) { return this.effectText; },
@@ -206,8 +214,8 @@ function getCivData() {
             prereqs: { carpentry: true },
             require: { wood: 100, stone: 10 },
             get effectText() {
-                let sbonus = ((civData.warehouses.owned ? 2 : 1) * 200);
-                let obonus = ((civData.storehouses.owned ? 2 : 1) * 100);
+                let sbonus = getWarehouseBonus();
+                let obonus = getStorehouseBonus();
                 return "+" + sbonus + " stone storage; +" + obonus + " ore storage";
             },
             set effectText(value) { return this.effectText; },
@@ -220,7 +228,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, skins: 5 },
             get effectText() {
-                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = getStoreroomBonus();
                 return "allows 1 tanner; +" + bonus + " leather storage";
             },
             set effectText(value) { return this.effectText; },
@@ -233,7 +241,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, ore: 5 },
             get effectText() {
-                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = getStoreroomBonus();
                 return "allows 1 blacksmith; +" + bonus + " metal storage";
             },
             set effectText(value) { return this.effectText; },
@@ -246,7 +254,7 @@ function getCivData() {
             prereqs: { masonry: true },
             require: { wood: 30, stone: 70, herbs: 5 },
             get effectText() {
-                let bonus = 50 + ((civData.storerooms.owned ? 1 : 0) * 50);
+                let bonus = getStoreroomBonus();
                 return "allows 1 healer; +" + bonus + " potion storage";
             },
             set effectText(value) { return this.effectText; },
@@ -598,37 +606,37 @@ function getCivData() {
         }),
         new Upgrade({
             id: "weaponry", name: "Basic Weaponry", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, soldier: 1 },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { wood: 500, metal: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "shields", name: "Basic Shields", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, soldier: 1 },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { wood: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "armour", name: "Basic Armour", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, soldier: 1 },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { metal: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advweaponry", name: "Advanced Weaponry", subType: subTypes.upgrade,
-            prereqs: { weaponry: true, engineering: true, soldier: 100 },
+            prereqs: { weaponry: true, engineering: true, barracks: 100 },
             require: { wood: 2500, metal: 2500, leather: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advshields", name: "Advanced Shields", subType: subTypes.upgrade,
-            prereqs: { shields: true, engineering: true, soldier: 100 },
+            prereqs: { shields: true, engineering: true, barracks: 100 },
             require: { wood: 2500, leather: 2500, metal: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advarmour", name: "Advanced Armour", subType: subTypes.upgrade,
-            prereqs: { armour: true, engineering: true, soldier: 100 },
+            prereqs: { armour: true, engineering: true, barracks: 100 },
             require: { leather: 2500, metal: 2500 },
             effectText: "Improve soldiers"
         }),
