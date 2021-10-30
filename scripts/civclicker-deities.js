@@ -73,10 +73,10 @@ function raiseDead(num) {
     civData.corpses.owned -= num;
 
     //Notify player
-    if (num == 1) { gameLog("A corpse rises, eager to do your bidding."); }
-    else if (num > 1) { gameLog("The corpses rise, eager to do your bidding."); }
-    else if (num == -1) { gameLog("A zombie crumples to the ground, inanimate."); }
-    else if (num < -1) { gameLog("The zombies fall, mere corpses once again."); }
+    if (num == 1) { gameLog("A corpse rises, eager to do your bidding"); }
+    else if (num > 1) { gameLog("The corpses rise, eager to do your bidding"); }
+    else if (num == -1) { gameLog("A zombie crumples to the ground, inanimate"); }
+    else if (num < -1) { gameLog("The zombies fall, mere corpses once again"); }
 
     calculatePopulation(); //Run through population->jobs cycle to update page with zombie and corpse totals
     updatePopulation();
@@ -131,15 +131,15 @@ function wickerman() {
 
     function getRewardMessage(rewardObj) {
         switch (rewardObj.id) {
-            case resourceType.food: return "The crops are abundant!";
-            case resourceType.wood: return "The trees grow stout!";
-            case resourceType.stone: return "The stone splits easily!";
-            case resourceType.skins: return "The animals are healthy!";
-            case resourceType.herbs: return "The gardens flourish!";
-            case resourceType.ore: return "A new vein is struck!";
-            case resourceType.leather: return "The tanneries are productive!";
-            case resourceType.potions: return "The apothecaries are productive!";
-            case resourceType.metal: return "The steel runs pure.";
+            case resourceType.food: return "The crops are abundant";
+            case resourceType.wood: return "The trees grow stout";
+            case resourceType.stone: return "The stone splits easily";
+            case resourceType.skins: return "The animals are healthy";
+            case resourceType.herbs: return "The gardens flourish";
+            case resourceType.ore: return "A new vein is struck";
+            case resourceType.leather: return "The tanneries are productive";
+            case resourceType.potions: return "The apothecaries are productive";
+            case resourceType.metal: return "The steel runs pure";
             default: return "You gain " + rewardObj.getQtyName(qty) + "!";
         }
     }
@@ -184,7 +184,7 @@ function pestControl(length) {
     civData.piety.owned -= (10 * length);
     ui.show("#pestControlGroup", true)
     civData.pestControl.timer = length * civData.cat.owned;
-    gameLog("The vermin are exterminated.");
+    gameLog("The vermin are exterminated");
 }
 
 /* Iconoclasm */
