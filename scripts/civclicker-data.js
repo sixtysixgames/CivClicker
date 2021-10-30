@@ -926,6 +926,7 @@ function getCivData() {
         new Unit({
             id: unitType.unemployed, singular: "idle citizen", plural: "idle citizens",
             require: undefined,  // Cannot be purchased (through normal controls) xxx Maybe change this?
+            defence: 0.025, // default is 0.05
             salable: false,  // Cannot be sold.
             customQtyId: "spawnCustomQty",
             effectText: "Playing idle games"
@@ -934,6 +935,7 @@ function getCivData() {
             id: unitType.farmer, singular: "farmer", plural: "farmers",
             source: unitType.unemployed,
             efficiency_base: 0.2,
+            defence: 0.06, // default is 0.05 same as wolf efficiency
             get efficiency() {
                 return farmerMods(this.efficiency_base);
             },
@@ -945,6 +947,7 @@ function getCivData() {
             source: unitType.unemployed,
             //efficiency: 0.5,
             efficiency_base: 0.49,
+            defence: 0.055, // default is 0.05
             get efficiency() {
                 return woodcutterMods(this.efficiency_base);
             },
@@ -956,6 +959,7 @@ function getCivData() {
             source: unitType.unemployed,
             //efficiency: 0.2,
             efficiency_base: 0.19,
+            defence: 0.055, // default is 0.05
             get efficiency() {
                 return minerMods(this.efficiency_base);
             },
@@ -966,6 +970,7 @@ function getCivData() {
             id: unitType.tanner, singular: "tanner", plural: "tanners",
             source: unitType.unemployed,
             efficiency: 0.44,
+            defence: 0.04, // default is 0.05
             prereqs: { tannery: 1 },
             require: { skins: 2 },
             get limit() { return civData.tannery.owned; },
@@ -976,6 +981,7 @@ function getCivData() {
             id: unitType.blacksmith, singular: "blacksmith", plural: "blacksmiths",
             source: unitType.unemployed,
             efficiency: 0.43,
+            defence: 0.04, // default is 0.05
             prereqs: { smithy: 1 },
             require: { ore: 2 },
             get limit() { return civData.smithy.owned; },
@@ -986,6 +992,7 @@ function getCivData() {
             id: unitType.healer, singular: "healer", plural: "healers",
             source: unitType.unemployed,
             efficiency: 0.42,
+            defence: 0.01, // default is 0.05
             prereqs: { apothecary: 1 },
             require: { herbs: 2 },
             init: function (fullInit) { Unit.prototype.init.call(this, fullInit); this.cureCount = 0; },
@@ -999,6 +1006,7 @@ function getCivData() {
             id: unitType.cleric, singular: "cleric", plural: "clerics",
             source: unitType.unemployed,
             efficiency: 0.05,
+            defence: 0.01, // default is 0.05
             prereqs: { temple: 1 },
             require: { herbs: 4 },
             get limit() { return civData.temple.owned; },
@@ -1009,6 +1017,7 @@ function getCivData() {
             id: unitType.labourer, singular: "labourer", plural: "labourers",
             source: unitType.unemployed,
             efficiency: 1.0,
+            defence: 0.025, // default is 0.05
             prereqs: { wonderStage: 1 }, //xxx This is a hack
             effectText: "Use resources to build wonder"
         }),
@@ -1044,6 +1053,7 @@ function getCivData() {
             prereqs: undefined,  // Hide until we get one.
             require: undefined,  // Cannot be purchased.
             salable: false,  // Cannot be sold.
+            defence: 0.001, // default is 0.05
             //xxx This (alternate data location) could probably be cleaner.
             get owned() { return population[this.id]; },
             set owned(value) { population[this.id] = value; },
