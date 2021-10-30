@@ -2,6 +2,7 @@
 
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
+    //Farmers farm food
     let millMod = 1;
     if (population.current > 0) {
         millMod = population.living / population.current;
@@ -12,7 +13,7 @@ function doFarmers() {
         * ((civData.pestControl.timer > 0) ? 1.01 : 1)
         * getWonderBonus(civData.food)
         * (1 + civData.walk.rate / 120)
-        * (1 + civData.mill.owned * millMod / 200) //Farmers farm food
+        * (1 + civData.mill.owned * millMod / 200) 
     );
     civData.food.net -= population.living; //The living population eats food.
     let foodEarned = Math.min(civData.food.net, civData.food.limit - civData.food.owned); // can't make more than we can store
@@ -20,7 +21,7 @@ function doFarmers() {
     civData.food.net = foodEarned;
     civData.food.owned += foodEarned;
 
-    if (civData.skinning.owned && civData.farmer.owned > 0) { //and sometimes get skins
+    if (civData.skinning.owned && civData.farmer.owned > 0 && civData.skins.owned < civData.skins.limit) { //and sometimes get skins
         let specialChance = civData.food.specialChance + (0.1 * civData.flensing.owned);
         let skinsChance = specialChance * (civData.food.increment + ((civData.butchering.owned) * civData.farmer.owned / 15.0)) * getWonderBonus(civData.skins);
         let skinsEarned = rndRound(skinsChance);
@@ -31,15 +32,15 @@ function doFarmers() {
 }
 
 function doWoodcutters() {
-    let efficiency = civData.woodcutter.efficiency + (0.1 * civData.woodcutter.efficiency * civData.felling.owned);
-    //civData.wood.net = civData.woodcutter.owned * (civData.woodcutter.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
-    civData.wood.net = civData.woodcutter.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); //Woodcutters cut wood
-    let woodEarned = Math.min(civData.wood.net, civData.wood.limit - civData.wood.owned); // can't make more than we can store
-    civData.wood.net = woodEarned;
-    //civData.wood.owned += civData.wood.net;
-    civData.wood.owned += woodEarned;
-
-    if (civData.harvesting.owned && civData.woodcutter.owned > 0) { //and sometimes get herbs
+    //Woodcutters cut wood
+    if (civData.wood.owned < civData.wood.limit) {
+        let efficiency = civData.woodcutter.efficiency + (0.1 * civData.woodcutter.efficiency * civData.felling.owned); 
+        civData.wood.net = civData.woodcutter.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.wood); 
+        let woodEarned = Math.min(civData.wood.net, civData.wood.limit - civData.wood.owned); // can't make more than we can store
+        civData.wood.net = woodEarned;
+        civData.wood.owned += woodEarned;
+    }
+    if (civData.harvesting.owned && civData.woodcutter.owned > 0 && civData.herbs.owned < civData.herbs.limit) { //and sometimes get herbs
         let specialChance = civData.wood.specialChance + (0.1 * civData.reaping.owned);
         let herbsChance = specialChance * (civData.wood.increment + ((civData.gardening.owned) * civData.woodcutter.owned / 5.0)) * getWonderBonus(civData.herbs);
         let herbsEarned = rndRound(herbsChance);
@@ -50,15 +51,15 @@ function doWoodcutters() {
 }
 
 function doMiners() {
-    let efficiency = civData.miner.efficiency + (0.1 * civData.miner.efficiency * civData.mining.owned);
-    //civData.stone.net = civData.miner.owned * (civData.miner.efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
-    civData.stone.net = civData.miner.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); //Miners mine stone
-    let stoneEarned = Math.min(civData.stone.net, civData.stone.limit - civData.stone.owned); // can't make more than we can store
-    civData.stone.net = stoneEarned;
-    civData.stone.owned += stoneEarned;
-    //civData.stone.owned += civData.stone.net;
-
-    if (civData.prospecting.owned && civData.miner.owned > 0) { //and sometimes get ore
+    //Miners mine stone
+    if (civData.stone.owned < civData.stone.limit) {
+        let efficiency = civData.miner.efficiency + (0.1 * civData.miner.efficiency * civData.mining.owned);
+        civData.stone.net = civData.miner.owned * (efficiency * curCiv.morale.efficiency) * getWonderBonus(civData.stone); 
+        let stoneEarned = Math.min(civData.stone.net, civData.stone.limit - civData.stone.owned); // can't make more than we can store
+        civData.stone.net = stoneEarned;
+        civData.stone.owned += stoneEarned;
+    }
+    if (civData.prospecting.owned && civData.miner.owned > 0 && civData.ore.owned < civData.ore.limit) { //and sometimes get ore
         let specialChance = civData.stone.specialChance + (civData.macerating.owned ? 0.1 : 0);
         let oreChance = specialChance * (civData.stone.increment + ((civData.extraction.owned) * civData.miner.owned / 5.0)) * getWonderBonus(civData.ore);
         let oreEarned = rndRound(oreChance);
@@ -163,90 +164,6 @@ function doHealers() {
  * An estimated 30% to 60% of the population of Europe died from the plague. This is often referred to as the 'mortality rate'.
  * victims of bubonic plague itself had a 50% chance of death.
  * */
-//function doPlague() {
-//    if (population.totalSick <= 0) {
-//        return false;
-//    }
-//    //let jobInfected = getRandomPatient();
-//    //let unitInfected = civData[jobInfected];
-//    //if (unitInfected.ill <= 0 || unitInfected.owned <= 0) {
-//    //    return false;
-//    //}
-
-//    let deathRoll = (100 * Math.random());
-
-//    // try 45 90 splits and 50/50 chance of death/survival
-//    if (deathRoll <= 1) { // 1% chance that up to 1% ill people dies
-//        let victims = Math.floor(population.totalSick / 100 * Math.random());
-
-//        if (victims <= 0) { return false; }
-//        let died = 0;
-//        let lastVictim = "citizen";
-//        for (let d = 1; d <= victims; d++) {
-//            let jobInfected = getRandomPatient();
-
-//            if (isValid(jobInfected)) {
-//                let unitInfected = civData[jobInfected];
-
-//                if (unitInfected.ill > 0 && unitInfected.owned > 0) {
-//                    killUnit(unitInfected);
-//                    lastVictim = unitInfected.singular;
-//                    died++;
-//                }
-//            }
-//        }
-
-//        if (died == 1) {
-//            gameLog("A sick " + lastVictim + " died of the plague.");
-//        }
-//        else if (died > 1) {
-//            gameLog(prettify(died) + " sick citizens died of the plague.");
-//        }
-//        calculatePopulation();
-//        return true;
-//    }
-//    else if (deathRoll <= 2) {
-//        // some sick victims recover naturally
-//        let survivors = Math.floor(population.totalSick / 100 * Math.random());
-//        if (survivors <= 0) { return false; }
-//        let survived = 0;
-//        let lastJob = "citizen";
-//        for (let s = 1; s <= survivors; s++) {
-//            let job = getRandomPatient();
-
-//            if (isValid(job)) {
-//                healByJob(job);
-//                lastJob = civData[job].singular;
-//                survived++;
-//            }
-//        }
-//        if (survived == 1) {
-//            gameLog("A sick " + lastJob + " recovered from the plague.");
-//        }
-//        else if (survived > 1) {
-//            gameLog(prettify(survived) + " sick citizens recovered from the plague.");
-//        }
-//        calculatePopulation();
-//        return true;
-//    } else if (deathRoll > 99) { // 1% chance that it spreads 
-//        // Infect up to 0.1% of the healthy population.
-//        //* (1 + civData.feast.owned)
-//        // needs to be same odds as catching plague in doCorpses
-//        let infected = Math.floor(population.healthy / 100 * Math.random()) + 1;
-//        if (infected <= 0) { return false; }
-//        let num = spreadPlague(infected);
-//        if (num == 1) {
-//            gameLog("The plague spreads to a new citizen.");
-//        }
-//        else {
-//            gameLog("The plague spreads to " + prettify(num) + " new citizens.");
-//        }
-//        return true;
-//    }
-//    return false;
-//}
-
-// lets try to simplify
 function doPlague() {
     if (population.totalSick <= 0) { return false; }
 
@@ -308,9 +225,7 @@ function doPlague() {
     } else if (Math.random() < chance && canSpreadPlague()) {
         // plague spreads
         // needs to be same odds as catching plague in doCorpses civData.corpses.owned
-        //let infected = Math.floor(population.healthy / 2 * Math.random()) + 1;
         let infected = Math.floor(population.healthy / 100 * Math.random());
-        //let infected = Math.ceil(population.totalSick / 2 * (1 + civData.feast.owned) * Math.random());
         if (infected <= 0) { return false; }
         let num = spreadPlague(infected);
         if (num == 1) {
@@ -331,12 +246,6 @@ function doGraveyards() {
             if (civData.corpses.owned > 0 && curCiv.grave.owned > 0 && civData.piety.owned > 0) {
                 civData.corpses.owned -= 1;
                 curCiv.grave.owned -= 1;
-
-                // it costs to bury
-                //if (civData.piety.owned > 0) {
-                //    civData.piety.net -= getPietyEarnedBonus();
-                //    civData.piety.owned -= getPietyEarnedBonus();
-                //}
             }
             else {
                 // if criteria not met, no point continuing
@@ -362,19 +271,6 @@ function doCorpses() {
     if (civData.corpses.owned <= civData.cleric.owned * 7 && curCiv.grave.owned > 0) { return; }
 
     // Corpses lying around will occasionally make people sick.
-    // 1-in-50 chance (1-in-100 with feast)
-    //sickChance = 50 * Math.random() * (1 + civData.feast.owned);
-    //if (sickChance >= 1) { return; }
-
-    // more corpses should mean more chance of disease
-    //let sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
-    // increase percentage to reduce frequency
-    //let test = population.healthy * 0.5 * Math.random();
-    //let test = population.healthy * (1 + civData.feast.owned) * Math.random();
-
-    // if corpses owned is greater than upto %age of population, then chance of sickness spreading
-    //if (sickChance < test) { return; }
-
     // Infect up to 1% of the healthy population.
     // if there are sick already, then see doPlague()
     if (canSpreadPlague() && population.healthy > 0 && population.totalSick == 0) {
@@ -415,7 +311,6 @@ function canSpreadPlague() {
     // more corpses should mean more chance of disease
     let sickChance = civData.corpses.owned / (1 + civData.feast.owned) * Math.random();
     // increase percentage to reduce frequency
-    //let test = population.healthy * 0.5 * Math.random();
     let test = population.healthy * (1 + civData.feast.owned) * Math.random();
 
     return sickChance > test;
@@ -476,7 +371,6 @@ function dismissWorkers() {
 }
 
 function farmerMods(efficiency_base) {
-    //+ civData.domestication.owned
     return efficiency_base + (0.1 * (
         + civData.farming.owned + civData.agriculture.owned
         + civData.ploughshares.owned + civData.irrigation.owned
@@ -491,4 +385,3 @@ function woodcutterMods(efficiency_base) {
 function minerMods(efficiency_base) {
     return efficiency_base + (0.1 * (civData.mathematics.owned));
 }
-
