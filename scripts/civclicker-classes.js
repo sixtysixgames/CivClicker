@@ -158,7 +158,7 @@ function Unit(props) // props is an object containing the desired properties.
     // Occasional Properties: singular, plural, subType, prereqs, require, effectText, alignment,
     // source, efficiency_base, efficiency, onWin, 
     // lootFatigue, lootStop, sackFatigue, sackStop, killFatigue, killStop, conquerFatigue, conquerStop
-    // species, place, ill
+    // species, place, ill, defence
     return this;
 }
 // Common Properties: type="unit"
@@ -176,6 +176,7 @@ Unit.prototype = new CivObj({
     species: speciesType.human, // Also:  "animal", "mechanical", "undead"
     place: placeType.home, // Also:  "party"
     combatType: "",  // Default noncombatant.  Also "infantry","cavalry","animal"
+    defence: 0.05, // used by non-combat civilians when attacked.  see combat.doSlaughter()
     onWin: function () { return; }, // Do nothing.
     get vulnerable() {
         return ((this.place == placeType.home) && (this.alignment == alignmentType.player) && (this.subType == subTypes.normal));
