@@ -229,7 +229,8 @@ function doWolves(attacker) {
         // just in case
         if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 
-        gameLog(prettify(gone) + " rotting " + civData.corpses.getQtyName(gone) + " devoured by wolves");
+        //gameLog(prettify(gone) + " rotting " + civData.corpses.getQtyName(gone) + " devoured by wolves");
+        gameLog("Rotting " + civData.corpses.getQtyName(gone) + " devoured by wolves");
 
     } else {
         doSlaughter(attacker);
@@ -283,7 +284,8 @@ function doSlaughter(attacker) {
                     civData.corpses.owned -= 1;
                 }
 
-                gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
+                //gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
+                gameLog("One " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
             }
             else {
                 --attacker.owned;
@@ -331,9 +333,10 @@ function doSlaughterMulti(attacker) {
         }
     }
     if (kills > 0) {
-        let killVerb = Math.random() < 0.5 ? "captured" : "slaughtered";
-        let killNote = (kills == 1) ? " " + lastTarget + " murdered by " : " citizens " + killVerb + " by ";
-        gameLog(prettify(kills) + killNote + attacker.getQtyName(2)); // always use plural attacker
+        let killVerb = Math.random() < 0.01 ? "captured" : "slaughtered";
+        let killNote = (kills == 1) ? "One " + lastTarget + " murdered by " : "Many citizens " + killVerb + " by ";
+        //gameLog(prettify(kills) + killNote + attacker.getQtyName(2)); // always use plural attacker
+        gameLog( killNote + attacker.getQtyName(2)); // always use plural attacker
         calculatePopulation();
     }
     if (attacker.owned < 0) { attacker.owned = 0; }
@@ -351,7 +354,9 @@ function doLoot(attacker) {
         if (stolenQty > 0) {
             target.owned -= stolenQty;
             if (Math.random() < attacker.lootStop) { --attacker.owned; } // Attackers might leave after stealing something.
-            gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
+            //gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
+
+            gameLog("Lots of " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
         }
     }
     if (isValid(target) && target.owned <= 0) {
@@ -370,7 +375,7 @@ function doSack(attacker) {
     let target = civData[targetID];
 
     if (isValid(target) && target.owned > 0) {
-        let destroyVerb = (Math.random() < 0.5) ? "burned" : "destroyed";
+        let destroyVerb = (Math.random() < 0.99) ? "burned" : "destroyed";
         // Slightly different phrasing for fortifications
         if (target == civData.fortification) { destroyVerb = "damaged"; }
 
@@ -382,7 +387,8 @@ function doSack(attacker) {
         updateResourceTotals();
         calculatePopulation(); // Limits might change
 
-        gameLog("1 " + target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(2)); // always plural
+        //gameLog("1 " + target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(2)); // always plural
+       gameLog("One " + target.getQtyName(1) + " " + destroyVerb + " by " + attacker.getQtyName(2)); // always plural
     }
     if (isValid(target) && target.owned <= 0) {
         //some will leave
@@ -421,9 +427,10 @@ function doSackMulti(attacker) {
         }
     }
     if (sacks > 0) {
-        let destroyVerb = (Math.random() < 0.5) ? " burned by " : " destroyed by ";
-        let destroyNote = (sacks == 1) ? " " + lastTarget + destroyVerb : " buildings " + destroyVerb;
-        gameLog(prettify(sacks) + destroyNote + attacker.getQtyName(2)); // always use plural attacker
+        let destroyVerb = (Math.random() < 0.01) ? " burned by " : " destroyed by ";
+        let destroyNote = (sacks == 1) ? "One " + lastTarget + destroyVerb : "Many buildings " + destroyVerb;
+        //gameLog(prettify(sacks) + destroyNote + attacker.getQtyName(2)); // always use plural attacker
+        gameLog(destroyNote + attacker.getQtyName(2)); // always use plural attacker
         updateResourceTotals();
         calculatePopulation(); // Limits might change
     }
@@ -440,7 +447,8 @@ function doConquer(attacker) {
         land = Math.min(civData.freeLand.owned, land);
         if (land > 0) {
             civData.freeLand.owned -= land;
-            gameLog(prettify(land) + " land occupied by " + attacker.getQtyName(2)); // always plural
+            //gameLog(prettify(land) + " land occupied by " + attacker.getQtyName(2)); // always plural
+            gameLog("Lots of land occupied by " + attacker.getQtyName(2)); // always plural
             // Attackers might leave after conquering land.
             if (Math.random() < attacker.conquerStop) { attacker.owned -= land; }
         }
@@ -461,7 +469,7 @@ function doDesecrate(attacker) {
         let land = Math.ceil(Math.random() * targets * 0.01);
         land = Math.min(civData.graveyard.owned, land);
         if (land > 0) {
-            let target = (land == 1) ? "graveyard" : "graveyards";
+            let target = (land == 1) ? "A graveyard" : "Many graveyards";
 
             civData.graveyard.owned -= land;
             //curCiv.grave.owned -= 1;
@@ -469,7 +477,8 @@ function doDesecrate(attacker) {
                 curCiv.grave.owned = curCiv.grave.owned - (civData.graveyard.owned * 100);
             }
             civData.freeLand.owned += land;
-            gameLog(prettify(land) + " " + target + " desecrated by " + attacker.getQtyName(2)); // always plural
+            //gameLog(prettify(land) + " " + target + " desecrated by " + attacker.getQtyName(2)); // always plural
+            gameLog( target + " desecrated by " + attacker.getQtyName(2)); // always plural
             // Attackers might leave after conquering land.
             if (Math.random() < attacker.sackStop) { attacker.owned -= land; }
         }
