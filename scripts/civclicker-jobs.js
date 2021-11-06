@@ -194,7 +194,8 @@ function doPlague() {
             gameLog("A sick " + lastVictim + " died of the plague");
         }
         else if (died > 1) {
-            gameLog(prettify(died) + " plague victims died");
+            //gameLog(prettify(died) + " plague victims died");
+            gameLog("Many plague victims died");
         }
         calculatePopulation();
         return true;
@@ -218,7 +219,8 @@ function doPlague() {
             gameLog("A sick " + lastJob + " recovered");
         }
         else if (survived > 1) {
-            gameLog(prettify(survived) + " sick citizens recovered");
+            //gameLog(prettify(survived) + " sick citizens recovered");
+            gameLog( "Many sick citizens recovered");
         }
         calculatePopulation();
         return true;
@@ -232,7 +234,8 @@ function doPlague() {
             gameLog("The plague spreads to a new citizen");
         }
         else {
-            gameLog("The plague infects " + prettify(num) + " new citizens");
+            //gameLog("The plague infects " + prettify(num) + " new citizens");
+            gameLog("The plague infects new citizens");
         }
         return true;
     }
@@ -282,9 +285,10 @@ function doCorpses() {
             calculatePopulation();
             //notify player
             if (infected == 1) {
-                gameLog("A citizen caught the plague");
+                gameLog("A citizen has caught the plague");
             } else {
-                gameLog(prettify(infected) + " citizens caught the plague");
+                //gameLog(prettify(infected) + " citizens caught the plague");
+                gameLog( "Many citizens have caught the plague");
             }
         }
     }
@@ -294,15 +298,17 @@ function doCorpses() {
         //civData.corpses.owned -= 1;
         let gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
-        let what = " corpse" + ((gone > 1) ? "s" : "");
+        //let what = " corpse" + ((gone > 1) ? "s" : "");
+        let what = ((gone > 1) ? "Many corpses have" : "A corpse has");
         let action = " rotted away";
         if (Math.random() < 0.33) {
-            action = " eaten by vermin";
+            action = " been eaten by vermin";
         } else if (Math.random() < 0.66) {
-            action = " devoured by scavengers";
+            action = " been devoured by scavengers";
         }
 
-        gameLog(prettify(gone) + what + action);
+        //gameLog(prettify(gone) + what + action);
+        gameLog( what + action);
     }
     if (civData.corpses.owned < 0) { civData.corpses.owned = 0; }
 }
