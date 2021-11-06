@@ -9,8 +9,6 @@
  * do not use the defer attribute on the script tag in index.html
  * because these must exist before everything else
  */
-
-
 // see -classes
 const civObjType = {
     resource: "resource",
