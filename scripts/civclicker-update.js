@@ -731,27 +731,28 @@ function updateGameDate() {
         }
     }
     let elem = ui.find("#gameDate");
-    if (curCiv.loopCounter % 24 != 0 && elem.innerHTML != "0000-00-00") { return; }
+    if (curCiv.loopCounter % 60 != 0 && elem.innerHTML != "0000-00-00") { return; }
 
-    elem.innerHTML = getGameDate();
+    //elem.innerHTML = getGameDate();
+    elem.innerHTML = getPlayingTime();
 }
-function getGameDate() {
-    let t = Math.floor(curCiv.loopCounter / 24);
-    let y = Math.floor(t / 360) + 1;
-    t = t % 360;
-    let m = Math.floor(t / 30) + 1;
-    let d = (t % 30) + 1;
+//function getGameDate() {
+//    let t = Math.floor(curCiv.loopCounter / 24);
+//    let y = Math.floor(t / 360) + 1;
+//    t = t % 360;
+//    let m = Math.floor(t / 30) + 1;
+//    let d = (t % 30) + 1;
 
-    return y + "-" + ('00' + m).slice(-2) + "-" + ('00' + d).slice(-2);
-}
-function getGameTime() {
-    let h = curCiv.loopCounter % 24;
-    let s = Math.floor(Math.random() * 60);
-    return ('00' + h).slice(-2) + ":" + ('00' + s).slice(-2);
-}
-function getGameDateTime() {
-    return getGameDate() + " " + getGameTime();
-}
+//    return y + "-" + ('00' + m).slice(-2) + "-" + ('00' + d).slice(-2);
+//}
+//function getGameTime() {
+//    let h = curCiv.loopCounter % 24;
+//    let s = Math.floor(Math.random() * 60);
+//    return ('00' + h).slice(-2) + ":" + ('00' + s).slice(-2);
+//}
+//function getGameDateTime() {
+//    return getGameDate() + " " + getGameTime();
+//}
 function getPlayingTime() {
     let oneDay = 24 * 60 * 60;
     let oneHour = 60 * 60;
@@ -765,10 +766,31 @@ function getPlayingTime() {
     let seconds = c % oneMinute;
 
     let ret = "Playing time: ";
-    if (days > 0) { ret += days + " days " }
-    if (hours > 0) { ret += hours + " hours " }
-    if (mins > 0) { ret += mins + " minutes " }
-    if (seconds > 0) { ret += seconds + " seconds " }
+    if (days > 0) { ret += days + " days "; }
+    if (hours > 0) { ret += hours + " hours "; }
+    if (mins > 0) { ret += mins + " minutes "; }
+    if (seconds > 0) { ret += seconds + " seconds "; }
+
+    return ret;
+}
+function getPlayingTimeShort() {
+    let oneDay = 24 * 60 * 60;
+    let oneHour = 60 * 60;
+    let oneMinute = 60;
+    let c = curCiv.loopCounter;
+    let days = Math.floor(c / oneDay);
+    c = c % oneDay;
+    let hours = Math.floor(c / oneHour);
+    c = c % oneHour;
+    let mins = Math.floor(c / oneMinute);
+    let seconds = c % oneMinute;
+
+    let ret = "";
+    if (days > 0) { ret += days + ":" }
+    
+    ret += ('00' + hours).slice(-2) + ":";
+    ret += ('00' + mins).slice(-2) + ":";
+    ret += ('00' + seconds).slice(-2);
 
     return ret;
 }
