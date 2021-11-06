@@ -229,7 +229,8 @@ function gameLog(message) {
     //let d = new Date();
     // todo: output some sort of in-game date based on how long played
     //let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
-    let curTime = getGameDateTime();
+    //let curTime = getGameDateTime();
+    let curTime = getPlayingTimeShort();
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#logL").innerHTML != message) {
         app.logRepeat = 0; //Reset the (xNumber) value
