@@ -606,7 +606,8 @@ function doStarve() {
         if (numberStarve == 1) {
             gameLog("A citizen starved to death");
         } else if (numberStarve > 1) {
-            gameLog(prettify(numberStarve) + " citizens starved to death");
+            //gameLog(prettify(numberStarve) + " citizens starved to death");
+            gameLog( "Many citizens starved to death");
         }
         civData.food.owned = 0;
     }
@@ -620,10 +621,11 @@ function doHomeless() {
         // kill off up to 20% of homeless
         let numDie = starve(Math.ceil(Math.random() * numHomeless / 5));
         if (numDie > 0) {
-            let who = numDie == 1 ? " homeless citizen" : " homeless citizens";
+            let who = numDie == 1 ? "A homeless citizen" : "Many homeless citizens";
             let where = ["north", "northeast", "east", "southeast", "south", "southwest", "west", "northwest"];
-            let what = Math.random() < 0.5 ? " died of exposure" : " migrated " + where[Math.floor(Math.random() * where.length)];
-            gameLog(prettify(numDie) + who + what);
+            let what = Math.random() < 0.99 ? " died of exposure" : " migrated " + where[Math.floor(Math.random() * where.length)];
+            //gameLog(prettify(numDie) + who + what);
+            gameLog(who + what);
         }
     }
 }
