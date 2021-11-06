@@ -583,15 +583,15 @@ function getCivData() {
         new Upgrade({
             id: "palisade", name: "Palisades", subType: subTypes.upgrade,
             efficiency: 0.01, // Subtracted from attacker efficiency.
-            prereqs: { engineering: true },
+            prereqs: { engineering: true,  rampart: true},
             require: { wood: 2500, stone: 1000 },
             effectText: "Enemies do less damage"
         }),
         new Upgrade({
             id: "battlement", name: "Battlements", subType: subTypes.upgrade,
             efficiency: 0.02, // Subtracted from attacker efficiency.
-            prereqs: { architecture: true },
-            require: { wood: 1000, stone: 5000 },
+            prereqs: { architecture: true, palisade: true },
+            require: { wood: 2500, stone: 5000 },
             effectText: "Enemies do less damage"
         }),
         new Upgrade({
