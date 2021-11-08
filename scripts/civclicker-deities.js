@@ -4,6 +4,26 @@ function getCurDeityDomain() {
     return (curCiv.deities.length > 0) ? curCiv.deities[0].domain : undefined;
 }
 
+function getCurrentAltarId() {
+    let domainId = getCurDeityDomain();
+    if (isValid(domainId)) {
+        if (domainId == deityDomains.battle) { return buildingType.battleAltar; }
+        if (domainId == deityDomains.cats) { return buildingType.catAltar; }
+        if (domainId == deityDomains.fields) { return buildingType.fieldsAltar; }
+        if (domainId == deityDomains.underworld) { return buildingType.underworldAltar; }
+    }
+    return undefined;
+}
+
+function getAltarsOwned() {
+    // get current altar
+    let id = getCurrentAltarId();
+    if (isValid(id)) {
+        return civData[id].owned;
+    }
+    return 0;
+}
+
 // todo make an associative array of dieties
 function typeToId(deityType) {
     if (deityType == deityTypes.Battle) { return deityDomains.battle; }
@@ -12,6 +32,7 @@ function typeToId(deityType) {
     if (deityType == deityTypes.Underworld) { return deityDomains.underworld; }
     return deityType;
 }
+
 function idToType(domainId) {
     if (domainId == deityDomains.battle) { return deityTypes.Battle; }
     if (domainId == deityDomains.cats) { return deityTypes.Cats; }
@@ -35,8 +56,9 @@ function makeDeitiesTables() {
     ui.find("#activeDeity").innerHTML = '<tr id="' + deityId + '">'
         + '<td><strong><span id="' + deityId + 'Name">' + '</span></strong>'
         + '<span id="' + deityId + 'Domain" class="deityDomain">' + '</span></td>'
-        + '<td>Devotion: <span id="' + deityId + 'Devotion">' + '</span></td></tr>';
-
+        + '<td>Devotion: <span id="' + deityId + 'Devotion">' + '</span>&nbsp;</td>'
+        + '<td>&nbsp;Altars: <span id="' + deityId + 'Altars">' + '</span></td>'
+        + '</tr>';
     // Display the table of prior deities.
     //xxx Change this to <th>, need to realign left.
     let s = "<tr><td><b>Name</b></td><td><b>Domain</b></td><td><b>Max Devotion</b></td></tr>";
@@ -107,7 +129,6 @@ function selectDeity(domain, force) {
     makeDeitiesTables();
     updateUpgrades();
 }
-
 
 //Selects a random worker, kills them, and then adds a random resource
 //xxx This should probably scale based on population (and maybe devotion).
@@ -224,7 +245,6 @@ function iconoclasm(index) {
     makeDeitiesTables();
 }
 
-
 function smiteMob(mobObj) {
     if (!isValid(mobObj.owned) || mobObj.owned <= 0) { return 0; }
     let num = Math.min(mobObj.owned, Math.floor(civData.piety.owned / 100));
@@ -246,7 +266,6 @@ function smite() {
     updateResourceTotals();
     updateJobButtons();
 }
-
 
 function glory(time) {
     if (time === undefined) { time = 180; }
