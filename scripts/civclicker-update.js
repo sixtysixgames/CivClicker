@@ -514,6 +514,13 @@ function updateDeity() {
     ui.find("#deityADomain").innerHTML = getCurDeityDomain() ? ", deity of " + idToType(getCurDeityDomain()) : "";
     ui.find("#deityADevotion").innerHTML = civData.devotion.owned;
 
+    let altarID = getCurrentAltarId();
+    let altars = 0;
+    if (isValid(altarID)) {
+        altars = civData[altarID].owned;
+    }
+    ui.find("#deityA" + "Altars").innerHTML = altars;
+
     // Display if we have an active deity, or any old ones.
     ui.show("#deityContainer", hasDeity);
     ui.show("#activeDeity", hasDeity);
@@ -763,13 +770,13 @@ function getPlayingTime() {
     let hours = Math.floor(c / oneHour);
     c = c % oneHour;
     let mins = Math.floor(c / oneMinute);
-    let seconds = c % oneMinute;
+    let secs = c % oneMinute;
 
     let ret = "Playing time: ";
-    if (days > 0) { ret += days + " days "; }
-    if (hours > 0) { ret += hours + " hours "; }
-    if (mins > 0) { ret += mins + " minutes "; }
-    if (seconds > 0) { ret += seconds + " seconds "; }
+    if (days > 0) { ret += days + " day" + (days > 1 ? "s " : " "); }
+    if (hours > 0) { ret += hours + " hour" + (hours > 1 ? "s " : " "); }
+    if (mins > 0) { ret += mins + " minute" + (mins > 1 ? "s " : " "); }
+    if (secs > 0) { ret += secs + " second" + (secs > 1 ? "s " : " "); }
 
     return ret;
 }
