@@ -195,7 +195,7 @@ function doPlague() {
         }
         else if (died > 1) {
             //gameLog(prettify(died) + " plague victims died");
-            gameLog("Many plague victims died");
+            gameLog("plague victims died");
         }
         calculatePopulation();
         return true;
@@ -216,11 +216,11 @@ function doPlague() {
             }
         }
         if (survived == 1) {
-            gameLog("A sick " + lastJob + " recovered");
+            gameLog("sick " + lastJob + " recovered");
         }
         else if (survived > 1) {
             //gameLog(prettify(survived) + " sick citizens recovered");
-            gameLog( "Many sick citizens recovered");
+            gameLog( "sick citizens recovered");
         }
         calculatePopulation();
         return true;
@@ -285,10 +285,10 @@ function doCorpses() {
             calculatePopulation();
             //notify player
             if (infected == 1) {
-                gameLog("A citizen has caught the plague");
+                gameLog("citizen caught the plague");
             } else {
                 //gameLog(prettify(infected) + " citizens caught the plague");
-                gameLog( "Many citizens have caught the plague");
+                gameLog( "citizens caught the plague");
             }
         }
     }
@@ -299,12 +299,12 @@ function doCorpses() {
         let gone = 1 + Math.floor((Math.random() * civData.corpses.owned / 100));
         civData.corpses.owned -= gone;
         //let what = " corpse" + ((gone > 1) ? "s" : "");
-        let what = ((gone > 1) ? "Many corpses have" : "A corpse has");
+        let what = ((gone > 1) ? "corpses" : "corpse");
         let action = " rotted away";
         if (Math.random() < 0.33) {
-            action = " been eaten by vermin";
+            action = " eaten by vermin";
         } else if (Math.random() < 0.66) {
-            action = " been devoured by scavengers";
+            action = " devoured by scavengers";
         }
 
         //gameLog(prettify(gone) + what + action);
