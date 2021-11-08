@@ -231,6 +231,8 @@ function gameLog(message) {
     //let curTime = d.getHours() + ":" + ((d.getMinutes() < 10) ? "0" : "") + d.getMinutes();
     //let curTime = getGameDateTime();
     let curTime = getPlayingTimeShort();
+    message = sentenceCase(message);
+
     //Check to see if the last message was the same as this one, if so just increment the (xNumber) value
     if (ui.find("#logL").innerHTML != message) {
         app.logRepeat = 0; //Reset the (xNumber) value
@@ -308,4 +310,12 @@ function getCustomNumber(civObj) {
     elem.style.background = "#fff";
 
     return num;
+}
+
+function sentenceCase(message) {
+    // capitalize first letter
+    if (!message || !isValid(message)) {
+        return message;
+    }
+    return message.charAt(0).toUpperCase() + message.slice(1);
 }
