@@ -797,6 +797,7 @@ function doMobs() {
                 mobNum = Math.max(mobNum, civData.freeLand.owned);
                 mobNum = Math.max(mobNum, civData.graveyard.owned);
                 mobNum = Math.max(mobNum, altars);
+                mobNum = mobNum % 500000;
                 mobNum = Math.ceil(mobNum * Math.random());
             }
             spawnMob(civData[mobType], mobNum);
