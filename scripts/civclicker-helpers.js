@@ -226,6 +226,13 @@ function getLandTotals() {
     return ret;
 }
 
+function getResourceTotal() {
+    let res = 0;
+    for (let i = 0; i < lootable.length; ++i) {
+        res += lootable[i].owned;
+    }
+    return res;
+}
 function testAchievements() {
     achData.forEach(function (achObj) {
         // if (!isValid(civData[achObj.id])) { return false}
