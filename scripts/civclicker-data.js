@@ -1097,10 +1097,10 @@ function getCivData() {
             lootFatigue: (0.01),  
             lootStop: (0.9), 
             lootMax: (0.99), 
-            sackFatigue: (0.02),  
+            sackFatigue: (0.5),  
             sackStop: (0.99), 
             sackMax: (0.25), 
-            killFatigue: (0.02),  
+            killFatigue: (0.5),  
             killStop: (0.99), 
             killMax: (0.1), 
             effectText: "Steal your resources"
@@ -1113,7 +1113,7 @@ function getCivData() {
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
             // see invader for definitions
-            lootFatigue: (0.05), 
+            lootFatigue: (0.25), 
             lootStop: (0.75), 
             lootMax: (0.99), 
             sackFatigue: (0.05), 
@@ -1134,16 +1134,16 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
-            lootFatigue: (0.01), // Max fraction that leave after cleaning out a resource
+            lootFatigue: (0.25), // Max fraction that leave after cleaning out a resource
             lootStop: (0.99), // Chance of an attacker leaving after looting a resource
             lootMax: (0.25), // Max fraction that will loot
-            sackFatigue: (0.01), // Max fraction that leave after destroying a building type
+            sackFatigue: (0.25), // Max fraction that leave after destroying a building type
             sackStop: (0.99), // Chance of an attacker leaving after sacking a building
             sackMax: (0.25), // Max fraction that will sack
-            killFatigue: (0.01), // Max fraction that leave after killing the last person
+            killFatigue: (0.25), // Max fraction that leave after killing the last person
             killStop: (0.99), // Chance of an attacker leaving after killing a person
             killMax: (0.25), // Max fraction that will kill
-            conquerFatigue: (0.01), // Max fraction that leave after conquering the last land
+            conquerFatigue: (0.25), // Max fraction that leave after conquering the last land
             conquerStop: (0.25), // Chance of an attacker leaving after conquering land
             conquerMax: (0.99), // Max fraction that will take land
             effectText: "Conquer your lands"
