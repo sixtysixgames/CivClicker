@@ -23,8 +23,9 @@ function resetRaiding() {
 }
 
 function playerCombatMods() {
-    return (0.01 * (civData.riddle.owned + civData.weaponry.owned + civData.shields.owned + civData.armour.owned
-        + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
+    return (0.01 * (civData.riddle.owned
+                + civData.weaponry.owned + civData.shields.owned + civData.armour.owned
+                + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
 }
 
 /* Enemies */
@@ -170,8 +171,10 @@ function getCombatants(place, alignment) {
 }
 
 // Some attackers get a damage mod against some defenders
+//https://history.stackexchange.com/questions/838/how-well-can-cavalry-fight-infantry
+//https://en.wikipedia.org/wiki/Infantry_in_the_Middle_Ages#Infantry_versus_cavalry
 function getCasualtyMod(attacker, defender) {
-    // Cavalry take 50% more casualties vs infantry - 66g todo seems a bit high  
+    // Cavalry take 50% more casualties vs infantry - 66G todo seems a bit high  
     if ((defender.combatType == combatTypes.cavalry) && (attacker.combatType == combatTypes.infantry)) { return 1.50; }
 
     return 1.0; // Otherwise no modifier
@@ -265,6 +268,15 @@ function doInvaders(attacker) {
     else if (r < 0.72) { doSackMulti(attacker); }
     else if (r < 0.96) { doConquer(attacker); }
     else { doDesecrate(attacker); }
+
+    if (civData.freeLand.owned === 0) {
+        // this is an attempt to speed up the decline process
+        let landTotals = getLandTotals();
+        let altars = getAltarsOwned();
+        if (civData.graveyard.owned + altars === landTotals.buildings) {
+            doDesecrate(attacker);
+        }
+    }
 }
 
 // kill
@@ -700,7 +712,7 @@ function doMobs() {
     if (civData.freeLand.owned < 0) {
         curCiv.attackCounter += Math.abs(civData.freeLand.owned);
     }
-    let minMinutes = (population.limit > 0) ? 5 : 1; // 5 mins if any population
+    let minMinutes = (population.limit > 0) ? 5 : 2; // 5 mins if any population
     let limit = (60 * minMinutes) + Math.floor(60 * minMinutes * Math.random()); //Minimum 5 minutes, max 10
 
     if (curCiv.attackCounter > limit) {
@@ -789,16 +801,18 @@ function doMobs() {
 
             let mobNum = Math.ceil(civLimit / 50 * Math.random());
             if (population.current === 0) {
-                //&& mobType == mobTypeIds.wolf
+                // no population, let's invade!
                 mobType = mobTypeIds.invader; // they do a bit of everything
-                //mobNum = Math.ceil((landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned + getAltarsOwned()) * Math.random() / 50);
-                // we want loads of attackers
-                mobNum = Math.max(landTotals.sackableTotal, resources);
-                mobNum = Math.max(mobNum, civData.freeLand.owned);
-                mobNum = Math.max(mobNum, civData.graveyard.owned);
-                mobNum = Math.max(mobNum, altars);
-                mobNum = mobNum % 500000;
-                mobNum = Math.ceil(mobNum * Math.random());
+                if (civData[mobType].owned > 0) {
+                    // already under attack
+                    mobNum = 0;
+                }
+                else {
+                    // we want loads of attackers, but not too many otherwise the browser breaks
+                    // get the min pop from the max civ this player has reached
+                    mobNum = civSizes[curCiv.raid.targetMax].min_pop;
+                    mobNum = Math.ceil(mobNum * Math.random());
+                }
             }
             spawnMob(civData[mobType], mobNum);
         }
