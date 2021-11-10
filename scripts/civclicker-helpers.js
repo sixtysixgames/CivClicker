@@ -233,9 +233,9 @@ function getResourceTotal() {
     }
     return res;
 }
+
 function testAchievements() {
     achData.forEach(function (achObj) {
-        // if (!isValid(civData[achObj.id])) { return false}
         if (civData[achObj.id].owned) { return true; }
         if (isValid(achObj.test) && !achObj.test()) { return false; }
         civData[achObj.id].owned = true;
@@ -533,19 +533,17 @@ function pickStarveTarget() {
 }
 
 function getPietyLimitBonus() {
-    let bonus1 = ((civData.theism.owned ? 1 : 0) * 10);
-    let bonus2 = ((civData.polytheism.owned ? 1 : 0) * 25);
-    let bonus3 = ((civData.monotheism.owned ? 1 : 0) * 50);
-
+    let bonus1 = (civData.theism.owned ? 1 : 0) * 25;
+    let bonus2 = (civData.polytheism.owned ? 1 : 0) * 50;
+    let bonus3 = (civData.monotheism.owned ? 1 : 0) * 100;
     return bonus1 + bonus2 + bonus3;
 }
 function getPietyEarnedBonus() {
     let pietyEarned = 
-         (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
-        * (1 + ((civData.secrets.owned)
-            * (1 - 100 / (civData.graveyard.owned + 100))))
-        * curCiv.morale.efficiency
-        * getWonderBonus(civData.piety);
+            (civData.cleric.efficiency + (civData.cleric.efficiency * (civData.theism.owned + civData.polytheism.owned + civData.monotheism.owned + civData.writing.owned)))
+            * (1 + ((civData.secrets.owned) * (1 - 100 / (civData.graveyard.owned + 100))))
+            * curCiv.morale.efficiency
+            * getWonderBonus(civData.piety);
 
     return pietyEarned;
 }
