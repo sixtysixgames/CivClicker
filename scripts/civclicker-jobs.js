@@ -126,8 +126,8 @@ function doClerics() {
     let pietyEarned = civData.cleric.owned * bonus;
     pietyEarned = Math.min(pietyEarned, civData.piety.limit - civData.piety.owned); // can't make more than we can store
 
-    // lose piety for having temples but no clerics
-    if (civData.cleric.owned == 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -bonus; }
+    // lose piety for having temples but no clerics or population
+    if (civData.cleric.owned === 0 && civData.temple.owned > 0 && civData.piety.owned > 0) { pietyEarned = -bonus; }
 
     civData.piety.net += pietyEarned;
     civData.piety.owned += pietyEarned;
