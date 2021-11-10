@@ -113,7 +113,7 @@ function getCivData() {
             vulnerable: false, // Can't be stolen
             get limit() {
                 let bonus = getPietyLimitBonus();
-                return 50 + (civData.temple.owned * 50) + (civData.temple.owned * bonus);
+                return (civData.temple.owned * 50) + (civData.temple.owned * bonus);
             },
             set limit(value) { return this.limit; } // Only here for JSLint.
         }), 
@@ -260,7 +260,7 @@ function getCivData() {
             require: { wood: 30, stone: 120, herbs: 10 },
             get effectText() {
                 let bonus = 50 + getPietyLimitBonus();
-                return "allows 1 cleric; +" + bonus + " piety storage";
+                return "allows 1 cleric; +" + bonus + " piety limit";
             },
             set effectText(value) { return this.effectText; },
             update: function () {
@@ -647,20 +647,20 @@ function getCivData() {
         new Upgrade({
             id: "theism", name: "Theism", subType: subTypes.upgrade,
             prereqs: { cleric: 1 },
-            require: { piety: 100 },
-            effectText: "Increase cleric piety generation. Increase piety storage"
+            require: { piety: 250 },
+            effectText: "Increase cleric piety generation. Increase piety limit"
         }),
         new Upgrade({
             id: "polytheism", name: "Polytheism", subType: subTypes.upgrade,
             prereqs: { theism: true },
             require: { piety: 1000  },
-            effectText: "Increase cleric piety generation. Increase piety storage"
+            effectText: "Increase cleric piety generation. Increase piety limit"
         }),
         new Upgrade({
             id: "monotheism", name: "Monotheism", subType: subTypes.upgrade,
             prereqs: { polytheism: true },
             require: { piety: 5000  },
-            effectText: "Increase cleric piety generation. Increase piety storage"
+            effectText: "Increase cleric piety generation. Increase piety limit"
         }),
 
         new Upgrade({
@@ -754,43 +754,43 @@ function getCivData() {
             id: "lure", name: "Lure of Civilisation", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.cats, devotion: 10 },
             require: { piety: 1000 },
-            effectText: "increase chance to get cats"
+            effectText: "Increase chance to get cats"
         }),
         new Upgrade({
             id: "companion", name: "Warmth of the Companion", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.cats, devotion: 30 },
             require: { piety: 1000 },
-            effectText: "cats help heal the sick"
+            effectText: "Cats help heal the sick"
         }),
         new Upgrade({
             id: "comfort", name: "Comfort of the Hearthfires", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.cats, devotion: 50 },
             require: { piety: 5000 },
-            effectText: "traders marginally more frequent"
+            effectText: "Traders marginally more frequent"
         }),
         new Upgrade({
             id: "blessing", name: "Blessing of Abundance", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.fields, devotion: 10 },
             require: { piety: 1000 },
-            effectText: "increase farmer food output"
+            effectText: "Increase farmer food output"
         }),
         new Upgrade({
             id: "waste", name: "Abide No Waste", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.fields, devotion: 30 },
             require: { piety: 1000 },
-            effectText: "workers will eat corpses if there is no food left"
+            effectText: "Workers will eat corpses if there is no food left"
         }),
         new Upgrade({
             id: "stay", name: "Stay With Us", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.fields, devotion: 50 },
             require: { piety: 5000 },
-            effectText: "traders stay longer"
+            effectText: "Traders stay longer"
         }),
         new Upgrade({
             id: "riddle", name: "Riddle of Steel", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.battle, devotion: 10 },
             require: { piety: 1000 },
-            effectText: "improve soldiers"
+            effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "throne", name: "Throne of Skulls", subType: subTypes.pantheon,
@@ -799,7 +799,7 @@ function getCivData() {
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.count = 0; },
             get count() { return this.data.count; }, // Partial temples from Throne
             set count(value) { this.data.count = value; },
-            effectText: "slaying enemies creates temples"
+            effectText: "Slaying enemies creates temples"
         }),
         new Upgrade({
             id: "lament", name: "Lament of the Defeated", subType: subTypes.pantheon,
@@ -811,19 +811,19 @@ function getCivData() {
             id: "book", name: "The Book of the Dead", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.underworld, devotion: 10 },
             require: { piety: 1000 },
-            effectText: "gain piety with deaths"
+            effectText: "Gain piety with deaths"
         }),
         new Upgrade({
             id: "feast", name: "A Feast for Crows", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.underworld, devotion: 30 },
             require: { piety: 1000 },
-            effectText: "corpses are less likely to cause illness"
+            effectText: "Corpses are less likely to cause illness"
         }),
         new Upgrade({
             id: "secrets", name: "Secrets of the Tombs", subType: subTypes.pantheon,
             prereqs: { deity: deityDomains.underworld, devotion: 50 },
             require: { piety: 5000 },
-            effectText: "graveyards increase cleric piety generation"
+            effectText: "Graveyards increase cleric piety generation"
         }),
         // Special Upgrades
         new Upgrade({
@@ -884,7 +884,7 @@ function getCivData() {
             init: function (fullInit) { Upgrade.prototype.init.call(this, fullInit); this.rate = 0; },
             get rate() { return this.data.rate; }, // Sacrifice rate
             set rate(value) { this.data.rate = value; },
-            effectText: "boost food production by sacrificing 1 worker/sec",
+            effectText: "Boost food production by sacrificing 1 worker/sec",
             extraText: "<br /><button id='ceaseWalk' onmousedown='walk(false)' disabled='disabled'>Cease Walking</button>"
         }),
         new Upgrade({
@@ -1094,10 +1094,10 @@ function getCivData() {
             efficiency: 0.07,
             onWin: function () { doBandits(this); },
             // see invader for definitions
-            lootFatigue: (0.01),  
+            lootFatigue: (0.1),  
             lootStop: (0.9), 
             lootMax: (0.99), 
-            sackFatigue: (0.5),  
+            sackFatigue: (0.25),  
             sackStop: (0.99), 
             sackMax: (0.25), 
             killFatigue: (0.5),  
@@ -1113,16 +1113,16 @@ function getCivData() {
             efficiency: 0.09,
             onWin: function () { doBarbarians(this); },
             // see invader for definitions
-            lootFatigue: (0.25), 
+            lootFatigue: (0.1), 
             lootStop: (0.75), 
             lootMax: (0.99), 
-            sackFatigue: (0.05), 
+            sackFatigue: (0.1), 
             sackStop: (0.66), 
             sackMax: (0.99), 
-            killFatigue: (0.05), 
+            killFatigue: (0.1), 
             killStop: (0.99), 
             killMax: (0.33), 
-            conquerFatigue: (0.05), 
+            conquerFatigue: (0.1), 
             conquerStop: (0.99), 
             conquerMax: (0.25), 
             effectText: "Slaughter, plunder, and burn"
@@ -1134,16 +1134,16 @@ function getCivData() {
             prereqs: undefined, // Cannot be purchased.
             efficiency: 0.11,
             onWin: function () { doInvaders(this); },
-            lootFatigue: (0.25), // Max fraction that leave after cleaning out a resource
+            lootFatigue: (0.05), // Max fraction that leave after cleaning out a resource
             lootStop: (0.99), // Chance of an attacker leaving after looting a resource
             lootMax: (0.25), // Max fraction that will loot
-            sackFatigue: (0.25), // Max fraction that leave after destroying a building type
+            sackFatigue: (0.05), // Max fraction that leave after destroying a building type
             sackStop: (0.99), // Chance of an attacker leaving after sacking a building
             sackMax: (0.25), // Max fraction that will sack
-            killFatigue: (0.25), // Max fraction that leave after killing the last person
+            killFatigue: (0.05), // Max fraction that leave after killing the last person
             killStop: (0.99), // Chance of an attacker leaving after killing a person
             killMax: (0.25), // Max fraction that will kill
-            conquerFatigue: (0.25), // Max fraction that leave after conquering the last land
+            conquerFatigue: (0.05), // Max fraction that leave after conquering the last land
             conquerStop: (0.25), // Chance of an attacker leaving after conquering land
             conquerMax: (0.99), // Max fraction that will take land
             effectText: "Conquer your lands"
