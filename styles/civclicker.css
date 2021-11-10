@@ -951,13 +951,13 @@ button {
 .bar span {
     display: none;
     position: relative;
-    top: 1.25em;
+    top: -1.8em;
     background-color: rgba(0,0,0,0.3);
     color: white;
     width: 10em;
     font-size: 80%;
     text-align: center;
-    padding: 0.5em;
+    padding: 0.25em;
     border-radius: 0.2em;
     text-shadow: 0 1px 0 rgba(0,0,0,0.2);
 }
