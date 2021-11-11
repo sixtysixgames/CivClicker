@@ -22,10 +22,10 @@ function resetRaiding() {
         .forEach(function (elem) { elem.reset(); });
 }
 
-function playerCombatMods() {
-    return (0.01 * (civData.riddle.owned
-                + civData.weaponry.owned + civData.shields.owned + civData.armour.owned
-                + civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned));
+function getPlayerCombatMods() {
+    let mods = 0.01 * (civData.riddle.owned + civData.weaponry.owned + civData.shields.owned + civData.armour.owned);
+    mods += 0.02 * (civData.advweaponry.owned + civData.advshields.owned + civData.advarmour.owned);
+    return mods;
 }
 
 /* Enemies */
@@ -37,10 +37,7 @@ function spawnMob(mobObj, num) {
         //No! According to research a standing army was about 1% of total population
         // However, the enemy force should not be based on player population.  See invade
         num = Math.ceil(max_mob * Math.random());
-
     }
-    // invaders require a larger army TODO: this is arbitrary. needs changing.  maybe property on unit
-    //if (mobObj.id === unitType.invader) { num *= Math.ceil(4 * Math.random()); }
 
     if (num === 0) { return num; }  // Nobody came
 
@@ -68,8 +65,6 @@ function invade(ecivtype) {
     if (maxpop === Infinity) { maxpop = civSizes[ecivtype].min_pop * 2; }
     curCiv.raid.epop = minpop + Math.ceil((maxpop - minpop) * Math.random());
 
-    //debug("curCiv.raid.epop=" + curCiv.raid.epop);
-
     if (civData.glory.timer > 0) { curCiv.raid.epop *= 2; } //doubles soldiers fought
 
     // 5-25% of enemy population is soldiers.
@@ -77,18 +72,22 @@ function invade(ecivtype) {
     civData.efort.owned += Math.floor(Math.random() * (curCiv.raid.epop / 5000));
 
     // 66g todo: should we should take into account size of raiding party
-    // baseLoot = Math.min(civData.soldierParty.owned + civData.cavalryParty.owned, baseLoot);
-
-    // Glory redoubles rewards (doubled here because doubled already above)
-    let baseLoot = curCiv.raid.epop / (1 + (civData.glory.timer <= 0));
+    let baseLoot = Math.min(civData.soldierParty.owned + civData.cavalryParty.owned, curCiv.raid.epop);
+    // Glory redoubles rewards
+    baseLoot = baseLoot * (1 + (civData.glory.timer <= 0 ? 0 : 1));
 
     // Set rewards of land and other random plunder.
-    // land between 25 and 50% of one third because it can be doubled with administration and we don't want to gain too much
+    // land between 25 and 50% because it can be doubled with administration and we don't want to gain too much
     let baseLand = (baseLoot / 3) * (1 + (civData.administration.owned));
     curCiv.raid.plunderLoot = {
-        freeLand: Math.floor((baseLand * 0.25) + Math.floor(Math.random() * (baseLand * 0.25)))
+        freeLand: Math.floor((baseLand * 0.25) + Math.round(Math.random() * (baseLand * 0.25)))
     };
-    lootable.forEach(function (elem) { curCiv.raid.plunderLoot[elem.id] = Math.round(baseLoot * Math.random()); });
+    //lootable.forEach(function (elem) { curCiv.raid.plunderLoot[elem.id] = Math.round(baseLoot * Math.random()); });
+    baseLoot -= Math.round(curCiv.raid.plunderLoot.freeLand * Math.random());
+    lootable.forEach(function (elem) {
+        curCiv.raid.plunderLoot[elem.id] = Math.round(baseLoot * Math.random());
+        baseLoot -= Math.round(curCiv.raid.plunderLoot[elem.id] * Math.random());
+    });
 
     ui.hide("#raidNews");
     updateTargets(); //Hides raid buttons until the raid is finished
@@ -149,7 +148,7 @@ function plunder() {
     }
 
     // Create message to notify player
-    plunderMsg = civSizes[curCiv.raid.last].name + " raided! ";
+    plunderMsg = civSizes[curCiv.raid.last].name + " raided! (pop." + prettify(curCiv.raid.epop) + ")<br/>";
     plunderMsg += "Plundered " + getReqText(curCiv.raid.plunderLoot) + ". ";
     gameLog(plunderMsg);
 
@@ -263,11 +262,11 @@ function doBarbarians(attacker) {
 }
 function doInvaders(attacker) {
     let r = Math.random();
-    if (r < 0.24 ) { doSlaughterMulti(attacker); }
-    else if (r < 0.48) { doLoot(attacker); }
-    else if (r < 0.72) { doSackMulti(attacker); }
-    else if (r < 0.96) { doConquer(attacker); }
-    else { doDesecrate(attacker); }
+    if (r < 0.24 ) { debug("doSlaughterMulti");doSlaughterMulti(attacker); }
+    else if (r < 0.48) { debug("doLoot");doLoot(attacker); }
+    else if (r < 0.72) { debug("doSackMulti");doSackMulti(attacker); }
+    else if (r < 0.96) { debug("doConquer");doConquer(attacker); }
+    else { debug("doDesecrate"); doDesecrate(attacker); }
 
     if (civData.freeLand.owned === 0) {
         // this is an attempt to speed up the decline process
@@ -284,7 +283,6 @@ function doSlaughter(attacker) {
     let target = getRandomWorker(); //Choose random worker
     let targetUnit = civData[target];
     if (isValid(targetUnit) && targetUnit.owned > 0) {
-        //if (targetUnit.owned >= 1) {
         if ((Math.random() * targetUnit.defence) <= (Math.random() * attacker.efficiency)) {
             let killVerb = (attacker.species == speciesType.animal) ? "eaten" : "killed";
             // An attacker may disappear after killing
@@ -296,18 +294,12 @@ function doSlaughter(attacker) {
             if (attacker.species == speciesType.animal) {
                 civData.corpses.owned -= 1;
             }
-
             //gameLog("1 " + targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
             gameLog(targetUnit.getQtyName(1) + " " + killVerb + " by " + attacker.getQtyName(2)); // always use plural
         }
         else {
             --attacker.owned;
         }
-        //}
-        //if (targetUnit.owned <= 0) { // Attackers slowly leave once everyone is dead
-        //    let leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
-        //    attacker.owned -= leaving;
-        //}
     }
     if (!isValid(targetUnit) || (isValid(targetUnit) && targetUnit.owned <= 0)) {
         // Attackers slowly leave once everyone is dead
@@ -320,7 +312,8 @@ function doSlaughter(attacker) {
 }
 function doSlaughterMulti(attacker) {
     // kill up to %age of attacking force
-    let targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.killMax);
+    let targets = Math.min(attacker.owned, population.current);
+    targets = 1 + Math.ceil(Math.random() * targets * attacker.killMax);
     let kills = 0;
     let lastTarget = "citizen";
 
@@ -345,10 +338,6 @@ function doSlaughterMulti(attacker) {
                     --attacker.owned;
                 }
             }
-            //if (targetUnit.owned <= 0) { 
-            //    let leaving = Math.ceil(attacker.owned * Math.random() * attacker.killFatigue);
-            //    attacker.owned -= leaving;
-            //}
         }
     }
     if (kills > 0) {
@@ -424,7 +413,9 @@ function doSack(attacker) {
 function doSackMulti(attacker) {
     //Destroy buildings
     // sack up to % of attacking force
-    let targets = 1 + Math.ceil(Math.random() * attacker.owned * attacker.sackMax);
+    let landTotals = getLandTotals();
+    let targets = Math.min(attacker.owned, landTotals.buildings)
+    targets = 1 + Math.ceil(Math.random() * targets * attacker.sackMax);
     let sacks = 0;
     let lastTarget = "building";
     for (let s = 1; s <= targets; s++) {
@@ -440,11 +431,6 @@ function doSackMulti(attacker) {
             updateRequirements(target);
 
         }
-        //if (isValid(target) && target.owned <= 0) {
-        //    //some will leave
-        //    let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
-        //    attacker.owned -= leaving;
-        //}
         if (attacker.owned < 0) { attacker.owned = 0; }
         if (isValid(target)) {
             updateRequirements(target);
@@ -489,37 +475,7 @@ function doConquer(attacker) {
     if (attacker.owned < 0) { attacker.owned = 0; }
 }
 
-// desecrate graves, maybe altars
-//function doDesecrate(attacker) {
-//    if (civData.graveyard.owned > 0) {
-//        // up to 1% of attacking force or land - this might need adjusting
-//        let targets = Math.min(attacker.owned, civData.graveyard.owned);
-//        let land = Math.ceil(Math.random() * targets * 0.01);
-//        land = Math.min(civData.graveyard.owned, land);
-//        if (land > 0) {
-//            let target = (land == 1) ? "graveyard" : "graveyards";
-
-//            civData.graveyard.owned -= land;
-//            //curCiv.grave.owned -= 1;
-//            if (curCiv.grave.owned > (civData.graveyard.owned * 100)) {
-//                curCiv.grave.owned = curCiv.grave.owned - (civData.graveyard.owned * 100);
-//            }
-//            civData.freeLand.owned += land;
-//            //gameLog(prettify(land) + " " + target + " desecrated by " + attacker.getQtyName(2)); // always plural
-//            gameLog( target + " desecrated by " + attacker.getQtyName(2)); // always plural
-//            // Attackers might leave after conquering land.
-//            if (Math.random() < attacker.sackStop) { attacker.owned -= land; }
-//        }
-//    }
-//    if (civData.graveyard.owned <= 0) {
-//        civData.graveyard.owned = 0;
-//        curCiv.grave.owned = 0;
-//        //some will leave
-//        let leaving = Math.ceil(attacker.owned * Math.random() * attacker.sackFatigue);
-//        attacker.owned -= leaving;
-//    }
-//    if (attacker.owned < 0) { attacker.owned = 0; }
-//}
+// desecrate graves or altars
 function doDesecrate(attacker) {
     let obj = "";
     let total = civData.graveyard.owned + getAltarsOwned();
@@ -535,9 +491,9 @@ function doDesecrate(attacker) {
         }
     }
     if (isValid(obj) && obj.owned > 0) {
-        // up to 1% of attacking force or owned - this might need adjusting
+        // up to 1% of attacking force or owned 
         let targets = Math.min(attacker.owned, obj.owned);
-        let sacked = Math.ceil(Math.random() * targets * 0.01);
+        let sacked = Math.ceil(Math.random() * targets * attacker.sackMax);
         sacked = Math.min(obj.owned, sacked);
         if (sacked > 0) {
             let target = obj.getQtyName(sacked);
@@ -547,7 +503,7 @@ function doDesecrate(attacker) {
                 if (curCiv.grave.owned < 0) { curCiv.grave.owned = 0; }
             }
             else {
-                updateDeity();
+                updateAltars()
             }
             civData.freeLand.owned += sacked;
             gameLog(target + " desecrated by " + attacker.getQtyName(2)); // always plural
@@ -693,9 +649,13 @@ function doMobs() {
 
     let civLimit = population.limit; //population.current// attacks can still happen if there are habitable buildings to destroy, resource to plunder, graves/altars to desecrate
     let totalStuff = population.limit + landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned + altars;
-    //if (population.limit === 0 && landTotals.sackableTotal === 0 && resources === 0 && civData.freeLand.owned === 0 && civData.graveyard.owned === 0 && altars === 0) {
     if (totalStuff === 0) {
         // nothing to do
+        if (civData[mobTypeIds.invader].owned > 0) {
+            // only invaders reduce civ to nothing
+            gameLog(prettify(civData[mobTypeIds.invader].owned) + " invaders go home disappointed"); 
+            civData[mobTypeIds.invader].owned = 0;
+        }
         return false;
     }
     else {
@@ -802,7 +762,7 @@ function doMobs() {
             let mobNum = Math.ceil(civLimit / 50 * Math.random());
             if (population.current === 0) {
                 // no population, let's invade!
-                mobType = mobTypeIds.invader; // they do a bit of everything
+                mobType = mobTypeIds.invader; // they do a lot of everything
                 if (civData[mobType].owned > 0) {
                     // already under attack
                     mobNum = 0;
