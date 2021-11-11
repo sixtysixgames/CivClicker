@@ -645,7 +645,7 @@ function killUnit(unit) {
     //Workers dying may trigger Book of the Dead
     if (civData.book.owned) { civData.piety.owned += 10; }
 
-    if (population.living > 50) {
+    if (population.living > 1) {
         // the greater the population, the less the drop in morale
         adjustMorale(-0.0025 / population.living);
     }
