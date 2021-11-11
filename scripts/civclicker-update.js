@@ -514,12 +514,7 @@ function updateDeity() {
     ui.find("#deityADomain").innerHTML = getCurDeityDomain() ? ", deity of " + idToType(getCurDeityDomain()) : "";
     ui.find("#deityADevotion").innerHTML = civData.devotion.owned;
 
-    let altarID = getCurrentAltarId();
-    let altars = 0;
-    if (isValid(altarID)) {
-        altars = civData[altarID].owned;
-    }
-    ui.find("#deityA" + "Altars").innerHTML = altars;
+    updateAltars()
 
     // Display if we have an active deity, or any old ones.
     ui.show("#deityContainer", hasDeity);
@@ -529,10 +524,20 @@ function updateDeity() {
     ui.show("#iconoclasmGroup", (curCiv.deities.length > 1));
 }
 
+function updateAltars() {
+    let altarID = getCurrentAltarId();
+    let altars = 0;
+    if (isValid(altarID)) {
+        altars = civData[altarID].owned;
+    }
+    ui.find("#deityA" + "Altars").innerHTML = altars;
+}
+
 // Enables or disables availability of activated religious powers.
 // Passive religious benefits are handled by the upgrade system.
 function updateDevotion() {
     ui.find("#deityA" + "Devotion").innerHTML = civData.devotion.owned;
+    updateAltars()
 
     // Process altars
     buildingData.forEach(function (elem) {
