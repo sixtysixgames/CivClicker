@@ -262,11 +262,11 @@ function doBarbarians(attacker) {
 }
 function doInvaders(attacker) {
     let r = Math.random();
-    if (r < 0.24 ) { debug("doSlaughterMulti");doSlaughterMulti(attacker); }
-    else if (r < 0.48) { debug("doLoot");doLoot(attacker); }
-    else if (r < 0.72) { debug("doSackMulti");doSackMulti(attacker); }
-    else if (r < 0.96) { debug("doConquer");doConquer(attacker); }
-    else { debug("doDesecrate"); doDesecrate(attacker); }
+    if (r < 0.24 ) { doSlaughterMulti(attacker); }
+    else if (r < 0.48) { doLoot(attacker); }
+    else if (r < 0.72) { doSackMulti(attacker); }
+    else if (r < 0.96) { doConquer(attacker); }
+    else { doDesecrate(attacker); }
 
     if (civData.freeLand.owned === 0) {
         // this is an attempt to speed up the decline process
@@ -649,11 +649,13 @@ function doMobs() {
 
     let civLimit = population.limit; //population.current// attacks can still happen if there are habitable buildings to destroy, resource to plunder, graves/altars to desecrate
     let totalStuff = population.limit + landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned + altars;
-    if (totalStuff === 0) {
+
+    if (totalStuff < 1) {
+        // resources can be fractional, so we don't check for zero stuff
         // nothing to do
         if (civData[mobTypeIds.invader].owned > 0) {
             // only invaders reduce civ to nothing
-            gameLog(prettify(civData[mobTypeIds.invader].owned) + " invaders go home disappointed"); 
+            gameLog(prettify(civData[mobTypeIds.invader].owned) + " invaders go home disappointed there is nothing to kill, plunder or destroy"); 
             civData[mobTypeIds.invader].owned = 0;
         }
         return false;
@@ -662,17 +664,12 @@ function doMobs() {
         // only attack if something available.
         ++curCiv.attackCounter;
     }
-    //if (civLimit > 0 || landTotals.sackableTotal > 0 || resources > 0 || civData.freeLand.owned > 0 || civData.graveyard.owned > 0 || altars > 0) {
-    //if (totalStuff > 0) {
-    //    // only attack if something available.
-    //    ++curCiv.attackCounter;
-    //}
 
     // overcrowding will speed up attack frequency
     if (civData.freeLand.owned < 0) {
         curCiv.attackCounter += Math.abs(civData.freeLand.owned);
     }
-    let minMinutes = (population.limit > 0) ? 5 : 2; // 5 mins if any population
+    let minMinutes = (population.current > 0) ? 5 : 2; // 5 mins if any population
     let limit = (60 * minMinutes) + Math.floor(60 * minMinutes * Math.random()); //Minimum 5 minutes, max 10
 
     if (curCiv.attackCounter > limit) {
@@ -769,7 +766,7 @@ function doMobs() {
                 }
                 else {
                     // we want loads of attackers, but not too many otherwise the browser breaks
-                    // get the min pop from the max civ this player has reached
+                    // get the min pop from the max civ this player has raided
                     mobNum = civSizes[curCiv.raid.targetMax].min_pop;
                     mobNum = Math.ceil(mobNum * Math.random());
                 }
