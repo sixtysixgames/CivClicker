@@ -586,15 +586,16 @@
                             <h2>Save &amp; Load Controls</h2>
                             <button onmousedown="save('manual')" title="Save your current stats">Manual Save</button><br />
                             <label><input id="toggleAutosave" type="checkbox" onclick="onToggleAutosave(this)" title="Autosave" />Autosave</label><br />
-                            <button onmousedown="reset()" title="Reset your game">Reset Game</button><span class="note"><span id="resetNote"><br />Resetting allows you to </span><span id="resetDeity">gain another deity</span><span id="resetBoth"><br /> and </span><span id="resetWonder">build another Wonder</span></span><br />
-                            <br />
-                            <button onmousedown="deleteSave()" title="Delete your saved stats">Delete Save File</button><br />
-                            <br />
+                            <button onmousedown="reset()" title="Reset your game">Reset Game</button><span class="note"><span id="resetNote"><br />Resetting allows you to </span><span id="resetDeity">gain another deity</span><span id="resetBoth"><br /> and </span><span id="resetWonder">build another Wonder</span></span>
+                            <br /><br />
                             <label>Save game data:</label>
                             <textarea id="impexpField"></textarea>
                             <button id="expButton" onclick="save('export')">Export</button>
                             <button id="expSelect" onclick="document.getElementById('impexpField').select();">Select All</button>
                             <button id="impButton" onclick="load('import')">Import</button>
+                            <br /><br />
+                            <span class="note">Deleting the saved stats removes everything and allows you to start again from scratch</span><br />
+                            <button onmousedown="deleteSave()" title="Delete your saved stats">Delete Saved Stats</button>
                         </div>
                         <div class="column right width33">
                             <div id="sysEventsContainer" class="civSection">
