@@ -596,37 +596,37 @@ function getCivData() {
         }),
         new Upgrade({
             id: "weaponry", name: "Basic Weaponry", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, barracks: 1 },
+            prereqs: { metalwork: true },
             require: { wood: 500, metal: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "shields", name: "Basic Shields", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, barracks: 1 },
+            prereqs: { metalwork: true },
             require: { wood: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "armour", name: "Basic Armour", subType: subTypes.upgrade,
-            prereqs: { metalwork: true, barracks: 1 },
+            prereqs: { metalwork: true },
             require: { metal: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advweaponry", name: "Advanced Weaponry", subType: subTypes.upgrade,
-            prereqs: { weaponry: true, engineering: true, barracks: 100 },
+            prereqs: { weaponry: true, engineering: true, standard: true },
             require: { wood: 2500, metal: 2500, leather: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advshields", name: "Advanced Shields", subType: subTypes.upgrade,
-            prereqs: { shields: true, engineering: true, barracks: 100 },
+            prereqs: { shields: true, engineering: true, standard: true },
             require: { wood: 2500, leather: 2500, metal: 1000 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "advarmour", name: "Advanced Armour", subType: subTypes.upgrade,
-            prereqs: { armour: true, engineering: true, barracks: 100 },
+            prereqs: { armour: true, engineering: true, standard: true },
             require: { leather: 2500, metal: 2500 },
             effectText: "Improve soldiers"
         }),
@@ -847,13 +847,13 @@ function getCivData() {
             id: "commerce", name: "Commerce", subType: subTypes.trade,
             prereqs: { currency: true },
             require: { gold: 50 },
-            effectText: "Traders arrive more frequently, stay longer"
+            effectText: "Traders arrive even more frequently, stay even longer"
         }),
         new Upgrade({
             id: "cornexchange", name: "Corn Exchange", subType: subTypes.trade,
             prereqs: { commerce: true },
             require: { gold: 100 },
-            effectText: "Traders set the cost of resources"
+            effectText: "Traders change the cost of resources"
         }),
         // Prayers
         new Upgrade({
