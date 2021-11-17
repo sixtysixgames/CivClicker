@@ -229,7 +229,8 @@ function getLandTotals() {
 function getResourceTotal() {
     let res = 0;
     for (let i = 0; i < lootable.length; ++i) {
-        res += lootable[i].owned;
+        // resources can be fractional, so we don't count less than 1
+        res += Math.floor(lootable[i].owned);
     }
     return res;
 }
