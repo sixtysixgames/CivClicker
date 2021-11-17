@@ -100,7 +100,7 @@ function doLabourers() {
         });
 
         // labourers use prods more efficiently with mods
-        prod += getLabourerMods();
+        prod += prod * getLabourerMods();
         //increase progress
         curCiv.curWonder.progress += prod / (1000000 * getWonderCostMultiplier());
     }
@@ -110,7 +110,7 @@ function getWonderLowItem() {
     let lowItem = null;
 
     for (let i = 0; i < wonderResources.length; ++i) {
-        if (wonderResources[i].owned < 1) {
+        if (wonderResources[i].owned < civData.labourer.owned) {
             lowItem = wonderResources[i];
             break;
         }
