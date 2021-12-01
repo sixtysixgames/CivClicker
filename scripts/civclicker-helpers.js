@@ -1,5 +1,10 @@
 ﻿"use strict";
-
+/* global achData, civData, civObjType, civSizes, curCiv, population, PATIENT_LIST,
+  alignmentType, buildingData, killable, lootable, matchType, placeType, resourceData, sackable, speciesType, subTypes, unitData, unitType, 
+  getCurDeityDomain, getCustomNumber, getWonderBonus, updateAchievements, updateBuildingButtons, updateDevotion, updateJobButtons, updateMorale, updatePartyButtons, updatePopulation, 
+  updateRequirements, updateResourceRows, updateResourceTotals, updateTargets,  updateUpgrades,
+ gameLog, isValid, makeDeitiesTables, prettify, spawnCat, sysLog, valOf,
+ abs, calcArithSum, logSearchFn, sgn, ui*/
 function getCivType() {
     let civType = civSizes.getCivSize(population.living).name;
     if (population.living === 0 && population.limit >= 1000) {
@@ -449,6 +454,10 @@ function checkResourceLimits() {
 }
 
 function calculatePopulation() {
+
+    if (curCiv.zombie.owned < 0) {
+        curCiv.zombie.owned = 0;
+    }
     population = {
         current: 0,
         living: 0,
@@ -599,7 +608,7 @@ function starve(num) {
 
 function doStarve() {
     let corpsesEaten, numberStarve;
-    if (civData.food.owned < 0 && civData.waste.owned) // Workers eat corpses if needed
+    if (civData.food.owned <= 0 && civData.waste.owned) // Workers eat corpses if needed
     {
         corpsesEaten = Math.min(civData.corpses.owned, -civData.food.owned);
         civData.corpses.owned -= corpsesEaten;
