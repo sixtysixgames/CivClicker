@@ -1,5 +1,10 @@
 ﻿"use strict";
-
+/* global civData, civSizes, curCiv, lootable, population, unitData, 
+ alignmentType, buildingType, combatTypes, mobTypeIds, placeType, speciesType, 
+ adjustMorale, dataset, calculatePopulation, gameLog, 
+ getAltarsOwned, getCurrentAltarId, getLandTotals, getRandomBuilding, getRandomLootableResource, getRandomWorker, getReqText, getResourceTotal,
+ isValid, killUnit, prettify, rndRound, ui, 
+ updateAltars, updateFightBar, updatePartyButtons, updateRequirements, updateResourceTotals, updateTargets */
 // there might be a better way to check this
 // loop over all enemy types
 function isUnderAttack() {
@@ -202,6 +207,16 @@ function doFight(attacker, defender) {
     attacker.owned -= attackerCas;
     defender.owned -= defenderCas;
 
+    // 66g attempt to control zombie pop = population.living <= 0 &&
+    if ( curCiv.zombie.owned > 0) {
+        // kill zombies
+        if (attacker.alignment == alignmentType.player) {
+            curCiv.zombie.owned -= attackerCas;
+        }
+        if (defender.alignment == alignmentType.player) {
+            curCiv.zombie.owned -= defenderCas;
+        }
+    }
     updateFightBar(attacker, defender);
 
     // Give player credit for kills.
@@ -262,7 +277,7 @@ function doBarbarians(attacker) {
 }
 function doInvaders(attacker) {
     let r = Math.random();
-    if (r < 0.24 ) { doSlaughterMulti(attacker); }
+    if (r < 0.24) { doSlaughterMulti(attacker); }
     else if (r < 0.48) { doLoot(attacker); }
     else if (r < 0.72) { doSackMulti(attacker); }
     else if (r < 0.96) { doConquer(attacker); }
@@ -289,7 +304,10 @@ function doSlaughter(attacker) {
             if (Math.random() < attacker.killStop) { --attacker.owned; }
 
             killUnit(targetUnit);
-
+            // 66g attempt to control zombie pop = population.living <= 0 &&
+            if ( curCiv.zombie.owned > 0) {
+                curCiv.zombie.owned -= 1;
+            }
             // Animals will eat the corpse
             if (attacker.species == speciesType.animal) {
                 civData.corpses.owned -= 1;
@@ -300,6 +318,11 @@ function doSlaughter(attacker) {
         else {
             --attacker.owned;
         }
+    }
+    else if ( curCiv.zombie.owned > 0) {
+        // 66g attempt to control zombie pop = population.living <= 0 &&
+        curCiv.zombie.owned -= 1;
+        gameLog("Zombie killed by " + attacker.getQtyName(2)); // always use plural
     }
     if (!isValid(targetUnit) || (isValid(targetUnit) && targetUnit.owned <= 0)) {
         // Attackers slowly leave once everyone is dead
@@ -327,6 +350,10 @@ function doSlaughterMulti(attacker) {
                     if (Math.random() < attacker.killStop) { --attacker.owned; }
 
                     killUnit(targetUnit);
+                    // 66g attempt to control zombie pop = population.living <= 0 &&
+                    if ( curCiv.zombie.owned > 0) {
+                        curCiv.zombie.owned -= 1;
+                    }
                     // Animals will eat the corpse
                     if (attacker.species == speciesType.animal) {
                         civData.corpses.owned -= 1;
@@ -339,10 +366,17 @@ function doSlaughterMulti(attacker) {
                 }
             }
         }
+        else if ( curCiv.zombie.owned > 0) {
+            // 66g attempt to control zombie pop = population.living <= 0 &&
+            curCiv.zombie.owned -= 1;
+            kills++;
+            lastTarget = "zombie";
+        }
     }
     if (kills > 0) {
-        let killVerb = Math.random() < 0.01 ? "captured" : "slaughtered";
-        let killNote = (kills == 1) ? lastTarget + " murdered by " : "citizens " + killVerb + " by ";
+        let who = population.living <= 0 ? "zombies " : "citizens ";
+        let killVerb = Math.random() < 0.001 ? "captured" : "slaughtered";
+        let killNote = (kills == 1) ? lastTarget + " murdered by " : who + killVerb + " by ";
         //gameLog(prettify(kills) + killNote + attacker.getQtyName(2)); // always use plural attacker
         gameLog(killNote + attacker.getQtyName(2)); // always use plural attacker
         calculatePopulation();
@@ -414,7 +448,7 @@ function doSackMulti(attacker) {
     //Destroy buildings
     // sack up to % of attacking force
     let landTotals = getLandTotals();
-    let targets = Math.min(attacker.owned, landTotals.buildings)
+    let targets = Math.min(attacker.owned, landTotals.buildings);
     targets = 1 + Math.ceil(Math.random() * targets * attacker.sackMax);
     let sacks = 0;
     let lastTarget = "building";
@@ -503,7 +537,7 @@ function doDesecrate(attacker) {
                 if (curCiv.grave.owned < 0) { curCiv.grave.owned = 0; }
             }
             else {
-                updateAltars()
+                updateAltars();
             }
             civData.freeLand.owned += sacked;
             gameLog(target + " desecrated by " + attacker.getQtyName(2)); // always plural
@@ -647,15 +681,15 @@ function doMobs() {
     let resources = getResourceTotal();
     let altars = getAltarsOwned();
 
-    let civLimit = population.limit; //population.current// attacks can still happen if there are habitable buildings to destroy, resource to plunder, graves/altars to desecrate
-    let totalStuff = population.limit + landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned + altars;
+    let civLimit = population.limit; //population.current// attacks can still happen if there are habitable buildings to destroy, resources to plunder, graves/altars to desecrate, zombies to hack
+    let totalStuff = population.limit + landTotals.sackableTotal + resources + civData.freeLand.owned + civData.graveyard.owned + altars + curCiv.zombie.owned;
 
     if (totalStuff < 1) {
         // resources can be fractional, so we don't check for zero stuff
         // nothing to do
         if (civData[mobTypeIds.invader].owned > 0) {
             // only invaders reduce civ to nothing
-            gameLog(prettify(civData[mobTypeIds.invader].owned) + " invaders go home disappointed there is nothing to kill, plunder or destroy"); 
+            gameLog(prettify(civData[mobTypeIds.invader].owned) + " invaders go home disappointed there is nothing to kill, plunder or destroy");
             civData[mobTypeIds.invader].owned = 0;
         }
         return false;
