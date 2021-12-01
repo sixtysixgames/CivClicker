@@ -91,7 +91,7 @@ function raiseDead(num) {
     //Update numbers and resource levels
     civData.piety.owned -= calcZombieCost(num);
     curCiv.zombie.owned += num;
-    civData.unemployed.owned += num;
+    civData.unemployed.owned += num; // 66g todo: possibly don't do this if rework zombies
     civData.corpses.owned -= num;
 
     //Notify player
