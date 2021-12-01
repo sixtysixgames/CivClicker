@@ -93,7 +93,7 @@ function updateAfterReset() {
 
 function updateTrader() {
     let isHere = isTraderHere();
-    if (isHere) {
+    if (isHere && civData[curCiv.trader.materialId]) {
         ui.find("#tradeType").innerHTML = civData[curCiv.trader.materialId].getQtyName(curCiv.trader.requested);
         ui.find("#tradeRequested").innerHTML = prettify(curCiv.trader.requested);
         ui.find("#traderTimer").innerHTML = curCiv.trader.timer + " second" + ((curCiv.trader.timer != 1) ? "s" : "");
@@ -227,7 +227,7 @@ function updateResourceTotals() {
 
     // Need to have enough resources to trade
     ui.find("#tradeButton").disabled = !curCiv.trader || !curCiv.trader.timer ||
-        (civData[curCiv.trader.materialId].owned < curCiv.trader.requested);
+        (civData[curCiv.trader.materialId] && civData[curCiv.trader.materialId].owned < curCiv.trader.requested);
 
     // Cheaters don't get names.
     ui.find("#renameRuler").disabled = (curCiv.rulerName == "Cheater");
