@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+/* global civData, isValid, typeToId */
 // Migrate an old savegame to the current format.
 // settingsVarReturn is assumed to be a struct containing a property 'val',
 //   which will be initialized with the new settingsVar object.
