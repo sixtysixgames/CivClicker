@@ -1,4 +1,5 @@
 ﻿"use strict";
+/* global app, dataset, getLandTotals, getPlayingTimeShort, getReqText, isValid, population, settings, ui, updateResourceTotals,  */
 //========== UI functions
 
 // Called when user switches between the various panes on the left hand side of the interface
