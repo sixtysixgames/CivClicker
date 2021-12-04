@@ -966,7 +966,10 @@ button {
     display: block;
 }
 
-.fightBar {
+.raidBar {
+    display: none;
+}
+.mobBar {
     display: none;
 }
 #morale {
