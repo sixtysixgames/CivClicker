@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+/* global civData, curCiv, gameLog, getRandomTradeableResource, isValid, population, prettify, resourceType, sysLog, ui, updateResourceTotals, updateTrader */
 /* Trade functions */
 function setInitTradePrice(civObj) {
     if (!isValid(civObj.initTradeAmount)) { return; }
@@ -12,23 +12,24 @@ function startTrader() {
     if (!checkTradeAmounts(resourceType.herbs)) { return; }
     if (!checkTradeAmounts(resourceType.metal)) { return; }
 
-    // Set timer length (12 sec + 5 sec/upgrade)
-    curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
-
     //let selected = lootable[Math.floor(Math.random() * lootable.length)];
     // select a resource the player actually has some to trade
     let selected = getRandomTradeableResource();
     if (isValid(selected)) {
+        // Set timer length (12 sec + 5 sec/upgrade)
+        curCiv.trader.timer = 12 + (5 * (civData.currency.owned + civData.commerce.owned + civData.stay.owned));
+
         curCiv.trader.materialId = selected.id;
         curCiv.trader.requested = selected.baseTradeAmount * (Math.ceil(Math.random() * 100)); // Up to 20x amount
         // between 75% and 100% of resource limit
-        let limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25)
+        let limit = Math.floor(selected.limit * 0.75) + Math.floor(selected.limit * Math.random() * 0.25);
+        // don't request more than the player can own
         curCiv.trader.requested = Math.min(selected.limit, curCiv.trader.requested);
         // and finally, we don't want less than the initial amount
         if (curCiv.trader.requested < selected.initTradeAmount) {
-            curCiv.trader.requested = selected.initTradeAmount
+            curCiv.trader.requested = selected.initTradeAmount;
         }
-        curCiv.trader.userTraded = false; // has the user sold requested
+        curCiv.trader.userTraded = false; // has the user sold the requested
         updateTrader();
     }
 }
