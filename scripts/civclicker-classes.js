@@ -1,5 +1,6 @@
 "use strict";
-
+/* global alignmentType, civData, civObjType, copyProps, curCiv, placeType, speciesType, subTypes,  
+ isValid */
 function VersionData(major, minor, sub, mod) {
     this.major = major;
     this.minor = minor;
