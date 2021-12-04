@@ -17,10 +17,16 @@
 	along with this program in the LICENSE file.
 	If it is not there, see <http://www.gnu.org/licenses/>.
 **/
+/* global addAchievementRows, addRaidRows, addUITable, addUpgradeRows, addWonderSelectText, alignmentType, calculatePopulation, checkResourceLimits, clearSpecialResourceNets, CivObj, civObjType, civSizes, dataset, 
+ dismissWorkers, doApothecaries, doBlacksmiths, doClerics, doCorpses, doEsiege, doFarmers, doGraveyards, doHealers, doHomeless, doLabourers, doMiners, doMobs, doPestControl, doPlague, 
+ doPurchase, doRaid, doRaidCheck, doShades, doStarve, doTanners, doThrone, doWoodcutters, 
+ gameLog, getCivData, getPlayingTime, indexArrayByAttr, increment, load, makeDeitiesTables, onInvade, onInvadeMult, placeType, renameCiv, renameRuler, 
+ setDefaultSettings, setInitTradeAmount, setInitTradePrice, subTypes, sysLog, testAchievements,  
+ tickAutosave, tickGlory, tickGrace, tickTraders, tickWalk, ui, updateAll, updateResourceTotals, VersionData */
+
 /*
  * Variables
  */
-
 const setup = {};
 
 const app = {
