@@ -1,5 +1,5 @@
 ﻿"use strict";
-
+/* global calculatePopulation, civData, curCiv, gameLog, isValid, ui, updateWonder, wonderCount, wonderResources */
 // Tallies the number of each wonder from the wonders array.
 function tallyWonderCount() {
     wonderCount = {};
@@ -128,9 +128,7 @@ function getWonderProduction() {
 }
 
 function isWonderLimited() {
-    if (curCiv.curWonder.stage !== 1) {
-        return false;
-    }
+    if (curCiv.curWonder.stage !== 1) { return false; }
     let prod = getWonderProduction();
     return (prod < civData.labourer.owned);
 }
