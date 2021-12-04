@@ -1,5 +1,7 @@
 "use strict";
-
+/* global civObjType, alignmentType, buildingData, population, subTypes, unitType, 
+  getCostNote, isValid, onBulkEvent, powerData, sysLog, ui, upgradeData,
+ abs, sgn */
 function createUIComponents() {
     return {
         raidRow: (elem) => {
