@@ -1,5 +1,8 @@
 ﻿"use strict";
-
+/* global civData, curCiv, population, buildingType, unitType,
+ calculatePopulation, getNextPatient, getPietyEarnedBonus, getRandomPatient, getTotalByJob, getWonderBonus, healByJob, spreadPlague,
+ updatePopulation,
+ gameLog, isValid, killUnit, rndRound*/
 // TODO: Need to improve 'net' handling.
 function doFarmers() {
     //Farmers farm food
@@ -327,53 +330,69 @@ function canSpreadPlague() {
 // 66g TODO: this could be improved.  maybe add id of worker to building type
 function dismissWorkers() {
     // we only lose a worker if an occupied building is destroyed
+    //let diff = 0;
+    //let total = 0;
+
+    dismissWorker(unitType.tanner, buildingType.tannery, 1);
+    //total = getTotalByJob(unitType.tanner);
+    //if (total > 0 && total > civData.tannery.owned) {
+    //    diff = total - civData.tannery.owned;
+    //    civData.tanner.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+
+    dismissWorker(unitType.blacksmith, buildingType.smithy, 1);
+    //total = getTotalByJob(unitType.blacksmith);
+    //if (total > 0 && total > civData.smithy.owned) {
+    //    diff = total - civData.smithy.owned;
+    //    civData.blacksmith.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+
+    dismissWorker(unitType.healer, buildingType.apothecary, 1);
+    //total = getTotalByJob(unitType.healer);
+    //if (total > 0 && total > civData.apothecary.owned) {
+    //    diff = total - civData.apothecary.owned;
+    //    civData.healer.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+
+    dismissWorker(unitType.cleric, buildingType.temple, 1);
+    //total = getTotalByJob(unitType.cleric);
+    //if (total > 0 && total > civData.temple.owned) {
+    //    diff = total - civData.temple.owned;
+    //    civData.cleric.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+
+    // these buildings have 10 units
+    dismissWorker(unitType.soldier, buildingType.barracks, 10);
+    //total = getTotalByJob(unitType.soldier);
+    //if (total > 0 && total > civData.barracks.owned * 10) {
+    //    diff = total - (civData.barracks.owned * 10);
+    //    civData.soldier.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+
+    // cavalry 
+    dismissWorker(unitType.cavalry, buildingType.stable, 10);
+    //total = getTotalByJob(unitType.cavalry);
+    //if (total > 0 && total > civData.stable.owned * 10) {
+    //    diff = total - (civData.stable.owned * 10);
+    //    civData.cavalry.owned -= diff;
+    //    civData.unemployed.owned += diff;
+    //}
+}
+function dismissWorker(unitTypeId, buildingTypeId, limit) {
     let diff = 0;
     let total = 0;
 
-    total = getTotalByJob(unitType.tanner);
-    if (total > 0 && total > civData.tannery.owned) {
-        diff = total - civData.tannery.owned;
-        civData.tanner.owned -= diff;
+    total = getTotalByJob(unitTypeId);
+    if (total > 0 && total > civData[buildingTypeId].owned * limit) {
+        diff = total - (civData[buildingTypeId].owned * limit);
+        civData[unitTypeId].owned -= diff;
         civData.unemployed.owned += diff;
     }
-
-    total = getTotalByJob(unitType.blacksmith);
-    if (total > 0 && total > civData.smithy.owned) {
-        diff = total - civData.smithy.owned;
-        civData.blacksmith.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
-
-    total = getTotalByJob(unitType.healer);
-    if (total > 0 && total > civData.apothecary.owned) {
-        diff = total - civData.apothecary.owned;
-        civData.healer.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
-
-    total = getTotalByJob(unitType.cleric);
-    if (total > 0 && total > civData.temple.owned) {
-        diff = total - civData.temple.owned;
-        civData.cleric.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
-
-    // these buildings have 10 units
-    total = getTotalByJob(unitType.soldier);
-    if (total > 0 && total > civData.barracks.owned * 10) {
-        diff = total - (civData.barracks.owned * 10);
-        civData.soldier.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
-
-    // cavalry first
-    total = getTotalByJob(unitType.cavalry);
-    if (total > 0 && total > civData.stable.owned * 10) {
-        diff = total - (civData.stable.owned * 10);
-        civData.cavalry.owned -= diff;
-        civData.unemployed.owned += diff;
-    }
-
 }
 
 function farmerMods(efficiency_base) {
