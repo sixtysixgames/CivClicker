@@ -2,9 +2,9 @@
 /* global civData, civSizes, curCiv, lootable, population, unitData, 
  alignmentType, buildingType, combatTypes, mobTypeIds, placeType, speciesType, 
  adjustMorale, dataset, calculatePopulation, gameLog, 
- getAltarsOwned, getCurrentAltarId, getLandTotals, getRandomBuilding, getRandomLootableResource, getRandomWorker, getReqText, getResourceTotal,
+ getAltarsOwned, getCurrentAltarId, getLandTotals, getPietyEarnedBonus, getRandomBuilding, getRandomLootableResource, getRandomWorker, getReqText, getResourceTotal,
  isValid, killUnit, prettify, rndRound, ui, 
- updateAltars, updateFightBar, updatePartyButtons, updateRequirements, updateResourceTotals, updateTargets */
+ updateAltars, updateRaidBar, updateMobBar, updatePartyButtons, updateRequirements, updateResourceTotals, updateTargets */
 // there might be a better way to check this
 // loop over all enemy types
 function isUnderAttack() {
@@ -208,7 +208,7 @@ function doFight(attacker, defender) {
     defender.owned -= defenderCas;
 
     // 66g attempt to control zombie pop = population.living <= 0 &&
-    if ( curCiv.zombie.owned > 0) {
+    if (curCiv.zombie.owned > 0) {
         // kill zombies
         if (attacker.alignment == alignmentType.player) {
             curCiv.zombie.owned -= attackerCas;
@@ -217,7 +217,6 @@ function doFight(attacker, defender) {
             curCiv.zombie.owned -= defenderCas;
         }
     }
-    updateFightBar(attacker, defender);
 
     // Give player credit for kills.
     let playerCredit = ((attacker.alignment == alignmentType.player) ? defenderCas : (defender.alignment == alignmentType.player) ? attackerCas : 0);
@@ -226,7 +225,7 @@ function doFight(attacker, defender) {
     curCiv.enemySlain.owned += playerCredit;
     if (civData.throne.owned) { civData.throne.count += playerCredit; }
     civData.corpses.owned += (attackerCas + defenderCas);
-    if (civData.book.owned) { civData.piety.owned += (attackerCas + defenderCas) * 10; }
+    if (civData.book.owned) { civData.piety.owned += (attackerCas + defenderCas) * getPietyEarnedBonus(); }
 
     // increase morale for enemy kills.  This is the opposite of losing morale for citizens dying
     // see doStarve and killUnit
@@ -256,8 +255,8 @@ function doWolves(attacker) {
 function doBandits(attacker) {
     // bandits mainly loot
     let r = Math.random();
-    if (r < 0.1) { doSlaughter(attacker); }
-    else if (r < 0.3) { doSack(attacker); }
+    if (r < 0.05) { doSlaughter(attacker); }
+    else if (r < 0.15) { doSack(attacker); }
     else { doLoot(attacker); }
 }
 function doBarbarians(attacker) {
@@ -280,7 +279,7 @@ function doInvaders(attacker) {
     if (r < 0.24) { doSlaughterMulti(attacker); }
     else if (r < 0.48) { doLoot(attacker); }
     else if (r < 0.72) { doSackMulti(attacker); }
-    else if (r < 0.96) { doConquer(attacker); }
+    else if (r < 0.98) { doConquer(attacker); }
     else { doDesecrate(attacker); }
 
     if (civData.freeLand.owned === 0) {
@@ -304,8 +303,8 @@ function doSlaughter(attacker) {
             if (Math.random() < attacker.killStop) { --attacker.owned; }
 
             killUnit(targetUnit);
-            // 66g attempt to control zombie pop = population.living <= 0 &&
-            if ( curCiv.zombie.owned > 0) {
+            // 66g attempt to control zombie pop // population.living <= 0 &&
+            if (curCiv.zombie.owned > 0) {
                 curCiv.zombie.owned -= 1;
             }
             // Animals will eat the corpse
@@ -319,8 +318,8 @@ function doSlaughter(attacker) {
             --attacker.owned;
         }
     }
-    else if ( curCiv.zombie.owned > 0) {
-        // 66g attempt to control zombie pop = population.living <= 0 &&
+    else if (curCiv.zombie.owned > 0) {
+        // 66g attempt to control zombie pop // population.living <= 0 &&
         curCiv.zombie.owned -= 1;
         gameLog("Zombie killed by " + attacker.getQtyName(2)); // always use plural
     }
@@ -350,8 +349,8 @@ function doSlaughterMulti(attacker) {
                     if (Math.random() < attacker.killStop) { --attacker.owned; }
 
                     killUnit(targetUnit);
-                    // 66g attempt to control zombie pop = population.living <= 0 &&
-                    if ( curCiv.zombie.owned > 0) {
+                    // 66g attempt to control zombie pop // population.living <= 0 &&
+                    if (curCiv.zombie.owned > 0) {
                         curCiv.zombie.owned -= 1;
                     }
                     // Animals will eat the corpse
@@ -366,8 +365,8 @@ function doSlaughterMulti(attacker) {
                 }
             }
         }
-        else if ( curCiv.zombie.owned > 0) {
-            // 66g attempt to control zombie pop = population.living <= 0 &&
+        else if (curCiv.zombie.owned > 0) {
+            // 66g attempt to control zombie pop // population.living <= 0 &&
             curCiv.zombie.owned -= 1;
             kills++;
             lastTarget = "zombie";
@@ -394,20 +393,21 @@ function doLoot(attacker) {
     let targetID = getRandomLootableResource();
     let target = civData[targetID];
     if (isValid(target) && target.owned > 0) {
-        let stolenQty = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
-        stolenQty = stolenQty * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items.  TODO: global constant for items
+        let looters = Math.ceil((Math.random() * attacker.owned * attacker.lootMax)); //up to %age of attackers steal.
+        let stolenQty = looters * (1 + Math.floor((Math.random() * 10))); // attackers steal up to 10 items.  TODO: global constant for items
         // target.owned can be decimal.  we can't loot more than is available
         stolenQty = Math.min(stolenQty, Math.floor(target.owned));
         if (stolenQty > 0) {
             target.owned -= stolenQty;
-            if (Math.random() < attacker.lootStop) { --attacker.owned; } // Attackers might leave after stealing something.
+            //if (Math.random() < attacker.lootStop) { --attacker.owned; } // Attackers might leave after stealing something.
+            if (Math.random() < attacker.lootStop) { attacker.owned -= looters; } // Attackers might leave after stealing something.
             //gameLog(prettify(stolenQty) + " " + target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
 
             gameLog(target.getQtyName(stolenQty) + " stolen by " + attacker.getQtyName(2)); // always plural
         }
     }
     if (!isValid(target) || (isValid(target) && target.owned <= 0)) {
-        //some will leave
+        //some will leave after cleaning out resource
         let leaving = Math.ceil(attacker.owned * Math.random() * attacker.lootFatigue);
         attacker.owned -= leaving;
     }
@@ -616,14 +616,14 @@ function doSiege(siegeObj, targetObj) {
 //starts when player clicks button on Conquest page. see invade
 function doRaid(place, attackAlignment, defendAlignment) {
     if (!curCiv.raid.raiding) {
-        ui.show("#fightBar", false);
+        ui.show("#raidBar", false);
         return;
     } // We're not raiding right now.
 
     let attackers = getCombatants(place, attackAlignment);
     let defenders = getCombatants(place, defendAlignment);
 
-    ui.show("#fightBar", attackers.length && defenders.length);
+    ui.show("#raidBar", attackers.length && defenders.length);
 
     if (attackers.length && !defenders.length) { // Win check.
         // Slaughter any losing noncombatant units.
@@ -650,7 +650,10 @@ function doRaid(place, attackAlignment, defendAlignment) {
 
     // Do the actual combat.
     attackers.forEach(function (attacker) {
-        defenders.forEach(function (defender) { doFight(attacker, defender); }); // FIGHT!
+        defenders.forEach(function (defender) {
+            doFight(attacker, defender);
+            updateRaidBar(attacker, defender);
+        });
     });
 
     // Handle siege engines
@@ -715,80 +718,7 @@ function doMobs() {
         if (rnum < rnum2) {
             curCiv.attackCounter = 0;
 
-            // we don't want wolves/bandits attacking large settlements/nations
-            // or barbarians/invaders attacking small ones
-            if (civLimit < civSizes.thorp.min_pop) {
-                // mostly wolves
-                if (Math.random() < 0.99) {
-                    mobType = mobTypeIds.wolf;
-                }
-                else {
-                    mobType = mobTypeIds.bandit;
-                }
-            }
-            else if (civLimit >= civSizes.thorp.min_pop && civLimit < civSizes.village.min_pop) {
-                // mostly wolves
-                if (Math.random() < 0.75) {
-                    mobType = mobTypeIds.wolf;
-                }
-                else {
-                    mobType = mobTypeIds.bandit;
-                }
-            }
-            else if (civLimit >= civSizes.village.min_pop && civLimit < civSizes.town.min_pop) {
-                // wolf or bandit
-                if (Math.random() < 0.5) {
-                    mobType = mobTypeIds.wolf;
-                }
-                else {
-                    mobType = mobTypeIds.bandit;
-                }
-            }
-            else if (civLimit >= civSizes.town.min_pop && civLimit < civSizes.smallCity.min_pop) {
-                // mostly bandits
-                if (Math.random() < 0.75) {
-                    mobType = mobTypeIds.bandit;
-                }
-                else {
-                    mobType = mobTypeIds.barbarian;
-                }
-            }
-            else if (civLimit >= civSizes.smallCity.min_pop && civLimit < civSizes.largeCity.min_pop) {
-                // bandits or barbarians
-                if (Math.random() < 0.5) {
-                    mobType = mobTypeIds.bandit;
-                }
-                else {
-                    mobType = mobTypeIds.barbarian;
-                }
-            }
-            else if (civLimit >= civSizes.largeCity.min_pop && civLimit < civSizes.smallNation.min_pop) {
-                // mostly barbarians
-                if (Math.random() < 0.75) {
-                    mobType = mobTypeIds.barbarian;
-                }
-                else {
-                    mobType = mobTypeIds.invader;
-                }
-            }
-            else if (civLimit >= civSizes.smallNation.min_pop && civLimit < civSizes.largeNation.min_pop) {
-                // barbarians or invaders
-                if (Math.random() < 0.5) {
-                    mobType = mobTypeIds.barbarian;
-                }
-                else {
-                    mobType = mobTypeIds.invader;
-                }
-            }
-            else if (civLimit >= civSizes.largeNation.min_pop) {
-                // mainly invaders 
-                if (Math.random() < 0.25) {
-                    mobType = mobTypeIds.barbarian;
-                }
-                else {
-                    mobType = mobTypeIds.invader;
-                }
-            }
+            mobType = getMobType(civLimit);
 
             let mobNum = Math.ceil(civLimit / 50 * Math.random());
             if (population.current === 0) {
@@ -808,14 +738,109 @@ function doMobs() {
             spawnMob(civData[mobType], mobNum);
         }
     }
+    ui.show("#mobBar", isUnderAttack());
 
     //Handling mob attacks
     getCombatants(placeType.home, alignmentType.enemy).forEach(function (attacker) {
-        if (attacker.owned <= 0) { return; } // In case the last one was killed in an earlier iteration.
+        if (attacker.owned <= 0) {
+            //ui.show("#mobBar", false);
+            return;
+        } // In case the last one was killed in an earlier iteration.
 
         let defenders = getCombatants(attacker.place, alignmentType.player);
-        if (!defenders.length) { attacker.onWin(); return; } // Undefended 
+        
+        if (!defenders.length) {
+            attacker.onWin();
+            //ui.show("#mobBar", false);
+            return;
+        } // Undefended 
 
-        defenders.forEach(function (defender) { doFight(attacker, defender); }); // FIGHT!
+        //ui.show("#mobBar", attacker.length && defender.length);
+
+        defenders.forEach(function (defender) {
+            doFight(attacker, defender);
+            updateMobBar(attacker, defender);
+        });
     });
+    
+}
+
+function getMobType(civLimit) {
+    // we don't want wolves/bandits attacking large settlements/nations
+    // or barbarians/invaders attacking small ones
+    let mobType;
+
+    if (civLimit < civSizes.thorp.min_pop) {
+        // mostly wolves
+        if (Math.random() < 0.99) {
+            mobType = mobTypeIds.wolf;
+        }
+        else {
+            mobType = mobTypeIds.bandit;
+        }
+    }
+    else if (civLimit >= civSizes.thorp.min_pop && civLimit < civSizes.village.min_pop) {
+        // mostly wolves
+        if (Math.random() < 0.75) {
+            mobType = mobTypeIds.wolf;
+        }
+        else {
+            mobType = mobTypeIds.bandit;
+        }
+    }
+    else if (civLimit >= civSizes.village.min_pop && civLimit < civSizes.town.min_pop) {
+        // wolf or bandit
+        if (Math.random() < 0.5) {
+            mobType = mobTypeIds.wolf;
+        }
+        else {
+            mobType = mobTypeIds.bandit;
+        }
+    }
+    else if (civLimit >= civSizes.town.min_pop && civLimit < civSizes.smallCity.min_pop) {
+        // mostly bandits
+        if (Math.random() < 0.75) {
+            mobType = mobTypeIds.bandit;
+        }
+        else {
+            mobType = mobTypeIds.barbarian;
+        }
+    }
+    else if (civLimit >= civSizes.smallCity.min_pop && civLimit < civSizes.largeCity.min_pop) {
+        // bandits or barbarians
+        if (Math.random() < 0.5) {
+            mobType = mobTypeIds.bandit;
+        }
+        else {
+            mobType = mobTypeIds.barbarian;
+        }
+    }
+    else if (civLimit >= civSizes.largeCity.min_pop && civLimit < civSizes.smallNation.min_pop) {
+        // mostly barbarians
+        if (Math.random() < 0.75) {
+            mobType = mobTypeIds.barbarian;
+        }
+        else {
+            mobType = mobTypeIds.invader;
+        }
+    }
+    else if (civLimit >= civSizes.smallNation.min_pop && civLimit < civSizes.largeNation.min_pop) {
+        // barbarians or invaders
+        if (Math.random() < 0.5) {
+            mobType = mobTypeIds.barbarian;
+        }
+        else {
+            mobType = mobTypeIds.invader;
+        }
+    }
+    else if (civLimit >= civSizes.largeNation.min_pop) {
+        // mainly invaders 
+        if (Math.random() < 0.25) {
+            mobType = mobTypeIds.barbarian;
+        }
+        else {
+            mobType = mobTypeIds.invader;
+        }
+    }
+    return mobType;
 }
