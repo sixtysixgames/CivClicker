@@ -1,5 +1,9 @@
 ﻿"use strict";
-
+/* global civData, curCiv,
+  buildingType, deityTypes, deityDomains, lootable, population, resourceType, 
+  adjustMorale, calculatePopulation, calcZombieCost, gameLog, getCustomNumber, getRandomHealthyWorker, updateDeity, updateJobButtons, updateMorale, 
+  updatePopulation, updateResourceTotals, updateUpgrades, 
+  isValid, payFor, prettify, logSearchFn, ui */
 function getCurDeityDomain() {
     return (curCiv.deities.length > 0) ? curCiv.deities[0].domain : undefined;
 }
@@ -203,7 +207,7 @@ function pestControl(length) {
     if (length === undefined) { length = 10; }
     if (civData.piety.owned < (10 * length)) { return; }
     civData.piety.owned -= (10 * length);
-    ui.show("#pestControlGroup", true)
+    ui.show("#pestControlGroup", true);
     civData.pestControl.timer = length * civData.cat.owned;
     gameLog("The vermin are exterminated");
 }
@@ -254,7 +258,7 @@ function smiteMob(mobObj) {
     civData.corpses.owned += num; //xxx Should dead wolves count as corpses?
     curCiv.enemySlain.owned += num;
     if (civData.throne.owned) { civData.throne.count += num; }
-    if (civData.book.owned) { civData.piety.owned += num * 10; }
+    if (civData.book.owned) { civData.piety.owned += num * getPietyEarnedBonus(); }
     gameLog("Struck down " + num + " " + mobObj.getQtyName(num)); // L10N
     return num;
 }
