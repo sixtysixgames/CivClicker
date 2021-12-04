@@ -1,5 +1,9 @@
 "use strict";
-
+/* global abs, achData, alignmentType, armyUnits, basicResources, buildingData, buildingType, calculatePopulation, calcWorkerCost, calcZombieCost, canAfford, canPurchase, 
+ civData, civObjType, civSizes, curCiv, dataset, deityDomains, 
+ getCombatants, getCivType, getCurDeityDomain, getCurrentAltarId, getLandTotals, getReqText, getWonderLowItem, homeBuildings, homeUnits, 
+ idToType, isTraderHere, isUnderAttack, isValid, isWonderLimited, logSearchFn, makeDeitiesTables, meetsPrereqs, onBulkEvent, placeType, population, powerData, prettify, 
+ settings, sgn, subTypes, sysLog, unitData, upgradeData, ui, UIComponents, wonderResources */
 // Update functions. Called by other routines in order to update the interface.
 function updateAll() {
     updateTrader();
@@ -433,8 +437,32 @@ function updateLandBar() {
     barElt.innerHTML = ('<div style="width: ' + p + '%; background-color: ' + bg + '"></div>');
 }
 
-function updateFightBar(attacker, defender) {
-    let barElt = ui.find("#fightBar");
+function updateRaidBar(attacker, defender) {
+    updateFightBar(attacker, defender, "#raidBar");
+    //let barElt = ui.find("#raidBar");
+    //let h = '';
+    //let apc = attacker.owned * 100 / (attacker.owned + defender.owned);
+    //let dpc = 100 - apc;
+
+    //h += '<div class="attacker" style="width: ' + apc + '%"></div>';
+    //h += '<div class="defender" style="width: ' + dpc + '%"></div>';
+
+    //barElt.innerHTML = '<div style="min-width: 100%">' + h + '</div>';
+}
+function updateMobBar(attacker, defender) {
+    updateFightBar(defender, attacker, "#mobBar");
+    //let barElt = ui.find("#mobBar");
+    //let h = '';
+    //let apc = attacker.owned * 100 / (attacker.owned + defender.owned);
+    //let dpc = 100 - apc;
+
+    //h += '<div class="attacker" style="width: ' + apc + '%"></div>';
+    //h += '<div class="defender" style="width: ' + dpc + '%"></div>';
+
+    //barElt.innerHTML = '<div style="min-width: 100%">' + h + '</div>';
+}
+function updateFightBar(attacker, defender, elementId) {
+    let barElt = ui.find(elementId);
     let h = '';
     let apc = attacker.owned * 100 / (attacker.owned + defender.owned);
     let dpc = 100 - apc;
@@ -444,7 +472,6 @@ function updateFightBar(attacker, defender) {
 
     barElt.innerHTML = '<div style="min-width: 100%">' + h + '</div>';
 }
-
 // Check to see if the player has an upgrade and hide as necessary
 // Check also to see if the player can afford an upgrade and enable/disable as necessary
 function updateUpgrades() {
@@ -484,7 +511,7 @@ function updateUpgrades() {
 
     // Deity techs
     ui.show("#deityPane .notYet", (!hasDomain && !canSelectDomain));
-    ui.find("#renameDeity").disabled = (!civData.worship.owned);
+    ui.find("#renameDeity").disabled = !civData.worship.owned;
     ui.show("#battleUpgrades", (getCurDeityDomain() == deityDomains.battle));
     ui.show("#fieldsUpgrades", (getCurDeityDomain() == deityDomains.fields));
     ui.show("#underworldUpgrades", (getCurDeityDomain() == deityDomains.underworld));
@@ -514,7 +541,7 @@ function updateDeity() {
     ui.find("#deityADomain").innerHTML = getCurDeityDomain() ? ", deity of " + idToType(getCurDeityDomain()) : "";
     ui.find("#deityADevotion").innerHTML = civData.devotion.owned;
 
-    updateAltars()
+    updateAltars();
 
     // Display if we have an active deity, or any old ones.
     ui.show("#deityContainer", hasDeity);
@@ -537,7 +564,7 @@ function updateAltars() {
 // Passive religious benefits are handled by the upgrade system.
 function updateDevotion() {
     ui.find("#deityA" + "Devotion").innerHTML = civData.devotion.owned;
-    updateAltars()
+    updateAltars();
 
     // Process altars
     buildingData.forEach(function (elem) {
@@ -798,7 +825,7 @@ function getPlayingTimeShort() {
     let seconds = c % oneMinute;
 
     let ret = "";
-    if (days > 0) { ret += days + ":" }
+    if (days > 0) { ret += days + ":"; }
     
     ret += ('00' + hours).slice(-2) + ":";
     ret += ('00' + mins).slice(-2) + ":";
