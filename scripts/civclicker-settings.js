@@ -1,5 +1,9 @@
 ﻿"use strict";
-
+/* global adjustMorale, app, civData, CivObj, civSizes, curCiv, deleteCookie, getCurDeityDomain, haveDeity, isValid, LZString, makeDeitiesTables, mergeObj, migrateGameData, population,
+ prettify, read_cookie, resetRaiding, saveTypes, selectDeity,
+ setAutosave, setCustomQuantities, setDelimiters, setIcons, setNotes, settings, setShadow, setWorksafe, sysLog, tallyWonderCount, textSize, ui, updateAfterReset,
+ updateDeity, updateDevotion, updateJobButtons, updateMorale, updatePartyButtons, updateRequirements, updateResourceTotals, updateTargets, updateTradeButtons, 
+ updateUpgrades, updateWonder, VersionData */
 function setDefaultSettings() {
     // Here, we ensure that UI is properly configured for our settings.
     // Calling these with no parameter makes them update the UI for the current values.
