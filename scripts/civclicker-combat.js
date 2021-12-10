@@ -742,27 +742,17 @@ function doMobs() {
 
     //Handling mob attacks
     getCombatants(placeType.home, alignmentType.enemy).forEach(function (attacker) {
-        if (attacker.owned <= 0) {
-            //ui.show("#mobBar", false);
-            return;
-        } // In case the last one was killed in an earlier iteration.
+        if (attacker.owned <= 0) { ui.show("#mobBar", false); return; } // In case the last one was killed in an earlier iteration.
 
         let defenders = getCombatants(attacker.place, alignmentType.player);
         
-        if (!defenders.length) {
-            attacker.onWin();
-            //ui.show("#mobBar", false);
-            return;
-        } // Undefended 
-
-        //ui.show("#mobBar", attacker.length && defender.length);
+        if (!defenders.length) { ui.show("#mobBar", false);attacker.onWin(); return; } // Undefended 
 
         defenders.forEach(function (defender) {
             doFight(attacker, defender);
             updateMobBar(attacker, defender);
         });
     });
-    
 }
 
 function getMobType(civLimit) {
