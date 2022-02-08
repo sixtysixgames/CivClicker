@@ -134,7 +134,7 @@ function getUpgradeData() {
         }),
         new Upgrade({
             id: "reaping", name: "Reaping", subType: subTypes.upgrade,
-            prereqs: { farming: true },
+            prereqs: { harvesting: true },
             require: { potions: 500, wood: 500 },
             effectText: "Collect herbs more frequently"
         }),
