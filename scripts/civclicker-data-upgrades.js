@@ -40,7 +40,7 @@ function getUpgradeData() {
             id: "farming", name: "Farming", subType: subTypes.upgrade,
             prereqs: { domestication: true },
             require: { skins: 100, herbs: 100 },
-            effectText: "Increase farmer food output.  Unlock more upgrades"
+            effectText: "Increase farmer food output. Unlock more upgrades"
         }),
         new Upgrade({
             id: "felling", name: "Felling", subType: subTypes.upgrade,
@@ -59,7 +59,7 @@ function getUpgradeData() {
             id: "agriculture", name: "Agriculture", subType: subTypes.upgrade,
             prereqs: { farming: true },
             require: { leather: 1000, metal: 1000 },
-            effectText: "Increase farmer food output.  Unlock more upgrades"
+            effectText: "Increase farmer food output. Unlock more upgrades"
         }),
         
         new Upgrade({
@@ -109,32 +109,32 @@ function getUpgradeData() {
 
         new Upgrade({
             id: "butchering", name: "Butchering", subType: subTypes.upgrade,
-            prereqs: { tannery: 1 },
+            prereqs: { skinning: 1 },
             require: { leather: 40 },
             effectText: "More farmers collect more skins"
         }),
         new Upgrade({
             id: "gardening", name: "Gardening", subType: subTypes.upgrade,
-            prereqs: { apothecary: 1 },
+            prereqs: { harvesting: 1 },
             require: { potions: 40 },
             effectText: "More woodcutters collect more herbs"
         }),
         new Upgrade({
             id: "extraction", name: "Extraction", subType: subTypes.upgrade,
-            prereqs: { prospecting: true, smithy: 1 },
+            prereqs: { prospecting: true },
             require: { metal: 40 },
             effectText: "More miners collect more ore"
         }),
 
         new Upgrade({
             id: "flensing", name: "Flensing", subType: subTypes.upgrade,
-            prereqs: { farming: true },
+            prereqs: { butchering: true },
             require: { leather: 500, food: 500 },
             effectText: "Collect skins more frequently"
         }),
         new Upgrade({
             id: "reaping", name: "Reaping", subType: subTypes.upgrade,
-            prereqs: { harvesting: true },
+            prereqs: { gardening: true },
             require: { potions: 500, wood: 500 },
             effectText: "Collect herbs more frequently"
         }),
@@ -241,19 +241,19 @@ function getUpgradeData() {
         }),
         new Upgrade({
             id: "weaponry", name: "Basic Weaponry", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { wood: 500, metal: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "shields", name: "Basic Shields", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { wood: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
         new Upgrade({
             id: "armour", name: "Basic Armour", subType: subTypes.upgrade,
-            prereqs: { metalwork: true },
+            prereqs: { metalwork: true, barracks: 1 },
             require: { metal: 500, leather: 500 },
             effectText: "Improve soldiers"
         }),
@@ -357,31 +357,31 @@ function getUpgradeData() {
             id: "civilservice", name: "Civil Service", subType: subTypes.upgrade,
             prereqs: { codeoflaws: true },
             require: { piety: 5000 },
-            effectText: "Increase basic resources from clicking.  Increase labourer efficiency"
+            effectText: "Increase basic resources from clicking. Increase labourer efficiency"
         }),
         new Upgrade({
             id: "guilds", name: "Guilds", subType: subTypes.upgrade,
             prereqs: { astronomy: true, mathematics: true, medicine: true },
             require: { piety: 10000 },
-            effectText: "Increase special resources from clicking.  Increase labourer efficiency"
+            effectText: "Increase special resources from clicking. Increase labourer efficiency"
         }),
         new Upgrade({
             id: "feudalism", name: "Feudalism", subType: subTypes.upgrade,
             prereqs: { guilds: true },
             require: { piety: 25000 },
-            effectText: "Further increase basic resources from clicking.  Increase labourer efficiency"
+            effectText: "Further increase basic resources from clicking. Increase labourer efficiency"
         }),
         new Upgrade({
             id: "serfs", name: "Serfs", subType: subTypes.upgrade,
             prereqs: { guilds: true },
             require: { piety: 25000 },
-            effectText: "Idle workers increase resources from clicking.  Increase labourer efficiency"
+            effectText: "Idle workers increase resources from clicking. Increase labourer efficiency"
         }),
         new Upgrade({
             id: "nationalism", name: "Nationalism", subType: subTypes.upgrade,
             prereqs: { civilservice: true },
             require: { piety: 50000 },
-            effectText: "Soldiers increase basic resources from clicking.  Increase labourer efficiency"
+            effectText: "Soldiers increase basic resources from clicking. Increase labourer efficiency"
         }),
 
         new Upgrade({
